@@ -9,19 +9,18 @@ import MuiBreadcrumbs from '@mui/material/Breadcrumbs';
 
 // project import
 import MainCard from '../../components/MainCard';
+import { TMenuItem } from '../../menu-items/types';
 
 export default function Breadcrumbs({ navigation, title, ...others }: any) {
   const location = useLocation();
   const [main, setMain] = useState<any>();
-  const [item, setItem] = useState<any>();
+  const [item, setItem] = useState<TMenuItem>();
 
   // set active item state
   const getCollapse = (menu: any) => {
     if (menu.children) {
       menu.children.filter((collapse: any) => {
-        if (collapse.type && collapse.type === 'collapse') {
-          getCollapse(collapse);
-        } else if (collapse.type && collapse.type === 'item') {
+        if (collapse.type && collapse.type === 'item') {
           if (location.pathname === collapse.url) {
             setMain(menu);
             setItem(collapse);
@@ -47,9 +46,9 @@ export default function Breadcrumbs({ navigation, title, ...others }: any) {
   }
 
   let mainContent;
-  let itemContent;
   let breadcrumbContent = <Typography />;
   let itemTitle = '';
+  let subTitle: string | undefined = '';
 
   // collapse item
   if (main && main.type === 'collapse') {
@@ -63,11 +62,8 @@ export default function Breadcrumbs({ navigation, title, ...others }: any) {
   // items
   if (item && item.type === 'item') {
     itemTitle = item.title;
-    itemContent = (
-      <Typography variant="subtitle1" color="textPrimary">
-        {itemTitle}
-      </Typography>
-    );
+    const subItem = item.subItems?.find((x) => x.url === document.location.pathname);
+    subTitle = subItem?.title;
 
     // main
     if (item.breadcrumbs !== false) {
@@ -77,16 +73,32 @@ export default function Breadcrumbs({ navigation, title, ...others }: any) {
             <Grid item>
               <MuiBreadcrumbs aria-label="breadcrumb">
                 <Typography component={Link} to="/" color="textSecondary" variant="h6" sx={{ textDecoration: 'none' }}>
-                  Home
+                  Trang chủ
                 </Typography>
                 {mainContent}
-                {itemContent}
+                {itemTitle && subTitle ? (
+                  <Typography component={Link} to={item.url} variant="h6" sx={{ textDecoration: 'none' }} color="textSecondary">
+                    {itemTitle}
+                  </Typography>
+                ) : (
+                  <Typography variant="subtitle1" color="textPrimary">
+                    {itemTitle}
+                  </Typography>
+                )}
+
+                {subTitle && (
+                  <Typography variant="subtitle1" color="textPrimary">
+                    {subTitle}
+                  </Typography>
+                )}
               </MuiBreadcrumbs>
             </Grid>
-            {title && (
+            {title && itemTitle && !subTitle ? (
               <Grid item sx={{ mt: 2 }}>
-                <Typography variant="h5">{item.title}</Typography>
+                <Typography variant="h3">{itemTitle}</Typography>
               </Grid>
+            ) : (
+              <></>
             )}
           </Grid>
         </MainCard>

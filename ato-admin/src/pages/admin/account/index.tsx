@@ -1,7 +1,13 @@
+import { Button, Stack } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
 import AppTable from '../../../components/table/AppTable';
+import AppSearchBar from '../../../components/table/SearchBar';
 import { TColumn } from '../../../components/table/types';
+import { ADMIN_URLs } from '../../../constants/admin-urls';
 
-export default function () {
+const Index = () => {
+  const navigate = useNavigate();
+
   const columns: TColumn[] = [
     { id: 'name', label: 'Họ Tên', minWidth: 170 },
     { id: 'role', label: 'Vai Trò', minWidth: 100 },
@@ -46,8 +52,26 @@ export default function () {
     } as TAccount;
   });
 
-  return <AppTable columns={columns} rows={rows} />;
-}
+  const handleViewDetails = (id: any) => navigate(`${ADMIN_URLs.ACCOUNT.DETAILS}?id=${id}`);
+  const handleUpdate = (id: any) => navigate(`${ADMIN_URLs.ACCOUNT.UPDATE}?id=${id}`);
+
+  return (
+    <>
+      <Stack direction={'column'} spacing={2}>
+        <Stack direction={'row'} display={'flex'} alignItems={'start'} justifyContent={'space-between'}>
+          <AppSearchBar placeholder="Nhập tên, vai trò, đơn vị, email, số điện thoại" />
+
+          <Button onClick={() => navigate(ADMIN_URLs.ACCOUNT.CREATE)} type="button" variant="contained" color="primary">
+            Thêm mới
+          </Button>
+        </Stack>
+        <AppTable columns={columns} rows={rows} handleViewDetails={handleViewDetails} handleUpdate={handleUpdate} rowKey="email" />
+      </Stack>
+    </>
+  );
+};
+
+export default Index;
 
 export type TAccount = {
   name: string;

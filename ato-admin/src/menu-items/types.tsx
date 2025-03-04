@@ -8,6 +8,7 @@ export type TMenuItem = {
   external?: boolean;
   disabled?: boolean;
   breadcrumbs?: boolean;
+  subItems?: TMenuItem[];
 };
 
 export type TMenuType = 'group';

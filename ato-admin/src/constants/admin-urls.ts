@@ -2,10 +2,6 @@ export const ADMIN_BASE_URL = '/admin';
 
 export const ADMIN_URLs = {
   DASHBOARD: ADMIN_BASE_URL,
-  AUTHEN: {
-    LOGIN: `${ADMIN_BASE_URL}/login`,
-    REGISTER: `${ADMIN_BASE_URL}/register`
-  },
   SAMPLE_PAGE: '/sample-page',
   ACCOUNT: {
     INDEX: `${ADMIN_BASE_URL}/account`,
@@ -13,8 +9,15 @@ export const ADMIN_URLs = {
     UPDATE: `${ADMIN_BASE_URL}/account/update`,
     DETAILS: `${ADMIN_BASE_URL}/account/details`
   },
-  TOUR: {
-    INDEX: `${ADMIN_BASE_URL}/account/tour`
+  REQUEST: {
+    INDEX: `${ADMIN_BASE_URL}/request`,
+    REPLY: `${ADMIN_BASE_URL}/request/reply`
+  },
+  COMPANY: {
+    INDEX: `${ADMIN_BASE_URL}/company`,
+    CREATE: `${ADMIN_BASE_URL}/company/create`,
+    UPDATE: `${ADMIN_BASE_URL}/company/update`,
+    DETAILS: `${ADMIN_BASE_URL}/company/details`
   },
   NEWS: {
     INDEX: `${ADMIN_BASE_URL}/account/news`

@@ -9,4 +9,7 @@ export type TColumn = {
 export type TAppTable = {
   columns: TColumn[];
   rows: any[];
+  rowKey: 'id' | 'email';
+  handleViewDetails: (id: any) => void;
+  handleUpdate: (id: any) => void;
 };

@@ -4,7 +4,6 @@ import { defineConfig } from 'vite';
 
 export default defineConfig({
   plugins: [react()],
-  base: '/admin', // accessing env variable is not possible here. So hard coding this.
   define: {
     global: 'window'
   },
