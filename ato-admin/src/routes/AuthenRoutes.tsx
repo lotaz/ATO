@@ -2,8 +2,8 @@ import { lazy } from 'react';
 
 // project import
 import Loadable from '../components/Loadable';
+import { AUTHEN_URLs } from '../constants/authen-url';
 import MinimalLayout from '../layout/MinimalLayout';
-import { ADMIN_URLs } from '../constants/admin-urls';
 
 // render - login
 const AuthLogin = Loadable(lazy(() => import('../pages/authentication/login')));
@@ -16,11 +16,11 @@ const AuthenRoutes = {
   element: <MinimalLayout />,
   children: [
     {
-      path: ADMIN_URLs.AUTHEN.LOGIN,
+      path: AUTHEN_URLs.LOGIN,
       element: <AuthLogin />
     },
     {
-      path: ADMIN_URLs.AUTHEN.REGISTER,
+      path: AUTHEN_URLs.REGISTER,
       element: <AuthRegister />
     }
   ]
