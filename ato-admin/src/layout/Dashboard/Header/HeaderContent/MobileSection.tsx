@@ -1,19 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
 
 // material-ui
-import { useTheme } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
-import ClickAwayListener from '@mui/material/ClickAwayListener';
-import Paper from '@mui/material/Paper';
-import IconButton from '@mui/material/IconButton';
-import Popper from '@mui/material/Popper';
-import Toolbar from '@mui/material/Toolbar';
 import Box from '@mui/material/Box';
+import ClickAwayListener from '@mui/material/ClickAwayListener';
+import IconButton from '@mui/material/IconButton';
+import Paper from '@mui/material/Paper';
+import Popper from '@mui/material/Popper';
+import { useTheme } from '@mui/material/styles';
+import Toolbar from '@mui/material/Toolbar';
 
 // project import
-import Search from './Search';
-import Profile from './Profile';
 import Transitions from '../../../../components/@extended/Transitions';
+import Profile from './Profile';
 
 // assets
 import MoreOutlined from '@ant-design/icons/MoreOutlined';
@@ -90,7 +89,6 @@ export default function MobileSection() {
               <ClickAwayListener onClickAway={handleClose}>
                 <AppBar color="inherit">
                   <Toolbar>
-                    <Search />
                     <Profile />
                   </Toolbar>
                 </AppBar>

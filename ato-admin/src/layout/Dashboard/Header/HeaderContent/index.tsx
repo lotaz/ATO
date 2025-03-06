@@ -5,7 +5,6 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 // project import
 import MobileSection from './MobileSection';
 import Profile from './Profile';
-import Search from './Search';
 
 // project import
 
@@ -14,8 +13,7 @@ export default function HeaderContent() {
 
   return (
     <>
-      {!downLG && <Search />}
-      {downLG && <Box sx={{ width: '100%', ml: 1 }} />}
+      {<Box sx={{ width: '100%', ml: 1 }} />}
       {!downLG && <Profile />}
       {downLG && <MobileSection />}
     </>

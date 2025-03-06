@@ -10,7 +10,7 @@ const icons = {
 
 const authentication: TMenu = {
   id: 'authentication',
-  title: 'Xác thực',
+  title: 'Authentication Pages',
   type: 'group',
   children: [
     {
