@@ -1,9 +1,16 @@
 export interface ISignInRequest {
-  email: string;
+  username: string;
   password: string;
 }
 
+export interface ISignInResponse {
+  bear?: string; // Optional string
+  expiration?: Date | null; // Nullable Date (null is allowed)
+  role?: string; // Optional string
+  message?: string;
+}
+
 export interface ISignUpRequest {
-  email: string;
+  username: string;
   password: string;
 }
