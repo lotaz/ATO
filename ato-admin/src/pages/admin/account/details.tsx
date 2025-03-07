@@ -1,22 +1,26 @@
-import { Grid, Stack, Typography, Divider, Box, Chip } from '@mui/material';
-import AppCard from '../../../components/cards/AppCard';
-import Avatar from '@mui/material/Avatar';
 import { UserOutlined } from '@ant-design/icons';
+import { Box, Chip, Divider, Grid, Stack, Typography } from '@mui/material';
+import Avatar from '@mui/material/Avatar';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation } from 'react-router-dom';
+import AppCard from '../../../components/cards/AppCard';
+import { getAccount } from '../../../redux/accountSlice';
+import { RootState } from '../../../redux/store';
+import { User } from '../../../types';
 
 const UserDetails = () => {
-  // Mock data - replace with actual API data later
-  const userInfo = {
-    fullName: 'Nguyễn Văn A',
-    role: 'Quản trị viên',
-    email: 'nguyenvana@example.com',
-    phone: '0123456789',
-    gender: 'Nam',
-    status: 'Đang hoạt động',
-    address: '123 Đường ABC, Quận XYZ, TP.HCM',
-    company: 'Công ty TNHH ABC',
-    joinDate: '01/01/2023',
-    lastActive: '25/11/2023'
-  };
+  const account: User = useSelector((state: RootState) => state.account.specific);
+
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  const accountId = params.get('id');
+  const dispatch = useDispatch<any>();
+
+  useEffect(() => {
+    if (accountId !== null) dispatch(getAccount(accountId));
+  }, [accountId]);
 
   const InfoRow = ({ label, value }: { label: string; value: string }) => (
     <Grid container spacing={2} sx={{ py: 1 }}>
@@ -46,10 +50,14 @@ const UserDetails = () => {
               <UserOutlined style={{ fontSize: '2rem' }} />
             </Avatar>
             <Stack spacing={1}>
-              <Typography variant="h4">{userInfo.fullName}</Typography>
+              <Typography variant="h4">{account?.fullname}</Typography>
               <Stack direction="row" spacing={1}>
-                <Chip label={userInfo.role} color="primary" size="small" />
-                <Chip label={userInfo.status} color={userInfo.status === 'Đang hoạt động' ? 'success' : 'default'} size="small" />
+                <Chip label={account?.roleName} color="primary" size="small" />
+                <Chip
+                  label={account?.isAccountActive ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                  color={account?.isAccountActive ? 'success' : 'default'}
+                  size="small"
+                />
               </Stack>
             </Stack>
           </Stack>
@@ -62,40 +70,14 @@ const UserDetails = () => {
               Thông tin cơ bản
             </Typography>
             <Stack spacing={1}>
-              <InfoRow label="Họ và tên" value={userInfo.fullName} />
-              <InfoRow label="Email" value={userInfo.email} />
-              <InfoRow label="Số điện thoại" value={userInfo.phone} />
-              <InfoRow label="Giới tính" value={userInfo.gender} />
-              <InfoRow label="Địa chỉ" value={userInfo.address} />
+              <InfoRow label="Họ và tên" value={account?.fullname} />
+              <InfoRow label="Email" value={account?.email} />
+              <InfoRow label="Số điện thoại" value={account?.phoneNumber} />
+              <InfoRow label="Giới tính" value={account?.gender ? 'Nam' : 'Nữ'} />
             </Stack>
           </Box>
 
           <Divider />
-
-          {/* Work Information */}
-          <Box>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Thông tin công việc
-            </Typography>
-            <Stack spacing={1}>
-              <InfoRow label="Đơn vị" value={userInfo.company} />
-              <InfoRow label="Vai trò" value={userInfo.role} />
-              <InfoRow label="Trạng thái" value={userInfo.status} />
-            </Stack>
-          </Box>
-
-          <Divider />
-
-          {/* Account Information */}
-          <Box>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Thông tin tài khoản
-            </Typography>
-            <Stack spacing={1}>
-              <InfoRow label="Ngày tham gia" value={userInfo.joinDate} />
-              <InfoRow label="Hoạt động gần nhất" value={userInfo.lastActive} />
-            </Stack>
-          </Box>
         </Stack>
       </AppCard>
     </Stack>

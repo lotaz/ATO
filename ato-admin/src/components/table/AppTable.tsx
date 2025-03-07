@@ -34,9 +34,13 @@ export default function AppTable({ columns, rows, rowKey, handleViewDetails, han
                 #
               </TableCell>
               {columns.map((column, index: number) => (
-                <TableCell key={`column-${index}`} align={column.align} style={{ minWidth: column.minWidth }}>
-                  {column.label}
-                </TableCell>
+                <>
+                  {!column.hidden && (
+                    <TableCell key={`column-${index}`} align={column.align} style={{ minWidth: column.minWidth }}>
+                      {column.label}
+                    </TableCell>
+                  )}
+                </>
               ))}
               <TableCell key={`column-${999}`} align="center" style={{ width: 100 }}>
                 Hành động
@@ -53,9 +57,13 @@ export default function AppTable({ columns, rows, rowKey, handleViewDetails, han
                   {columns.map((column, index: number) => {
                     const value = row[column?.id];
                     return (
-                      <TableCell onClick={() => handleViewDetails(row[rowKey])} key={`record-${index}`} align={column.align}>
-                        {column.format && typeof value === 'number' ? column.format(value) : value}
-                      </TableCell>
+                      <>
+                        {!column.hidden && (
+                          <TableCell onClick={() => handleViewDetails(row[rowKey])} key={`record-${index}`} align={column.align}>
+                            {column.format ? column.format(value) : value}
+                          </TableCell>
+                        )}
+                      </>
                     );
                   })}
                   <TableCell key={`record-${999}`} style={{ width: 100 }}>

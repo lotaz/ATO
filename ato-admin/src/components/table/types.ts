@@ -1,5 +1,19 @@
-// ... existing types
+export type TColumn = {
+  id: string;
+  label?: string;
+  minWidth?: number;
+  align?: 'right' | 'left';
+  hidden?: boolean;
+  format?: (value: any) => string;
+};
 
+export type TAppTable = {
+  columns: TColumn[];
+  rows: any[];
+  rowKey: 'id' | 'email';
+  handleViewDetails: (id: any) => void;
+  handleUpdate: (id: any) => void;
+};
 export interface RequestData {
   id: string;
   title: string;

@@ -1,56 +1,56 @@
-import { Button, Stack } from '@mui/material';
+import { Button, Stack, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import AppTable from '../../../components/table/AppTable';
 import AppSearchBar from '../../../components/table/SearchBar';
 import { TColumn } from '../../../components/table/types';
 import { ADMIN_URLs } from '../../../constants/admin-urls';
+import { RootState } from '../../../redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { useEffect } from 'react';
+import { getAccounts } from '../../../redux/accountSlice';
+export type User = {
+  email: string;
+  phoneNumber: string;
+  fullname: string;
+  gender: boolean; // True or false
+  dob: string; // ISO 8601 format date string
+  isAccountActive: boolean;
+  roleName: string;
+};
 
 const Index = () => {
   const navigate = useNavigate();
 
+  const accounts: any = useSelector((state: RootState) => state.account.data);
+  const dispatch = useDispatch<any>();
+
+  useEffect(() => {
+    dispatch(getAccounts());
+  }, []);
+
   const columns: TColumn[] = [
-    { id: 'name', label: 'Họ Tên', minWidth: 170 },
-    { id: 'role', label: 'Vai Trò', minWidth: 100 },
-    {
-      id: 'company',
-      label: 'Đơn Vị',
-      minWidth: 170,
-      format: (value: number) => value.toLocaleString('en-US')
-    },
+    { id: 'id', hidden: true },
+    { id: 'fullname', label: 'Họ Tên', minWidth: 170 },
+    { id: 'roleName', label: 'Vai Trò', minWidth: 100 },
     {
       id: 'email',
       label: 'Email',
       minWidth: 170,
-      format: (value: number) => value.toLocaleString('en-US')
+      format: (value: any) => value.toLocaleString('en-US')
     },
     {
-      id: 'phone',
+      id: 'phoneNumber',
       label: 'Số điện thoại',
       minWidth: 170,
-      format: (value: number) => value.toFixed(2)
+      format: (value: any) => value?.toFixed(2)
     },
     {
-      id: 'status',
+      id: 'isAccountActive',
       label: 'Trạng thái',
       minWidth: 170,
-      format: (value: number) => value.toFixed(2)
+      format: (value: any) => (value ? 'Đang hoạt động' : 'Ngừng hoạt động ')
     }
   ];
-
-  const records = Array(100)
-    .fill()
-    .map((_, index) => index + 1);
-
-  const rows: TAccount[] = Array.from(records, (index: number) => {
-    return {
-      name: `Nguyễn Văn ${index}`,
-      company: `Công ty ${index}`,
-      role: 'Quản trị viên',
-      email: `Email${index}@gmail.com`,
-      phone: '0123456' + index,
-      status: 'Đang hoạt động'
-    } as TAccount;
-  });
 
   const handleViewDetails = (id: any) => navigate(`${ADMIN_URLs.ACCOUNT.DETAILS}?id=${id}`);
   const handleUpdate = (id: any) => navigate(`${ADMIN_URLs.ACCOUNT.UPDATE}?id=${id}`);
@@ -65,19 +65,14 @@ const Index = () => {
             Thêm mới
           </Button>
         </Stack>
-        <AppTable columns={columns} rows={rows} handleViewDetails={handleViewDetails} handleUpdate={handleUpdate} rowKey="email" />
+        {accounts && (
+          <AppTable columns={columns} rows={accounts} handleViewDetails={handleViewDetails} handleUpdate={handleUpdate} rowKey="id" />
+        )}
+
+        {!accounts && <Typography>Không tìm thấy dữ liệu tài khoản.</Typography>}
       </Stack>
     </>
   );
 };
 
 export default Index;
-
-export type TAccount = {
-  name: string;
-  role: string;
-  company: string;
-  email: string;
-  phone: string;
-  status: string;
-};

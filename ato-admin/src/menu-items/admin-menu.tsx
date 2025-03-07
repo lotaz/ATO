@@ -5,7 +5,6 @@ import { TMenu } from './types';
 
 const adminMenu: TMenu = {
   id: 'pages',
-  title: 'Admin Pages',
   type: 'group',
   children: [
     {
