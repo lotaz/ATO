@@ -12,8 +12,11 @@ import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
 import UserOutlined from '@ant-design/icons/UserOutlined';
 
 // ==============================|| HEADER PROFILE - PROFILE TAB ||============================== //
+interface IProps {
+  handleLogout: () => void;
+}
 
-export default function ProfileTab() {
+export default function ProfileTab({ handleLogout }: IProps) {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
   const handleListItemClick = (index: any) => {
@@ -33,7 +36,7 @@ export default function ProfileTab() {
         <ListItemIcon>
           <LogoutOutlined />
         </ListItemIcon>
-        <ListItemText primary="Thoát" />
+        <ListItemText onClick={handleLogout} primary="Thoát" />
       </ListItemButton>
     </List>
   );
