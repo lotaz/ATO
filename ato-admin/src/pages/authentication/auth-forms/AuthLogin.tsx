@@ -1,6 +1,6 @@
 import PropTypes from 'prop-types';
-import React from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 
 // material-ui
 import Button from '@mui/material/Button';
@@ -26,32 +26,48 @@ import AnimateButton from '../../../components/@extended/AnimateButton';
 // assets
 import EyeInvisibleOutlined from '@ant-design/icons/EyeInvisibleOutlined';
 import EyeOutlined from '@ant-design/icons/EyeOutlined';
+import { useDispatch, useSelector } from 'react-redux';
+import { signin } from '../../../redux/authenSlice';
+import { RootState } from '../../../redux/store';
+import { ISignInRequest } from '../../../services/authen/types';
 
 // ============================|| JWT - LOGIN ||============================ //
 
 export default function AuthLogin() {
   const [checked, setChecked] = React.useState(false);
+  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.authen.user);
+
+  useEffect(() => {
+    console.log('user', user);
+    if (user !== null) navigate('/');
+  }, [user]);
 
   const [showPassword, setShowPassword] = React.useState(false);
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
   };
 
+  const dispatch = useDispatch<any>();
+
   const handleMouseDownPassword = (event: any) => {
     event.preventDefault();
   };
 
+  const handleSubmit = (e: ISignInRequest) => dispatch(signin({ username: e.username, password: e.password }));
+
   return (
     <>
       <Formik
-        onSubmit={() => {}}
-        initialValues={{
-          email: '',
-          password: '',
-          submit: null
-        }}
-        validationSchema={Yup.object().shape({
-          email: Yup.string().email('Cần nhập đúng địa chỉ email').max(255).required('Nhập tên đăng nhập'),
+        onSubmit={(e) => handleSubmit(e)}
+        initialValues={
+          {
+            username: '',
+            password: ''
+          } as ISignInRequest
+        }
+        validationSchema={Yup.object<ISignInRequest>().shape({
+          username: Yup.string().max(50).required('Nhập tên đăng nhập'),
           password: Yup.string().max(255).required('Nhập mật khẩu')
         })}
       >
@@ -63,19 +79,19 @@ export default function AuthLogin() {
                   <InputLabel htmlFor="email-login">Tên đăng nhập</InputLabel>
                   <OutlinedInput
                     id="email-login"
-                    type="email"
-                    value={values.email}
-                    name="email"
+                    type="text"
+                    value={values.username}
+                    name="username"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     placeholder="Nhập tên đăng nhập"
                     fullWidth
-                    error={Boolean(touched.email && errors.email)}
+                    error={Boolean(touched.username && errors.username)}
                   />
                 </Stack>
-                {touched.email && errors.email && (
+                {touched.username && errors.username && (
                   <FormHelperText error id="standard-weight-helper-text-email-login">
-                    {errors.email}
+                    {errors.username}
                   </FormHelperText>
                 )}
               </Grid>
@@ -133,9 +149,9 @@ export default function AuthLogin() {
                   </Link>
                 </Stack>
               </Grid>
-              {errors.submit && (
+              {errors.username && (
                 <Grid item xs={12}>
-                  <FormHelperText error>{errors.submit}</FormHelperText>
+                  <FormHelperText error>{errors.username}</FormHelperText>
                 </Grid>
               )}
               <Grid item xs={12}>
