@@ -8,6 +8,9 @@ import AuthenRoutes from './AuthenRoutes';
 import AdminRoutes from './admin';
 import ContentModeratorRoutes from './content-moderator';
 import { TRoute } from './types';
+import TourGuideRoutes from './tour-guide';
+import TourCompanyRoutes from './tourism-company';
+import TourFacilityoutes from './tourism-facility';
 
 // ==============================|| ROUTING RENDER ||============================== //
 const Index = Loadable(lazy(() => import('../pages/index')));
@@ -23,6 +26,9 @@ const IndexRoutes: TRoute = {
   ]
 };
 
-const router = createBrowserRouter([IndexRoutes, AuthenRoutes, AdminRoutes, ContentModeratorRoutes], { basename: '/' });
+const router = createBrowserRouter(
+  [IndexRoutes, AuthenRoutes, AdminRoutes, ContentModeratorRoutes, TourGuideRoutes, TourCompanyRoutes, TourFacilityoutes],
+  { basename: '/' }
+);
 
 export default router;
