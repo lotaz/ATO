@@ -1,5 +1,5 @@
 import PropTypes from 'prop-types';
-import { useMemo } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import useMediaQuery from '@mui/material/useMediaQuery';
 import Drawer from '@mui/material/Drawer';
@@ -13,6 +13,10 @@ import MiniDrawerStyled from './MiniDrawerStyled';
 import { drawerWidth } from '../../../config';
 import { handlerDrawerOpen, useGetMenuMaster } from '../../../api/menu';
 import { Theme } from '@mui/system';
+import { useSelector } from 'react-redux';
+import { RootState } from '../../../redux/store';
+import { useNavigate } from 'react-router-dom';
+import { AUTHEN_URLs } from '../../../constants/authen-url';
 
 // ==============================|| MAIN LAYOUT - DRAWER ||============================== //
 
@@ -20,6 +24,13 @@ export default function MainDrawer({ window }: any) {
   const { menuMaster } = useGetMenuMaster();
   const drawerOpen = menuMaster?.isDashboardDrawerOpened;
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
+
+  const user: any = useSelector((state: RootState) => state.authen.user);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user === null) navigate(AUTHEN_URLs.LOGIN);
+  }, [user]);
 
   // responsive drawer container
   const container = window !== undefined ? () => window().document.body : undefined;

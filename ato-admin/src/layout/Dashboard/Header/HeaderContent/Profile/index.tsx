@@ -23,8 +23,12 @@ import ProfileTab from './ProfileTab';
 
 // assets
 import LogoutOutlined from '@ant-design/icons/LogoutOutlined';
+import { useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import avatar1 from '../../../../../assets/images/users/avatar-1.png';
-
+import { AUTHEN_URLs } from '../../../../../constants/authen-url';
+import { RootState } from '../../../../../redux/store';
+import { UserInfo } from '../../../../../types';
 // tab panel wrapper
 function TabPanel({ children, value, index, ...other }: any) {
   return (
@@ -51,6 +55,12 @@ export default function Profile() {
     }
     setOpen(false);
   };
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    navigate(AUTHEN_URLs.SIGN_OUT);
+  };
+  const user: UserInfo | null = useSelector((state: RootState) => state.authen.user);
 
   const iconBackColorOpen = 'grey.100';
 
@@ -73,7 +83,7 @@ export default function Profile() {
         <Stack direction="row" spacing={1.25} alignItems="center" sx={{ p: 0.5 }}>
           <Avatar alt="profile user" src={avatar1} size="sm" />
           <Typography variant="subtitle1" sx={{ textTransform: 'capitalize' }}>
-            Admin
+            {user?.name}
           </Typography>
         </Stack>
       </ButtonBase>
@@ -106,16 +116,16 @@ export default function Profile() {
                         <Stack direction="row" spacing={1.25} alignItems="center">
                           <Avatar alt="profile user" src={avatar1} sx={{ width: 32, height: 32 }} />
                           <Stack>
-                            <Typography variant="h6">Admin</Typography>
+                            <Typography variant="h6"> {user?.name}</Typography>
                             <Typography variant="body2" color="text.secondary">
-                              Admin
+                              {user?.role}
                             </Typography>
                           </Stack>
                         </Stack>
                       </Grid>
                       <Grid item>
                         <Tooltip title="Logout">
-                          <IconButton size="large" sx={{ color: 'text.primary' }}>
+                          <IconButton onClick={handleLogout} size="large" sx={{ color: 'text.primary' }}>
                             <LogoutOutlined />
                           </IconButton>
                         </Tooltip>
@@ -123,7 +133,7 @@ export default function Profile() {
                     </Grid>
                   </CardContent>
 
-                  <ProfileTab />
+                  <ProfileTab handleLogout={handleLogout} />
                 </MainCard>
               </ClickAwayListener>
             </Paper>
