@@ -5,7 +5,6 @@ import { TMenu } from './types';
 
 const contentModeratorMenu: TMenu = {
   id: 'pages',
-  title: 'Content Moderator Pages',
   type: 'group',
   children: [
     {
