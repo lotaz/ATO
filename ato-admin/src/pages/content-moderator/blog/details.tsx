@@ -1,156 +1,141 @@
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
-import { Avatar, Box, Button, Chip, Divider, Grid, Stack, Typography } from '@mui/material';
-import { useNavigate, useParams } from 'react-router-dom';
+import { Box, Button, Chip, Divider, Grid, Stack, Typography } from '@mui/material';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
 import AppCard from '../../../components/cards/AppCard';
-import { ADMIN_URLs } from '../../../constants/admin-urls';
 import { CONTENT_MODERATOR_URLs } from '../../../constants/content-moderator-urls';
-
-interface NewsDetails {
-  id: string;
-  title: string;
-  category: string;
-  author: string;
-  authorAvatar?: string;
-  publishDate: string;
-  content: string;
-  image: string;
-  status: 'draft' | 'published' | 'archived';
-  views: number;
-  tags: string[];
-  readTime: string;
-}
+import { getBlog, getBlogStatusText, getBlogTypeText } from '../../../redux/blogSlice';
+import { RootState } from '../../../redux/store';
+import { BlogStatus } from '../../../services/blog/types';
 
 const BlogDetails = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const dispatch = useDispatch<any>();
 
-  // Mock data - thay thế bằng API call sau
-  const newsInfo: NewsDetails = {
-    id: 'TT-001',
-    title: 'Du lịch Hạ Long mùa thu - Khám phá vẻ đẹp thiên nhiên kỳ vĩ',
-    category: 'Du lịch trong nước',
-    author: 'Nguyễn Văn A',
-    authorAvatar: 'https://xsgames.co/randomusers/avatar.php?g=pixel',
-    publishDate: '20/02/2024',
-    content: `Vịnh Hạ Long mùa thu mang một vẻ đẹp khác biệt với nắng dịu, gió mát và những hòn đảo được bao phủ trong sương sớm mờ ảo. 
-    Đây là thời điểm lý tưởng để du khách có thể tận hưởng những trải nghiệm tuyệt vời nhất tại di sản thiên nhiên thế giới này.
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
 
-    Trong bài viết này, chúng tôi sẽ chia sẻ những điểm đến không thể bỏ qua, các hoạt động thú vị và những lưu ý quan trọng khi du lịch Hạ Long vào mùa thu...`,
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592',
-    status: 'published',
-    views: 1250,
-    tags: ['Du lịch', 'Hạ Long', 'Mùa thu', 'Khám phá'],
-    readTime: '5 phút'
-  };
+  const id = params.get('id');
+  const { currentBlog: blog, loading } = useSelector((state: RootState) => state.blog);
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'published':
-        return 'success';
-      case 'draft':
-        return 'warning';
-      case 'archived':
-        return 'default';
-      default:
-        return 'default';
+  useEffect(() => {
+    if (id) {
+      dispatch(getBlog(id));
     }
+  }, [id, dispatch]);
+
+  const getImageUrl = (linkImg: string) => {
+    if (!linkImg) return '';
+    if (linkImg.startsWith('http')) {
+      return linkImg;
+    }
+    if (linkImg.includes('/uploads/')) {
+      return `https://localhost:8081${linkImg}`;
+    }
+    return linkImg;
   };
 
-  const getStatusText = (status: string) => {
-    switch (status) {
-      case 'published':
-        return 'Đã đăng';
-      case 'draft':
-        return 'Bản nháp';
-      case 'archived':
-        return 'Đã lưu trữ';
-      default:
-        return status;
-    }
-  };
+  if (loading || !blog) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Stack spacing={3}>
-      <Button startIcon={<ArrowLeftOutlined />} onClick={() => navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX)} sx={{ width: 'fit-content' }}>
-        Quay lại danh sách
-      </Button>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Button variant="text" startIcon={<ArrowLeftOutlined />} onClick={() => navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX)}>
+          Quay lại
+        </Button>
+      </Stack>
 
       <AppCard>
+        <Typography variant="h3" textAlign={'center'}>
+          Chi tiết tin tức
+        </Typography>
         <Stack spacing={3}>
-          {/* Header Section */}
-          <Stack direction="row" justifyContent="space-between" alignItems="start">
-            <Stack spacing={2}>
-              <Typography variant="h3">{newsInfo.title}</Typography>
-              <Stack direction="row" spacing={1} alignItems="center">
-                <Chip label={newsInfo.category} color="primary" size="small" />
-                <Chip label={getStatusText(newsInfo.status)} color={getStatusColor(newsInfo.status)} size="small" />
-                <Typography variant="body2" color="textSecondary">
-                  • {newsInfo.readTime} đọc
-                </Typography>
-              </Stack>
-            </Stack>
+          <Box
+            sx={{
+              width: '100%',
+              height: 400,
+              overflow: 'hidden',
+              borderRadius: 1
+            }}
+          >
+            <img
+              src={getImageUrl(blog.linkImg)}
+              alt={blog.title}
+              style={{
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover'
+              }}
+            />
+          </Box>
+
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="h4">{blog.title}</Typography>
             <Button
               variant="contained"
-              color="primary"
               startIcon={<EditOutlined />}
-              onClick={() => navigate(`${CONTENT_MODERATOR_URLs.BLOG.UPDATE}?id=${newsInfo.id}`)}
+              onClick={() => navigate(`${CONTENT_MODERATOR_URLs.BLOG.UPDATE}?id=${blog.blogId}`)}
             >
               Chỉnh sửa
             </Button>
           </Stack>
 
-          {/* Author Info */}
-          <Stack direction="row" spacing={2} alignItems="center">
-            <Avatar src={newsInfo.authorAvatar} alt={newsInfo.author} sx={{ width: 48, height: 48 }} />
-            <Stack spacing={0}>
-              <Typography variant="subtitle1">{newsInfo.author}</Typography>
-              <Typography variant="body2" color="textSecondary">
-                Đăng ngày {newsInfo.publishDate} • {newsInfo.views} lượt xem
-              </Typography>
-            </Stack>
-          </Stack>
-
           <Divider />
 
-          {/* Featured Image */}
-          <Box
-            component="img"
-            src={newsInfo.image}
-            alt={newsInfo.title}
-            sx={{
-              width: '100%',
-              height: 400,
-              objectFit: 'cover',
-              borderRadius: 1
-            }}
-          />
-
-          {/* Content */}
-          <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-            {newsInfo.content}
-          </Typography>
-
-          <Divider />
-
-          {/* Statistics */}
-          <Box>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Thống kê
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={4}>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={8}>
+              <Stack spacing={3}>
+                <Typography variant="body1">{blog.description}</Typography>
+                <div dangerouslySetInnerHTML={{ __html: blog.content }} />
+              </Stack>
+            </Grid>
+            <Grid item xs={12} md={4}>
+              <Stack spacing={2}>
                 <AppCard>
-                  <Stack spacing={1} alignItems="center">
-                    <Typography variant="h4">{newsInfo.views}</Typography>
-                    <Typography variant="body2" color="textSecondary">
-                      Lượt xem
-                    </Typography>
+                  <Stack spacing={2}>
+                    <Typography variant="h6">Thông tin</Typography>
+                    <Stack spacing={1}>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography color="textSecondary">Trạng thái</Typography>
+                        <Chip
+                          label={getBlogStatusText(blog.blogStatus)}
+                          color={blog.blogStatus === BlogStatus.Approval ? 'success' : 'default'}
+                          size="small"
+                        />
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography color="textSecondary">Loại</Typography>
+                        <Typography>{getBlogTypeText(blog.blogType)}</Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography color="textSecondary">Người tạo</Typography>
+                        <Typography>{blog.createByName}</Typography>
+                      </Stack>
+                      <Stack direction="row" justifyContent="space-between">
+                        <Typography color="textSecondary">Ngày tạo</Typography>
+                        <Typography>{new Date(blog.createDate).toLocaleDateString()}</Typography>
+                      </Stack>
+                      {blog.updateTime && (
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography color="textSecondary">Cập nhật lần cuối</Typography>
+                          <Typography>{new Date(blog.updateTime).toLocaleDateString()}</Typography>
+                        </Stack>
+                      )}
+                      {blog.replyRequest && (
+                        <Stack direction="row" justifyContent="space-between">
+                          <Typography color="textSecondary">Phản hồi</Typography>
+                          <Typography>{blog.replyRequest}</Typography>
+                        </Stack>
+                      )}
+                    </Stack>
                   </Stack>
                 </AppCard>
-              </Grid>
-              {/* Add more statistics cards as needed */}
+              </Stack>
             </Grid>
-          </Box>
+          </Grid>
         </Stack>
       </AppCard>
     </Stack>

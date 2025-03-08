@@ -13,10 +13,12 @@ import MiniDrawerStyled from './MiniDrawerStyled';
 import { drawerWidth } from '../../../config';
 import { handlerDrawerOpen, useGetMenuMaster } from '../../../api/menu';
 import { Theme } from '@mui/system';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../../redux/store';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AUTHEN_URLs } from '../../../constants/authen-url';
+import authenSlice from '../../../redux/authenSlice';
+import { enqueueSnackbar } from 'notistack';
 
 // ==============================|| MAIN LAYOUT - DRAWER ||============================== //
 
@@ -25,12 +27,23 @@ export default function MainDrawer({ window }: any) {
   const drawerOpen = menuMaster?.isDashboardDrawerOpened;
   const matchDownMD = useMediaQuery((theme: Theme) => theme.breakpoints.down('lg'));
 
-  const user: any = useSelector((state: RootState) => state.authen.user);
   const navigate = useNavigate();
+  const dispatch = useDispatch<any>();
+
+  const { signOut } = authenSlice.actions;
+
+  const { pathname } = useLocation();
 
   useEffect(() => {
-    if (user === null) navigate(AUTHEN_URLs.LOGIN);
-  }, [user]);
+    const token = sessionStorage.getItem('token');
+
+    if (!token) {
+      enqueueSnackbar('Mã truy cập hết hạn vui lòng đăng nhập lại', { variant: 'error' });
+
+      dispatch(signOut());
+      navigate(AUTHEN_URLs.LOGIN);
+    }
+  }, [pathname]);
 
   // responsive drawer container
   const container = window !== undefined ? () => window().document.body : undefined;
