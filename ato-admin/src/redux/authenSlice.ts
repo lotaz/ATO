@@ -34,16 +34,17 @@ const authenSlice = createSlice({
       } else {
         const user = decryptJWT(bear);
 
-        state.user = user;
+        state.user = user!;
 
         sessionStorage.setItem('token', bear);
         sessionStorage.setItem('user', JSON.stringify(user));
-        enqueueSnackbar('Đăng nhập thành công');
+
+        enqueueSnackbar('Đăng nhập thành công', { variant: 'success' });
       }
     });
 
     builder.addCase(signin.rejected, () => {
-      enqueueSnackbar('Tài khoản hoặc mật khẩu không chính xác');
+      enqueueSnackbar('Tài khoản hoặc mật khẩu không chính xác', { variant: 'error' });
     });
 
     builder.addCase(signup.fulfilled, (_, action) => {

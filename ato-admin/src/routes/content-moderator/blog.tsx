@@ -1,29 +1,29 @@
 import { lazy } from 'react';
-import Loadable from '../../components/Loadable';
 import { CONTENT_MODERATOR_URLs } from '../../constants/content-moderator-urls';
 import { TRouteItem } from '../types';
+import Loadable from '../../components/Loadable';
 
-const List = Loadable(lazy(() => import('../../pages/content-moderator/blog/index')));
-const Create = Loadable(lazy(() => import('../../pages/content-moderator/blog/create')));
-const Update = Loadable(lazy(() => import('../../pages/content-moderator/blog/update')));
-const Details = Loadable(lazy(() => import('../../pages/content-moderator/blog/details')));
+const BlogList = Loadable(lazy(() => import('../../pages/content-moderator/blog/index')));
+const BlogCreate = Loadable(lazy(() => import('../../pages/content-moderator/blog/create')));
+const BlogUpdate = Loadable(lazy(() => import('../../pages/content-moderator/blog/update')));
+const BlogDetails = Loadable(lazy(() => import('../../pages/content-moderator/blog/details')));
 
 const ManageBlogRoutes: TRouteItem[] = [
   {
     path: CONTENT_MODERATOR_URLs.BLOG.INDEX,
-    element: <List />
+    element: <BlogList />
   },
   {
     path: CONTENT_MODERATOR_URLs.BLOG.CREATE,
-    element: <Create />
+    element: <BlogCreate />
   },
   {
-    path: CONTENT_MODERATOR_URLs.BLOG.UPDATE,
-    element: <Update />
+    path: `${CONTENT_MODERATOR_URLs.BLOG.UPDATE}`,
+    element: <BlogUpdate />
   },
   {
-    path: CONTENT_MODERATOR_URLs.BLOG.DETAILS,
-    element: <Details />
+    path: `${CONTENT_MODERATOR_URLs.BLOG.DETAILS}`,
+    element: <BlogDetails />
   }
 ];
 
