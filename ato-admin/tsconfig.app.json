@@ -22,7 +22,7 @@
       "noUnusedParameters": true,
       "noFallthroughCasesInSwitch": true,
       "noUncheckedSideEffectImports": true,
-      "types": ["redux-persist", "lodash"]
+      "types": ["redux-persist", "lodash", "node"]
 
     },
     "include": ["src"]
