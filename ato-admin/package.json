@@ -11,7 +11,8 @@
     "preview": "vite preview",
     "lint": "eslint \"src/**/*.{js,jsx,ts,tsx}\"",
     "lint:fix": "eslint --fix \"src/**/*.{js,jsx,ts,tsx}\"",
-    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\""
+    "prettier": "prettier --write \"src/**/*.{js,jsx,ts,tsx}\"",
+    "server": "node server.js"
   },
   "dependencies": {
     "@ant-design/colors": "^7.0.2",
@@ -90,6 +91,7 @@
     "@babel/eslint-parser": "^7.23.10",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@types/lodash": "^4.17.15",
+    "@types/node": "^22.13.9",
     "@types/react": "^18.0.23",
     "@types/react-dom": "^18.0.9",
     "eslint": "^8.56.0",
