@@ -1,4 +1,4 @@
-import { DeleteOutlined, EditOutlined, EyeFilled, PlusOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeFilled, PlusOutlined } from '@ant-design/icons';
 import { Box, Button, Card, CardContent, CardMedia, Chip, Grid, IconButton, Stack, TablePagination, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -39,22 +39,7 @@ const BlogList = () => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
   };
-  const getImageUrl = (linkImg: string) => {
-    if (!linkImg) return '';
 
-    // If it's a full URL (e.g. from Firebase storage), use it directly
-    if (linkImg.startsWith('http')) {
-      return linkImg;
-    }
-
-    // If it's a relative path from uploads folder, construct the full URL
-    if (linkImg.includes('/uploads/')) {
-      return `https://localhost:8081${linkImg}`;
-    }
-
-    // Default case - return the link as is
-    return linkImg;
-  };
   if (loading) {
     return <Loader />;
   }
@@ -74,7 +59,7 @@ const BlogList = () => {
               {filteredBlogs?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((blog) => (
                 <Grid item xs={12} sm={6} md={4} key={blog.blogId}>
                   <Card>
-                    <CardMedia component="img" height="200" image={getImageUrl(blog.linkImg)} alt={blog.title} />
+                    <CardMedia component="img" height="200" image={blog.linkImg} alt={blog.title} />
                     <CardContent>
                       <Stack spacing={2}>
                         <Typography variant="h6" noWrap>
