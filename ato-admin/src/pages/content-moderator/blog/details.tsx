@@ -23,18 +23,7 @@ const BlogDetails = () => {
     if (id) {
       dispatch(getBlog(id));
     }
-  }, [id, dispatch]);
-
-  const getImageUrl = (linkImg: string) => {
-    if (!linkImg) return '';
-    if (linkImg.startsWith('http')) {
-      return linkImg;
-    }
-    if (linkImg.includes('/uploads/')) {
-      return `https://localhost:8081${linkImg}`;
-    }
-    return linkImg;
-  };
+  }, [id]);
 
   if (loading || !blog) {
     return <div>Loading...</div>;
@@ -62,7 +51,7 @@ const BlogDetails = () => {
             }}
           >
             <img
-              src={getImageUrl(blog.linkImg)}
+              src={blog.linkImg}
               alt={blog.title}
               style={{
                 width: '100%',

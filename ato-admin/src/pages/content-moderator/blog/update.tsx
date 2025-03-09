@@ -3,7 +3,7 @@ import { Box, Button, FormHelperText, Grid, InputLabel, MenuItem, OutlinedInput,
 import { Formik } from 'formik';
 import { useEffect, useRef, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import AnimateButton from '../../../components/@extended/AnimateButton';
 import AppCard from '../../../components/cards/AppCard';
@@ -12,11 +12,15 @@ import { getBlog, updateBlog } from '../../../redux/blogSlice';
 import { RootState } from '../../../redux/store';
 import { BlogType, BlogUpdateRequest } from '../../../services/blog/types';
 import { handleImageUpload } from '../../../utils/image-helper';
+import { enqueueSnackbar } from 'notistack';
 
 const UpdateBlog = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
-  const { id } = useParams();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  const id = params.get('id');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const { currentBlog, loading } = useSelector((state: RootState) => state.blog);
@@ -26,22 +30,18 @@ const UpdateBlog = () => {
     if (id) {
       dispatch(getBlog(id));
     }
-  }, [id, dispatch]);
-
-  const getImageUrl = (linkImg: string) => {
-    if (!linkImg) return '';
-    if (linkImg.startsWith('http')) {
-      return linkImg;
-    }
-    if (linkImg.includes('/uploads/')) {
-      return `https://localhost:8081${linkImg}`;
-    }
-    return linkImg;
-  };
+  }, [id]);
 
   useEffect(() => {
+    console.log('go here 1', currentBlog);
+    if (currentBlog === null) {
+      console.log('go here 2', currentBlog);
+      enqueueSnackbar('Không tìm thấy thông tin tin tức', { variant: 'error' });
+      navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX);
+    }
+
     if (currentBlog?.linkImg) {
-      setPreviewImage(getImageUrl(currentBlog.linkImg));
+      setPreviewImage(currentBlog.linkImg);
     }
   }, [currentBlog]);
 

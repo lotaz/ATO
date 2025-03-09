@@ -7,7 +7,7 @@ import { API_BASE_URL } from '../helpers/axios-helper';
 // Constants for image validation
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const API_UPLOAD_URL = API_BASE_URL + '/file/upload'; // Replace with your actual API endpoint
+const API_UPLOAD_URL = API_BASE_URL + '/file/upload-image'; // Replace with your actual API endpoint
 interface ImageValidationResult {
   isValid: boolean;
   error?: string;

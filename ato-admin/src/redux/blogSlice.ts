@@ -143,6 +143,7 @@ const blogSlice = createSlice({
         state.currentBlog = action.payload!;
       })
       .addCase(getBlog.rejected, (state, action) => {
+        state.currentBlog = null;
         state.loading = false;
         state.error = action.payload as string;
       })
