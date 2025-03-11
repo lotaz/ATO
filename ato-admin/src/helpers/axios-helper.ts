@@ -1,6 +1,7 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
+import { env } from '../config/env.config';
 
-export const API_BASE_URL = `https://localhost:8081/api`;
+export const API_BASE_URL = env.API_URL;
 
 // Create an axios instance
 const axiosInstance = axios.create({
