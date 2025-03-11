@@ -2,15 +2,28 @@ import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { enqueueSnackbar } from 'notistack';
 import { decryptJWT } from '../helpers/jwt-helper';
 import { authenService } from '../services/authen';
-import { ISignInRequest, ISignInResponse, ISignUpRequest } from '../services/authen/types';
+import { IChangePasswordRequest, ISignInRequest, ISignInResponse, ISignUpRequest } from '../services/authen/types';
 
 export const signin = createAsyncThunk('signin', async (request: ISignInRequest) => await authenService.signIn(request));
 export const signup = createAsyncThunk('signup', async (request: ISignUpRequest) => await authenService.signUp(request));
+export const forgotPassword = createAsyncThunk('auth/forgotPassword', async (email: string) => await authenService.forgotPassword(email));
+export const verifyOTP = createAsyncThunk('auth/verifyOTP', async (otp: string) => await authenService.verifyOTP(otp));
+export const changePassword = createAsyncThunk(
+  'auth/changePassword',
+  async (request: IChangePasswordRequest) => await authenService.changePassword(request)
+);
 
 const authenSlice = createSlice({
   name: 'authen',
   initialState: {
-    user: null
+    user: null,
+    forgotPasswordStatus: 'idle',
+    forgotPasswordError: null,
+    verifyOTPStatus: 'idle',
+    verifyOTPError: null,
+    changePasswordStatus: 'idle',
+    changePasswordError: null,
+    username: null
   },
   reducers: {
     signOut: (state, _) => {
@@ -22,6 +35,26 @@ const authenSlice = createSlice({
     },
     setUser: (state, action) => {
       state.user = action.payload;
+    },
+    resetForgotPassword: (state) => {
+      state.forgotPasswordStatus = 'idle';
+      state.forgotPasswordError = null;
+    },
+    resetVerifyOTP: (state) => {
+      state.verifyOTPStatus = 'idle';
+      state.verifyOTPError = null;
+    },
+    resetChangePassword: (state) => {
+      state.changePasswordStatus = 'idle';
+      state.changePasswordError = null;
+    },
+
+    setUsername: (state, action) => {
+      state.username = action.payload;
+    },
+
+    resetUsername: (state) => {
+      state.username = null;
     }
   },
   extraReducers: (builder) => {
@@ -55,7 +88,58 @@ const authenSlice = createSlice({
     builder.addCase(signup.rejected, () => {
       enqueueSnackbar('Email đã tồn tại');
     });
+
+    builder
+      .addCase(forgotPassword.pending, (state) => {
+        state.forgotPasswordStatus = 'loading';
+        state.forgotPasswordError = null;
+      })
+      .addCase(forgotPassword.fulfilled, (state, _) => {
+        state.forgotPasswordStatus = 'succeeded';
+        enqueueSnackbar('Mã OPT đã được gửi về email của bạn', {
+          variant: 'success'
+        });
+      })
+      .addCase(forgotPassword.rejected, (state, action) => {
+        state.forgotPasswordStatus = 'failed';
+        state.forgotPasswordError = action.error.message;
+        enqueueSnackbar('Tên đăng nhập không tồn tại', {
+          variant: 'error'
+        });
+      });
+
+    builder
+      .addCase(verifyOTP.pending, (state) => {
+        state.verifyOTPStatus = 'loading';
+        state.verifyOTPError = null;
+      })
+      .addCase(verifyOTP.fulfilled, (state) => {
+        state.verifyOTPStatus = 'succeeded';
+        enqueueSnackbar('Xác thực OTP thành công', { variant: 'success' });
+      })
+      .addCase(verifyOTP.rejected, (state, action) => {
+        state.verifyOTPStatus = 'failed';
+        state.verifyOTPError = action.error.message;
+        enqueueSnackbar('Mã OTP không chính xác', { variant: 'error' });
+      });
+
+    builder
+      .addCase(changePassword.pending, (state) => {
+        state.changePasswordStatus = 'loading';
+        state.changePasswordError = null;
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.changePasswordStatus = 'succeeded';
+        enqueueSnackbar('Đổi mật khẩu thành công', { variant: 'success' });
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.changePasswordStatus = 'failed';
+        state.changePasswordError = action.error.message;
+        enqueueSnackbar('Đổi mật khẩu thất bại', { variant: 'error' });
+      });
   }
 });
+
+export const { resetForgotPassword, resetVerifyOTP, resetChangePassword, setUsername, resetUsername } = authenSlice.actions;
 
 export default authenSlice;

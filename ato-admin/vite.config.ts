@@ -2,7 +2,8 @@ import react from '@vitejs/plugin-react';
 import path from 'path';
 import { defineConfig, loadEnv } from 'vite';
 
-export default defineConfig(({ command, mode }) => {
+
+export default defineConfig(({ mode }) => {
   // Load env file based on `mode` in the current working directory.
   const env = loadEnv(mode, process.cwd(), '');
 
@@ -39,19 +40,6 @@ export default defineConfig(({ command, mode }) => {
     preview: {
       open: true,
       port: 3000
-    },
-    build: {
-      outDir: 'dist',
-      sourcemap: command === 'serve',
-      rollupOptions: {
-        output: {
-          manualChunks: {
-            vendor: ['react', 'react-dom', 'react-router-dom'],
-            mui: ['@mui/material', '@mui/icons-material'],
-            redux: ['@reduxjs/toolkit', 'react-redux']
-          }
-        }
-      }
     }
   };
 });

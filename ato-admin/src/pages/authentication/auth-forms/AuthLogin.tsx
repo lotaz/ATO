@@ -30,6 +30,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { signin } from '../../../redux/authenSlice';
 import { RootState } from '../../../redux/store';
 import { ISignInRequest } from '../../../services/authen/types';
+import { AUTHEN_URLs } from '../../../constants/authen-url';
 
 // ============================|| JWT - LOGIN ||============================ //
 
@@ -144,7 +145,7 @@ export default function AuthLogin() {
                     }
                     label={<Typography variant="h6">Nhớ mật khẩu</Typography>}
                   />
-                  <Link to={''} variant="h6" component={RouterLink} color="text.primary">
+                  <Link to={AUTHEN_URLs.FORGOT_PASSWORD} variant="h6" component={RouterLink} color="text.primary">
                     Quên mật khẩu?
                   </Link>
                 </Stack>

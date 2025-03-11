@@ -5,6 +5,8 @@ import Grid from '@mui/material/Grid';
 
 // project import
 import AuthCard from './AuthCard';
+import LogoSection from '../../components/logo';
+import { Box } from '@mui/material';
 
 // assets
 
@@ -20,6 +22,9 @@ export default function AuthWrapper({ children }) {
         sx={{ minHeight: { xs: 'calc(100vh - 210px)', sm: 'calc(100vh - 134px)', md: 'calc(100vh - 112px)' } }}
       >
         <Grid item>
+          <Box sx={{ mb: 3, textAlign: 'center' }}>
+            <LogoSection />
+          </Box>
           <AuthCard>{children}</AuthCard>
         </Grid>
       </Grid>
