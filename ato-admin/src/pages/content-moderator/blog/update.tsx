@@ -1,87 +1,123 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Box, Button, Divider, FormHelperText, Grid, InputLabel, MenuItem, OutlinedInput, Select, Stack, Typography } from '@mui/material';
+import { Box, Button, FormHelperText, Grid, InputLabel, MenuItem, OutlinedInput, Select, Stack, Typography } from '@mui/material';
 import { Formik } from 'formik';
-import { useRef, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useEffect, useRef, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate, useParams } from 'react-router-dom';
 import * as Yup from 'yup';
 import AnimateButton from '../../../components/@extended/AnimateButton';
 import AppCard from '../../../components/cards/AppCard';
-import { ADMIN_URLs } from '../../../constants/admin-urls';
 import { CONTENT_MODERATOR_URLs } from '../../../constants/content-moderator-urls';
+import { getBlog, updateBlog } from '../../../redux/blogSlice';
+import { RootState } from '../../../redux/store';
+import { BlogType, BlogUpdateRequest } from '../../../services/blog/types';
+import { handleImageUpload } from '../../../utils/image-helper';
+import { enqueueSnackbar } from 'notistack';
 
 const UpdateBlog = () => {
   const navigate = useNavigate();
-  const { id } = useParams();
+  const dispatch = useDispatch<any>();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+
+  const id = params.get('id');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Mock data - thay thế bằng API call sau
-  const initialValues = {
-    title: 'Du lịch Hạ Long mùa thu - Khám phá vẻ đẹp thiên nhiên kỳ vĩ',
-    category: 'domestic',
-    content: `Vịnh Hạ Long mùa thu mang một vẻ đẹp khác biệt với nắng dịu, gió mát và những hòn đảo được bao phủ trong sương sớm mờ ảo. 
-    Đây là thời điểm lý tưởng để du khách có thể tận hưởng những trải nghiệm tuyệt vời nhất tại di sản thiên nhiên thế giới này.
+  const { currentBlog, loading } = useSelector((state: RootState) => state.blog);
+  const [previewImage, setPreviewImage] = useState<string>('');
 
-    Trong bài viết này, chúng tôi sẽ chia sẻ những điểm đến không thể bỏ qua, các hoạt động thú vị và những lưu ý quan trọng khi du lịch Hạ Long vào mùa thu...`,
-    image: 'https://images.unsplash.com/photo-1528127269322-539801943592',
-    status: 'published',
-    tags: ['Du lịch', 'Hạ Long', 'Mùa thu', 'Khám phá'],
-    submit: null
-  };
-
-  const [previewImage, setPreviewImage] = useState(initialValues.image);
-
-  const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-        setFieldValue('image', file);
-      };
-      reader.readAsDataURL(file);
+  useEffect(() => {
+    if (id) {
+      dispatch(getBlog(id));
     }
+  }, [id]);
+
+  useEffect(() => {
+    console.log('go here 1', currentBlog);
+    if (currentBlog === null) {
+      console.log('go here 2', currentBlog);
+      enqueueSnackbar('Không tìm thấy thông tin tin tức', { variant: 'error' });
+      navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX);
+    }
+
+    if (currentBlog?.linkImg) {
+      setPreviewImage(currentBlog.linkImg);
+    }
+  }, [currentBlog]);
+
+  if (loading || !currentBlog) {
+    return <div>Loading...</div>;
+  }
+
+  const initialValues: BlogUpdateRequest = {
+    id: currentBlog.blogId!,
+    title: currentBlog.title,
+    description: currentBlog.description,
+    content: currentBlog.content,
+    linkImg: currentBlog.linkImg,
+    blogType: currentBlog.blogType,
+    blogStatus: currentBlog.blogStatus
   };
 
+  const validationSchema = Yup.object().shape({
+    title: Yup.string().required('Tiêu đề không được để trống'),
+    description: Yup.string().required('Mô tả không được để trống'),
+    content: Yup.string().required('Nội dung không được để trống'),
+    linkImg: Yup.string().required('Ảnh không được để trống'),
+    blogType: Yup.string().required('Loại tin tức không được để trống')
+  });
   const handleImageClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = async (values: any, { setSubmitting }: any) => {
-    try {
-      // Thêm API call ở đây
-      console.log('Cập nhật tin tức:', values);
-      setSubmitting(false);
-      navigate(ADMIN_URLs.NEWS.INDEX);
-    } catch (error) {
-      console.error('Lỗi khi cập nhật tin tức:', error);
-      setSubmitting(false);
+  const handleImageChange = async (event: React.ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await handleImageUpload(
+        file,
+        (imageUrl) => {
+          setFieldValue('linkImg', imageUrl);
+        },
+        (error) => {
+          console.error('Image upload failed:', error);
+        },
+        (previewUrl) => {
+          setPreviewImage(previewUrl);
+        }
+      );
     }
   };
 
   return (
     <Stack spacing={3}>
-      <Button startIcon={<ArrowLeftOutlined />} onClick={() => navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX)} sx={{ width: 'fit-content' }}>
-        Quay lại danh sách
-      </Button>
+      <Stack direction="row" alignItems="center" spacing={1}>
+        <Button variant="text" startIcon={<ArrowLeftOutlined />} onClick={() => navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX)}>
+          Quay lại
+        </Button>
+      </Stack>
 
       <AppCard>
-        <Typography variant="h3" textAlign="center" sx={{ mb: 3 }}>
-          Cập nhật tin tức
+        <Typography variant="h3" textAlign={'center'}>
+          Chỉnh sửa tin tức
         </Typography>
-
         <Formik
           initialValues={initialValues}
-          validationSchema={Yup.object().shape({
-            title: Yup.string().max(255).required('Tiêu đề là bắt buộc'),
-            category: Yup.string().required('Danh mục là bắt buộc'),
-            content: Yup.string().required('Nội dung là bắt buộc')
-          })}
-          onSubmit={handleSubmit}
+          validationSchema={validationSchema}
+          onSubmit={async (values, { setSubmitting }) => {
+            try {
+              await dispatch(updateBlog(values)).unwrap();
+              setSubmitting(false);
+              navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX);
+            } catch (error) {
+              console.error('Error updating blog:', error);
+              setSubmitting(false);
+            }
+          }}
         >
           {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values, setFieldValue }) => (
             <form noValidate onSubmit={handleSubmit}>
               <Grid container spacing={3}>
-                {/* Ảnh tin tức */}
+                {/* Image Upload Section */}
                 <Grid item xs={12}>
                   <Stack spacing={1} alignItems="center">
                     <Box
@@ -128,95 +164,95 @@ const UpdateBlog = () => {
                   </Stack>
                 </Grid>
 
+                {/* Title Field */}
                 <Grid item xs={12}>
-                  <Divider />
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="title">Tiêu đề</InputLabel>
+                    <OutlinedInput
+                      id="title"
+                      type="text"
+                      value={values.title}
+                      name="title"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="Nhập tiêu đề"
+                      fullWidth
+                      error={Boolean(touched.title && errors.title)}
+                    />
+                    {touched.title && errors.title && <FormHelperText error>{errors.title}</FormHelperText>}
+                  </Stack>
                 </Grid>
 
-                {/* Thông tin bài viết */}
+                {/* Blog Type Field */}
                 <Grid item xs={12}>
-                  <Typography variant="h5" sx={{ mb: 2 }}>
-                    Thông tin bài viết
-                  </Typography>
-                  <Grid container spacing={2}>
-                    <Grid item xs={12}>
-                      <Stack spacing={1}>
-                        <InputLabel htmlFor="title">Tiêu đề*</InputLabel>
-                        <OutlinedInput
-                          id="title"
-                          name="title"
-                          value={values.title}
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          placeholder="Nhập tiêu đề bài viết"
-                          fullWidth
-                          error={Boolean(touched.title && errors.title)}
-                        />
-                        {touched.title && errors.title && <FormHelperText error>{errors.title}</FormHelperText>}
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <Stack spacing={1}>
-                        <InputLabel htmlFor="category">Danh mục*</InputLabel>
-                        <Select
-                          id="category"
-                          name="category"
-                          value={values.category}
-                          onChange={handleChange}
-                          fullWidth
-                          error={Boolean(touched.category && errors.category)}
-                        >
-                          <MenuItem value="domestic">Du lịch trong nước</MenuItem>
-                          <MenuItem value="international">Du lịch nước ngoài</MenuItem>
-                          <MenuItem value="food">Ẩm thực</MenuItem>
-                          <MenuItem value="culture">Văn hóa</MenuItem>
-                          <MenuItem value="experience">Kinh nghiệm</MenuItem>
-                        </Select>
-                        {touched.category && errors.category && <FormHelperText error>{errors.category}</FormHelperText>}
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12} sm={6}>
-                      <Stack spacing={1}>
-                        <InputLabel htmlFor="status">Trạng thái</InputLabel>
-                        <Select id="status" name="status" value={values.status} onChange={handleChange} fullWidth>
-                          <MenuItem value="draft">Bản nháp</MenuItem>
-                          <MenuItem value="published">Xuất bản</MenuItem>
-                          <MenuItem value="archived">Lưu trữ</MenuItem>
-                        </Select>
-                      </Stack>
-                    </Grid>
-
-                    <Grid item xs={12}>
-                      <Stack spacing={1}>
-                        <InputLabel htmlFor="content">Nội dung*</InputLabel>
-                        <OutlinedInput
-                          id="content"
-                          name="content"
-                          value={values.content}
-                          onBlur={handleBlur}
-                          onChange={handleChange}
-                          placeholder="Nhập nội dung bài viết"
-                          fullWidth
-                          multiline
-                          rows={10}
-                          error={Boolean(touched.content && errors.content)}
-                        />
-                        {touched.content && errors.content && <FormHelperText error>{errors.content}</FormHelperText>}
-                      </Stack>
-                    </Grid>
-                  </Grid>
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="blogType">Loại tin tức</InputLabel>
+                    <Select
+                      id="blogType"
+                      value={values.blogType}
+                      name="blogType"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      error={Boolean(touched.blogType && errors.blogType)}
+                    >
+                      <MenuItem value={BlogType.News}>Tin tức</MenuItem>
+                      <MenuItem value={BlogType.Even}>Sự kiện</MenuItem>
+                    </Select>
+                    {touched.blogType && errors.blogType && <FormHelperText error>{errors.blogType}</FormHelperText>}
+                  </Stack>
                 </Grid>
 
-                {/* Buttons */}
+                {/* Description Field */}
+                <Grid item xs={12}>
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="description">Mô tả</InputLabel>
+                    <OutlinedInput
+                      id="description"
+                      type="text"
+                      value={values.description}
+                      name="description"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="Nhập mô tả"
+                      fullWidth
+                      multiline
+                      rows={3}
+                      error={Boolean(touched.description && errors.description)}
+                    />
+                    {touched.description && errors.description && <FormHelperText error>{errors.description}</FormHelperText>}
+                  </Stack>
+                </Grid>
+
+                {/* Content Field */}
+                <Grid item xs={12}>
+                  <Stack spacing={1}>
+                    <InputLabel htmlFor="content">Nội dung</InputLabel>
+                    <OutlinedInput
+                      id="content"
+                      type="text"
+                      value={values.content}
+                      name="content"
+                      onBlur={handleBlur}
+                      onChange={handleChange}
+                      placeholder="Nhập nội dung"
+                      fullWidth
+                      multiline
+                      rows={6}
+                      error={Boolean(touched.content && errors.content)}
+                    />
+                    {touched.content && errors.content && <FormHelperText error>{errors.content}</FormHelperText>}
+                  </Stack>
+                </Grid>
+
+                {/* Action Buttons */}
                 <Grid item xs={12}>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
                     <Button variant="outlined" color="secondary" onClick={() => navigate(CONTENT_MODERATOR_URLs.BLOG.INDEX)}>
                       Hủy
                     </Button>
                     <AnimateButton>
-                      <Button disableElevation disabled={isSubmitting} type="submit" variant="contained" color="primary">
-                        Cập nhật
+                      <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
+                        Lưu thay đổi
                       </Button>
                     </AnimateButton>
                   </Stack>
