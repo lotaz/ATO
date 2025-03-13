@@ -9,6 +9,9 @@ export const ADMIN_URLs = {
     UPDATE: `${ADMIN_BASE_URL}/account/update`,
     DETAILS: `${ADMIN_BASE_URL}/account/details`
   },
+  CONFIG: {
+    EMAIL: `${ADMIN_BASE_URL}/config/email`
+  },
   REQUEST: {
     INDEX: `${ADMIN_BASE_URL}/request`,
     REPLY: `${ADMIN_BASE_URL}/request/reply`

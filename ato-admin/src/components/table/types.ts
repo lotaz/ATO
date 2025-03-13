@@ -4,7 +4,7 @@ export type TColumn = {
   minWidth?: number;
   align?: 'right' | 'left';
   hidden?: boolean;
-  format?: (value: any) => string;
+  format?: (value: any) => any;
 };
 
 export type TAppTable = {
