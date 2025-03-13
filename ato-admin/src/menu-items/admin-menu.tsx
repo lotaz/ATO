@@ -1,5 +1,13 @@
 // assets
-import { CarOutlined, DashboardOutlined, MessageOutlined, ProfileOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  CarOutlined,
+  DashboardOutlined,
+  MailOutlined,
+  MessageOutlined,
+  ProfileOutlined,
+  SettingOutlined,
+  TeamOutlined
+} from '@ant-design/icons';
 import { ADMIN_URLs } from '../constants/admin-urls';
 import { TMenu } from './types';
 
@@ -88,6 +96,22 @@ const adminMenu: TMenu = {
           type: 'item',
           url: ADMIN_URLs.REQUEST.REPLY,
           icon: ProfileOutlined
+        }
+      ]
+    },
+    {
+      id: 'config',
+      title: 'Cấu hình',
+      type: 'item',
+      icon: SettingOutlined,
+      url: ADMIN_URLs.CONFIG.EMAIL,
+      subItems: [
+        {
+          id: 'email-config',
+          title: 'Cấu hình Email',
+          type: 'item',
+          url: ADMIN_URLs.CONFIG.EMAIL,
+          icon: MailOutlined
         }
       ]
     }
