@@ -1,6 +1,7 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { enqueueSnackbar } from 'notistack';
 import { productService } from '../../services/tourism-facility/product.service';
-import type { Product, ProductParams } from '../../types/tourism-facility/product.types';
+import type { Product } from '../../types/tourism-facility/product.types';
 
 interface ProductState {
   products: Product[];
@@ -18,9 +19,11 @@ const initialState: ProductState = {
   total: 0
 };
 
-export const fetchProducts = createAsyncThunk('product/fetchProducts', async (params: ProductParams) => {
-  const response = await productService.getProducts(params);
-  return response.data;
+export const fetchProducts = createAsyncThunk('product/fetchProducts', async () => {
+  console.log('ok');
+  const response = await productService.getProducts();
+  console.log('response', response);
+  return response;
 });
 
 export const fetchProduct = createAsyncThunk('product/fetchProduct', async (id: string) => {
@@ -59,12 +62,12 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.fulfilled, (state, action) => {
         state.loading = false;
-        state.products = action.payload.data;
-        state.total = action.payload.total;
+        state.products = action.payload;
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch products';
+        enqueueSnackbar(state.error, { variant: 'error' });
       })
       // Fetch Single Product
       .addCase(fetchProduct.pending, (state) => {
@@ -78,19 +81,23 @@ const productSlice = createSlice({
       .addCase(fetchProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch product';
+        enqueueSnackbar(state.error, { variant: 'error' });
       })
       // Create Product
       .addCase(createProduct.pending, (state) => {
         state.loading = true;
         state.error = null;
       })
-      .addCase(createProduct.fulfilled, (state, action) => {
+      .addCase(createProduct.fulfilled, (state, _) => {
         state.loading = false;
-        state.products.unshift(action.payload);
+
+        enqueueSnackbar('Thêm sản phẩm thành công', { variant: 'success' });
       })
       .addCase(createProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to create product';
+
+        enqueueSnackbar(state.error, { variant: 'error' });
       })
       // Update Product
       .addCase(updateProduct.pending, (state) => {
@@ -108,6 +115,7 @@ const productSlice = createSlice({
       .addCase(updateProduct.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to update product';
+        enqueueSnackbar(state.error, { variant: 'error' });
       });
   }
 });
