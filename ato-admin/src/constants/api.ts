@@ -8,13 +8,32 @@ export const API_URLs = {
   },
   CONFIG: {
     EMAIL: {
-      GET: '/admin/config/email',
+      GET: '/admin/config/get-config-email',
       UPDATE: '/admin/config/update-config-email'
+    },
+    VNPAY: {
+      GET: '/admin/config/get-config-vnpay',
+      UPDATE: '/admin/config/update-config-vnpay'
     }
   },
   ACCOUNT: {
     LIST: '/admin/user/get-list-users',
-    GET: '/admin/user/get-user/:id'
+    GET: '/admin/user/get-user/:id',
+    CREATE: '/admin/user/create-account'
+  },
+  COMPANY: {
+    LIST: '/admin/tour-company/list-tour-companies',
+    GET: '/admin/tour-company/get-tour-company/:id',
+    CREATE: '/admin/tour-company/create-tour-company',
+    UPDATE: '/admin/tour-company/update-tour-company',
+    UNASSIGED: '/admin/tour-company/unassigned-tour-companies'
+  },
+  FACILITY: {
+    LIST: '/admin/tourist-facility/list-tourist-facilities',
+    GET: '/admin/tourist-facility/get-tourist-facility/:id',
+    CREATE: '/admin/tourist-facility/create-tourist-facility',
+    UPDATE: '/admin/tourist-facility/update-tourist-facility',
+    UNASSIGED: '/admin/tourist-facility/unassigned-tourist-facility'
   },
   BLOG: {
     CREATE: '/content-moderators/blog/create',
@@ -28,5 +47,13 @@ export const API_URLs = {
     UPDATE: '/tour-guide/update',
     DETAILS: '/tour-guide/details',
     REQUEST: '/tour-guide/request'
+  },
+  FACILITY_OWNER: {
+    PRODUCT: {
+      LIST: '/afto/product/get-products',
+      GET: '/afto/product/get-product/:id',
+      CREATE: '/afto/product/create-product',
+      UPDATE: '/afto/product/update-product/:id'
+    }
   }
 };

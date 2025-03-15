@@ -6,23 +6,23 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import AppCard from '../../../components/cards/AppCard';
 import { ADMIN_URLs } from '../../../constants/admin-urls';
-import { getCompany } from '../../../redux/companySlice';
+import { getFacility } from '../../../redux/facilitySlice';
 import { RootState } from '../../../redux/store';
 
-const CompanyDetails = () => {
+const FacilityDetails = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
   const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const companyId = params.get('id');
+  const facilityId = params.get('id');
 
-  const company = useSelector((state: RootState) => state.company.specific);
-  console.log('company', company);
+  const facility = useSelector((state: RootState) => state.facility.specific);
+
   useEffect(() => {
-    if (companyId) {
-      dispatch(getCompany(companyId));
+    if (facilityId) {
+      dispatch(getFacility(facilityId));
     }
-  }, [dispatch, companyId]);
+  }, [dispatch, facilityId]);
 
   const InfoRow = ({ label, value }: { label: string; value: string | null }) => (
     <Grid container spacing={2} sx={{ py: 1 }}>
@@ -37,7 +37,7 @@ const CompanyDetails = () => {
     </Grid>
   );
 
-  if (!company) return null;
+  if (!facility) return null;
 
   return (
     <Stack spacing={3}>
@@ -48,8 +48,8 @@ const CompanyDetails = () => {
             <Stack direction="row" spacing={3} alignItems="center">
               <Box
                 component="img"
-                src={company.logoURL}
-                alt={company.companynName}
+                src={facility.logoURL}
+                alt={facility.touristFacilityName}
                 sx={{
                   width: 200,
                   height: 120,
@@ -58,11 +58,11 @@ const CompanyDetails = () => {
                 }}
               />
               <Stack spacing={1}>
-                <Typography variant="h4">{company.companynName}</Typography>
+                <Typography variant="h4">{facility.touristFacilityName}</Typography>
                 <Stack direction="row" spacing={1}>
                   <Chip
-                    label={company.website ? 'Website có sẵn' : 'Chưa có website'}
-                    color={company.website ? 'success' : 'default'}
+                    label={facility.website ? 'Website có sẵn' : 'Chưa có website'}
+                    color={facility.website ? 'success' : 'default'}
                     size="small"
                   />
                 </Stack>
@@ -72,7 +72,7 @@ const CompanyDetails = () => {
               variant="contained"
               color="primary"
               startIcon={<EditOutlined />}
-              onClick={() => navigate(`${ADMIN_URLs.COMPANY.UPDATE}?id=${company.tourCompanyId}`)}
+              onClick={() => navigate(`${ADMIN_URLs.FACILITY.UPDATE}?id=${facility.touristFacilityId}`)}
             >
               Chỉnh sửa
             </Button>
@@ -83,16 +83,16 @@ const CompanyDetails = () => {
             <Typography variant="h5" sx={{ mb: 2 }}>
               Người phụ trách
             </Typography>
-            {company.account ? (
+            {facility.account ? (
               <Stack direction="row" spacing={2} alignItems="center">
-                <Avatar src={company.account.avatarURL!} alt={company.account.fullname} sx={{ width: 64, height: 64 }} />
+                <Avatar src={facility.account.avatarURL!} alt={facility.account.fullname} sx={{ width: 64, height: 64 }} />
                 <Stack spacing={0.5}>
-                  <Typography variant="h6">{company.account.fullname}</Typography>
+                  <Typography variant="h6">{facility.account.fullname}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {company.account.email}
+                    {facility.account.email}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    {company.account.phoneNumber}
+                    {facility.account.phoneNumber}
                   </Typography>
                 </Stack>
               </Stack>
@@ -100,16 +100,17 @@ const CompanyDetails = () => {
               <Typography color="text.secondary">Chưa có người phụ trách</Typography>
             )}
           </Box>
+
           {/* Basic Information */}
           <Box>
             <Typography variant="h5" sx={{ mb: 2 }}>
               Thông tin cơ bản
             </Typography>
             <Stack spacing={1}>
-              <InfoRow label="Tên công ty" value={company.companynName} />
-              <InfoRow label="Website" value={company.website} />
-              <InfoRow label="Ngày tạo" value={dayjs(company.createDate).format('DD/MM/YYYY HH:mm')} />
-              {company.updateTime && <InfoRow label="Cập nhật lần cuối" value={dayjs(company.updateTime).format('DD/MM/YYYY HH:mm')} />}
+              <InfoRow label="Tên cơ sở" value={facility.touristFacilityName} />
+              <InfoRow label="Website" value={facility.website} />
+              <InfoRow label="Ngày tạo" value={dayjs(facility.createDate).format('DD/MM/YYYY HH:mm')} />
+              {facility.updateTime && <InfoRow label="Cập nhật lần cuối" value={dayjs(facility.updateTime).format('DD/MM/YYYY HH:mm')} />}
             </Stack>
           </Box>
 
@@ -121,8 +122,8 @@ const CompanyDetails = () => {
               Thông tin liên hệ
             </Typography>
             <Stack spacing={1}>
-              <InfoRow label="Địa chỉ" value={company.addressCompany} />
-              <InfoRow label="Email" value={company.emailCompany} />
+              <InfoRow label="Địa chỉ" value={facility.address} />
+              <InfoRow label="Email" value={facility.emailTouristFacility} />
             </Stack>
           </Box>
 
@@ -134,7 +135,7 @@ const CompanyDetails = () => {
               Mô tả
             </Typography>
             <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-              {company.companyDescription || 'Chưa có mô tả'}
+              {facility.description || 'Chưa có mô tả'}
             </Typography>
           </Box>
         </Stack>
@@ -143,4 +144,4 @@ const CompanyDetails = () => {
   );
 };
 
-export default CompanyDetails;
+export default FacilityDetails;

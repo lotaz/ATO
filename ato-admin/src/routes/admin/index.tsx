@@ -7,10 +7,12 @@ import ManageAccountRoutes from './account';
 import ManageCompanyRoutes from './company';
 import { TRoute } from '../types';
 import ManageRequestRoutes from './request';
-import EmailConfig from '../../pages/admin/config/email';
+import ManageFacilityRoutes from './facility';
 
 const Layout = Loadable(lazy(() => import('../../layout')));
 const Dashboard = Loadable(lazy(() => import('../../pages/admin/dashboard/index')));
+const EmailConfig = Loadable(lazy(() => import('../../pages/admin/config/email')));
+const VNPayConfig = Loadable(lazy(() => import('../../pages/admin/config/vnpay')));
 
 const AdminRoutes: TRoute = {
   path: ADMIN_BASE_URL,
@@ -24,9 +26,14 @@ const AdminRoutes: TRoute = {
       path: ADMIN_URLs.CONFIG.EMAIL,
       element: <EmailConfig />
     },
+    {
+      path: ADMIN_URLs.CONFIG.VNPAY,
+      element: <VNPayConfig />
+    },
     ...ManageAccountRoutes,
     ...ManageCompanyRoutes,
-    ...ManageRequestRoutes
+    ...ManageRequestRoutes,
+    ...ManageFacilityRoutes
   ]
 };
 

@@ -8,15 +8,6 @@ import { RootState } from '../../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getAccounts } from '../../../redux/accountSlice';
-export type User = {
-  email: string;
-  phoneNumber: string;
-  fullname: string;
-  gender: boolean; // True or false
-  dob: string; // ISO 8601 format date string
-  isAccountActive: boolean;
-  roleName: string;
-};
 
 const Index = () => {
   const navigate = useNavigate();
@@ -30,6 +21,7 @@ const Index = () => {
 
   const columns: TColumn[] = [
     { id: 'id', hidden: true },
+
     { id: 'fullname', label: 'Họ Tên', minWidth: 170 },
     { id: 'roleName', label: 'Vai Trò', minWidth: 100 },
     {
@@ -42,7 +34,7 @@ const Index = () => {
       id: 'phoneNumber',
       label: 'Số điện thoại',
       minWidth: 170,
-      format: (value: any) => value?.toFixed(2)
+      format: (value: any) => value
     },
     {
       id: 'isAccountActive',

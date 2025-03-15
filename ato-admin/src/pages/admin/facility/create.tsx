@@ -1,60 +1,54 @@
 import { CameraOutlined } from '@ant-design/icons';
 import {
-  Avatar,
   Box,
   Button,
   Divider,
-  FormControl,
   FormHelperText,
   Grid,
   InputLabel,
-  MenuItem,
   OutlinedInput,
-  Select,
   Stack,
-  Typography
+  Typography,
+  FormControl,
+  Select,
+  MenuItem,
+  Avatar
 } from '@mui/material';
 import { Formik } from 'formik';
-import { useEffect, useRef, useState } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useRef, useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import AnimateButton from '../../../components/@extended/AnimateButton';
 import AppCard from '../../../components/cards/AppCard';
 import { ADMIN_URLs } from '../../../constants/admin-urls';
 import { useDispatch, useSelector } from 'react-redux';
-import { getCompany, getUnAssigedAccounts, updateCompany } from '../../../redux/companySlice';
+import { createFacility } from '../../../redux/facilitySlice';
 import { RootState } from '../../../redux/store';
-import { Company } from '../../../services/company/types';
-import { API_URLs } from '../../../constants/api';
+import { CreateFacilityRequest } from '../../../services/facility/types';
+import { getUnAssigedAccounts } from '../../../redux/companySlice';
+import { User } from '../../../types';
 
-const UpdateCompany = () => {
+const CreateFacility = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const companyId = params.get('id');
-
-  const company = useSelector((state: RootState) => state.company.specific) as any as Company;
-
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [previewImage, setPreviewImage] = useState('');
-  const unassignedAccounts = useSelector((state: RootState) => state.company.unassigned);
+  const unassignedAccounts = useSelector((state: RootState) => state.facility.unassigned);
 
   useEffect(() => {
     dispatch(getUnAssigedAccounts());
   }, [dispatch]);
 
-  useEffect(() => {
-    if (companyId) {
-      dispatch(getCompany(companyId));
-    }
-  }, [dispatch, companyId]);
-
-  useEffect(() => {
-    if (company) {
-      setPreviewImage(company.logoURL);
-    }
-  }, [company]);
+  const initialValues: CreateFacilityRequest = {
+    touristFacilityName: '',
+    description: '',
+    address: '',
+    emailTouristFacility: '',
+    website: '',
+    logoURL: '',
+    userId: '',
+    contactInfor: ''
+  };
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>, setFieldValue: any) => {
     const file = event.target.files?.[0];
@@ -72,40 +66,30 @@ const UpdateCompany = () => {
     fileInputRef.current?.click();
   };
 
-  const handleSubmit = async (values: Partial<Company>, { setSubmitting }: any) => {
+  const handleSubmit = async (values: CreateFacilityRequest, { setSubmitting }: any) => {
     try {
-      if (companyId) {
-        await dispatch(updateCompany({ ...values, tourCompanyId: companyId } as any));
-      }
+      await dispatch(createFacility(values));
+      navigate(ADMIN_URLs.FACILITY.INDEX);
     } finally {
       setSubmitting(false);
     }
   };
 
-  if (company === null) navigate(API_URLs.COMPANY.LIST);
-
   return (
     <Stack direction="column" justifyContent="space-between">
       <AppCard variant="outlined">
         <Typography variant="h3" textAlign="center" sx={{ mb: 3 }}>
-          Chỉnh sửa thông tin công ty
+          Thêm mới cơ sở
         </Typography>
 
         <Formik
-          initialValues={{
-            companynName: company.companynName,
-            companyDescription: company.companyDescription || '',
-            addressCompany: company.addressCompany,
-            emailCompany: company.emailCompany,
-            website: company.website || '',
-            logoURL: company.logoURL
-          }}
+          initialValues={initialValues}
           validationSchema={Yup.object().shape({
-            companynName: Yup.string().required('Tên công ty là bắt buộc'),
-            emailCompany: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
-            addressCompany: Yup.string().required('Địa chỉ là bắt buộc'),
+            facilityName: Yup.string().required('Tên cơ sở là bắt buộc'),
+            emailFacility: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
+            addressFacility: Yup.string().required('Địa chỉ là bắt buộc'),
             website: Yup.string().url('Website không hợp lệ'),
-            logoURL: Yup.string().required('Logo công ty là bắt buộc')
+            logoURL: Yup.string().required('Logo cơ sở là bắt buộc')
           })}
           onSubmit={handleSubmit}
         >
@@ -136,7 +120,7 @@ const UpdateCompany = () => {
                       {previewImage ? (
                         <img
                           src={previewImage}
-                          alt="Company Logo"
+                          alt="Facility Logo"
                           style={{
                             width: '100%',
                             height: '100%',
@@ -147,7 +131,7 @@ const UpdateCompany = () => {
                         <Stack spacing={1} alignItems="center">
                           <CameraOutlined style={{ fontSize: '2rem', color: '#666' }} />
                           <Typography color="textSecondary" variant="body2">
-                            Tải lên logo công ty
+                            Tải lên logo cơ sở
                           </Typography>
                         </Stack>
                       )}
@@ -198,44 +182,20 @@ const UpdateCompany = () => {
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="userId">Người phụ trách</InputLabel>
-                        <FormControl fullWidth>
-                          <Select id="userId" name="userId" value={values.userId} onChange={handleChange} onBlur={handleBlur} displayEmpty>
-                            <MenuItem value="">
-                              <em>Chọn người phụ trách</em>
-                            </MenuItem>
-                            {unassignedAccounts &&
-                              unassignedAccounts.map((account) => (
-                                <MenuItem key={account.id} value={account.id}>
-                                  <Stack direction="row" spacing={2} alignItems="center">
-                                    <Avatar src={account.avatarURL} alt={account.fullname} sx={{ width: 24, height: 24 }} />
-                                    <Stack>
-                                      <Typography variant="body1">{account.fullname}</Typography>
-                                      <Typography variant="caption" color="textSecondary">
-                                        {account.email}
-                                      </Typography>
-                                    </Stack>
-                                  </Stack>
-                                </MenuItem>
-                              ))}
-                          </Select>
-                        </FormControl>
-                      </Stack>
-                    </Grid>
-                    <Grid item xs={12}>
-                      <Stack spacing={1}>
-                        <InputLabel htmlFor="companynName">Tên công ty*</InputLabel>
+                        <InputLabel htmlFor="facilityName">Tên cơ sở*</InputLabel>
                         <OutlinedInput
-                          id="companynName"
-                          name="companynName"
-                          value={values.companynName}
+                          id="facilityName"
+                          name="facilityName"
+                          value={values.touristFacilityName}
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Nhập tên công ty"
+                          placeholder="Nhập tên cơ sở"
                           fullWidth
-                          error={Boolean(touched.companynName && errors.companynName)}
+                          error={Boolean(touched.touristFacilityName && errors.touristFacilityName)}
                         />
-                        {touched.companynName && errors.companynName && <FormHelperText error>{errors.companynName}</FormHelperText>}
+                        {touched.touristFacilityName && errors.touristFacilityName && (
+                          <FormHelperText error>{errors.touristFacilityName}</FormHelperText>
+                        )}
                       </Stack>
                     </Grid>
 
@@ -258,54 +218,83 @@ const UpdateCompany = () => {
 
                     <Grid item xs={12} sm={6}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="emailCompany">Email công ty*</InputLabel>
+                        <InputLabel htmlFor="emailFacility">Email cơ sở*</InputLabel>
                         <OutlinedInput
-                          id="emailCompany"
-                          name="emailCompany"
-                          value={values.emailCompany}
+                          id="emailFacility"
+                          name="emailFacility"
+                          value={values.emailTouristFacility}
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Nhập email công ty"
+                          placeholder="Nhập email cơ sở"
                           fullWidth
-                          error={Boolean(touched.emailCompany && errors.emailCompany)}
+                          error={Boolean(touched.emailTouristFacility && errors.emailTouristFacility)}
                         />
-                        {touched.emailCompany && errors.emailCompany && <FormHelperText error>{errors.emailCompany}</FormHelperText>}
+                        {touched.emailTouristFacility && errors.emailTouristFacility && (
+                          <FormHelperText error>{errors.emailTouristFacility}</FormHelperText>
+                        )}
                       </Stack>
                     </Grid>
 
                     <Grid item xs={12}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="addressCompany">Địa chỉ*</InputLabel>
+                        <InputLabel htmlFor="addressFacility">Địa chỉ*</InputLabel>
                         <OutlinedInput
-                          id="addressCompany"
-                          name="addressCompany"
-                          value={values.addressCompany}
+                          id="addressFacility"
+                          name="addressFacility"
+                          value={values.address}
                           onBlur={handleBlur}
                           onChange={handleChange}
                           placeholder="Nhập địa chỉ"
                           fullWidth
                           multiline
                           rows={3}
-                          error={Boolean(touched.addressCompany && errors.addressCompany)}
+                          error={Boolean(touched.address && errors.address)}
                         />
-                        {touched.addressCompany && errors.addressCompany && <FormHelperText error>{errors.addressCompany}</FormHelperText>}
+                        {touched.address && errors.address && <FormHelperText error>{errors.address}</FormHelperText>}
                       </Stack>
                     </Grid>
 
                     <Grid item xs={12}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="companyDescription">Mô tả</InputLabel>
+                        <InputLabel htmlFor="facilityDescription">Mô tả</InputLabel>
                         <OutlinedInput
-                          id="companyDescription"
-                          name="companyDescription"
-                          value={values.companyDescription}
+                          id="facilityDescription"
+                          name="facilityDescription"
+                          value={values.description}
                           onBlur={handleBlur}
                           onChange={handleChange}
-                          placeholder="Nhập mô tả về công ty"
+                          placeholder="Nhập mô tả về cơ sở"
                           fullWidth
                           multiline
                           rows={4}
                         />
+                      </Stack>
+                    </Grid>
+
+                    <Grid item xs={12}>
+                      <Stack spacing={1}>
+                        <InputLabel htmlFor="userId">Người phụ trách</InputLabel>
+                        <FormControl fullWidth>
+                          <Select id="userId" name="userId" value={values.userId} onChange={handleChange} displayEmpty>
+                            <MenuItem value="">
+                              <em>Chọn người phụ trách</em>
+                            </MenuItem>
+                            {unassignedAccounts &&
+                              unassignedAccounts.map((account: User) => (
+                                <MenuItem key={account.id} value={account.id}>
+                                  <Stack direction="row" spacing={2} alignItems="center">
+                                    <Avatar src={account.avatarURL} alt={account.fullname} sx={{ width: 24, height: 24 }} />
+                                    <Stack>
+                                      <Typography variant="body1">{account.fullname}</Typography>
+                                      <Typography variant="caption" color="textSecondary">
+                                        {account.email}
+                                      </Typography>
+                                    </Stack>
+                                  </Stack>
+                                </MenuItem>
+                              ))}
+                          </Select>
+                        </FormControl>
                       </Stack>
                     </Grid>
                   </Grid>
@@ -313,12 +302,12 @@ const UpdateCompany = () => {
 
                 <Grid item xs={12}>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
-                    <Button variant="outlined" color="secondary" onClick={() => navigate(ADMIN_URLs.COMPANY.INDEX)}>
+                    <Button variant="outlined" color="secondary" onClick={() => navigate(ADMIN_URLs.FACILITY.INDEX)}>
                       Hủy
                     </Button>
                     <AnimateButton>
                       <Button type="submit" variant="contained" color="primary">
-                        Lưu thay đổi
+                        Tạo mới
                       </Button>
                     </AnimateButton>
                   </Stack>
@@ -332,4 +321,4 @@ const UpdateCompany = () => {
   );
 };
 
-export default UpdateCompany;
+export default CreateFacility;

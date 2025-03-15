@@ -5,30 +5,29 @@ import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { ADMIN_URLs } from '../../../constants/admin-urls';
-import { getCompanies } from '../../../redux/companySlice';
+import { getFacilities } from '../../../redux/facilitySlice';
 import { RootState } from '../../../redux/store';
-import { Company } from '../../../services/company/types';
+import { Facility } from '../../../services/facility/types';
 import { NoDataDisplay } from '../../../components/no-data/NoDataDisplay';
-import { filterCompanies } from '../../../utils/filters';
 import { Avatar, Tooltip } from '@mui/material';
 
-const CompanyList = () => {
+const FacilityList = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
   const dispatch = useDispatch<any>();
-  const companies = useSelector((state: RootState) => state.company.data) as any as Company[] | undefined;
+  const facilities = useSelector((state: RootState) => state.facility.list);
 
   useEffect(() => {
-    dispatch(getCompanies());
+    dispatch(getFacilities());
   }, [dispatch]);
 
-  const CompanyCard = ({ company }: { company: Company }) => (
+  const FacilityCard = ({ facility }: { facility: Facility }) => (
     <Card sx={{ height: '100%', display: 'flex', flexDirection: 'column' }}>
       <CardMedia
         component="img"
         height="200"
-        image={company.logoURL}
-        alt={company.companynName}
+        image={facility.logoURL}
+        alt={facility.touristFacilityName}
         sx={{
           objectFit: 'cover',
           borderBottom: '1px solid',
@@ -39,11 +38,11 @@ const CompanyList = () => {
         <Stack spacing={2}>
           <Stack direction="row" justifyContent="space-between" alignItems="center">
             <Typography variant="h5" component="div" noWrap>
-              {company.companynName}
+              {facility.touristFacilityName}
             </Typography>
-            {company.account ? (
-              <Tooltip title={`Người phụ trách: ${company.account.fullname}`}>
-                <Avatar src={company.account.avatarURL} alt={company.account.fullname} sx={{ width: 32, height: 32 }} />
+            {facility.account ? (
+              <Tooltip title={`Người phụ trách: ${facility.account.fullname}`}>
+                <Avatar src={facility.account.avatarURL} alt={facility.account.fullname} sx={{ width: 32, height: 32 }} />
               </Tooltip>
             ) : (
               <Tooltip title="Chưa có người phụ trách">
@@ -54,27 +53,27 @@ const CompanyList = () => {
 
           <Stack spacing={1}>
             <Typography variant="body2" color="text.secondary">
-              <strong>Ngày thành lập:</strong> {company.createDate}
+              <strong>Ngày tạo:</strong> {facility.createDate}
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <strong>Email:</strong> {company.emailCompany}
+              <strong>Email:</strong> {facility.emailTouristFacility}
             </Typography>
             <Typography variant="body2" color="text.secondary">
               <strong>
                 Website:{' '}
-                <a target="_blank" href={company.website}>
-                  {company.website}
+                <a target="_blank" href={facility.website} rel="noopener noreferrer">
+                  {facility.website}
                 </a>
               </strong>
             </Typography>
             <Typography variant="body2" color="text.secondary">
-              <strong>Địa chỉ:</strong> {company.addressCompany}
+              <strong>Địa chỉ:</strong> {facility.address}
             </Typography>
           </Stack>
 
           <Stack direction="row" spacing={1} justifyContent="flex-end">
             <Button
-              onClick={() => navigate(`${ADMIN_URLs.COMPANY.DETAILS}?id=${company.tourCompanyId}`)}
+              onClick={() => navigate(`${ADMIN_URLs.FACILITY.DETAILS}?id=${facility.touristFacilityId}`)}
               size="small"
               variant="outlined"
               color="primary"
@@ -82,7 +81,7 @@ const CompanyList = () => {
               Chi tiết
             </Button>
             <Button
-              onClick={() => navigate(`${ADMIN_URLs.COMPANY.UPDATE}?id=${company.tourCompanyId}`)}
+              onClick={() => navigate(`${ADMIN_URLs.FACILITY.UPDATE}?id=${facility.touristFacilityId}`)}
               size="small"
               variant="contained"
               color="primary"
@@ -95,7 +94,14 @@ const CompanyList = () => {
     </Card>
   );
 
-  const filteredCompanies = companies ? filterCompanies(companies, searchTerm) : [];
+  const filteredFacilities = facilities
+    ? facilities.filter(
+        (facility) =>
+          facility.touristFacilityName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          facility.emailTouristFacility.toLowerCase().includes(searchTerm.toLowerCase()) ||
+          facility.address?.toLowerCase().includes(searchTerm.toLowerCase())
+      )
+    : [];
 
   return (
     <Stack direction={'column'}>
@@ -103,7 +109,7 @@ const CompanyList = () => {
         <Stack direction="row" justifyContent="space-between" alignItems="center">
           <OutlinedInput
             size="small"
-            placeholder="Tìm kiếm công ty..."
+            placeholder="Tìm kiếm cơ sở..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             startAdornment={
@@ -113,22 +119,22 @@ const CompanyList = () => {
             }
             sx={{ minWidth: 300 }}
           />
-          <Button variant="contained" color="primary" startIcon={<PlusOutlined />} onClick={() => navigate(ADMIN_URLs.COMPANY.CREATE)}>
+          <Button variant="contained" color="primary" startIcon={<PlusOutlined />} onClick={() => navigate(ADMIN_URLs.FACILITY.CREATE)}>
             Thêm mới
           </Button>
         </Stack>
       </MuiCard>
 
       <Grid container spacing={3} mt={1}>
-        {filteredCompanies.map((company) => (
-          <Grid item xs={12} sm={6} md={3} key={company.tourCompanyId}>
-            <CompanyCard company={company} />
+        {filteredFacilities.map((facility) => (
+          <Grid item xs={12} sm={6} md={3} key={facility.touristFacilityId}>
+            <FacilityCard facility={facility} />
           </Grid>
         ))}
       </Grid>
-      {filteredCompanies.length === 0 && <NoDataDisplay />}
+      {filteredFacilities.length === 0 && <NoDataDisplay />}
     </Stack>
   );
 };
 
-export default CompanyList;
+export default FacilityList;

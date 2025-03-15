@@ -1,207 +1,270 @@
-import { useState } from 'react';
 import {
+  Alert,
+  Button,
+  FormControl,
+  FormControlLabel,
   FormHelperText,
   Grid,
-  Box,
-  Button,
-  Stack,
-  Typography,
-  OutlinedInput,
   InputLabel,
-  FormControl,
-  Select,
   MenuItem,
+  OutlinedInput,
+  Radio,
   RadioGroup,
-  FormControlLabel,
-  Radio
+  Select,
+  Stack,
+  Switch,
+  Typography
 } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs';
 import { Formik } from 'formik';
+import { useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
-import AnimateButton from '../../../components/@extended/AnimateButton';
 import AppCard from '../../../components/cards/AppCard';
+import { FileUploader } from '../../../components/upload/FileUploader';
+import { ADMIN_URLs } from '../../../constants/admin-urls';
+import { ListRole, TAccountRole } from '../../../constants/role';
+import { createAccount } from '../../../redux/accountSlice';
+import { RootState } from '../../../redux/store';
 
 const CreateAccount = () => {
-  const [gender, setGender] = useState('male');
+  const navigate = useNavigate();
+  const dispatch = useDispatch<any>();
+  const { createLoading } = useSelector((state: RootState) => state.account);
 
-  const handleSubmit = (values: any) => {
-    console.log(values);
-  };
+  const [error, setError] = useState('');
 
   return (
-    <Stack direction="column" justifyContent="space-between">
+    <Stack direction="column" spacing={2}>
       <AppCard variant="outlined">
         <Typography component="h4" variant="h3" textAlign={'center'} sx={{ width: '100%', mb: 3 }}>
           Thêm mới người dùng
         </Typography>
 
-        <Box component="form" noValidate sx={{ mt: 1 }}>
-          <Formik
-            initialValues={{
-              fullName: '',
-              role: '',
-              gender: 'male',
-              status: 'active',
-              address: '',
-              email: '',
-              phone: '',
-              submit: null
-            }}
-            validationSchema={Yup.object().shape({
-              fullName: Yup.string().max(255).required('Họ và tên là bắt buộc'),
-              role: Yup.string().required('Vai trò là bắt buộc'),
-              address: Yup.string().max(255).required('Địa chỉ là bắt buộc'),
-              email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
-              phone: Yup.string()
-                .matches(/^[0-9]{10}$/, 'Số điện thoại không hợp lệ')
-                .required('Số điện thoại là bắt buộc')
-            })}
-            onSubmit={handleSubmit}
-          >
-            {({ errors, handleBlur, handleChange, handleSubmit, touched, values }) => (
-              <form noValidate onSubmit={handleSubmit}>
-                <Grid container spacing={3}>
-                  {/* Họ và tên & Vai trò */}
-                  <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={1}>
-                          <InputLabel htmlFor="fullName">Họ và tên*</InputLabel>
-                          <OutlinedInput
-                            id="fullName"
-                            type="text"
-                            value={values.fullName}
-                            name="fullName"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            placeholder="Nhập họ và tên"
-                            fullWidth
-                            error={Boolean(touched.fullName && errors.fullName)}
-                          />
-                          {touched.fullName && errors.fullName && <FormHelperText error>{errors.fullName}</FormHelperText>}
-                        </Stack>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={1}>
-                          <InputLabel htmlFor="role">Vai trò*</InputLabel>
-                          <Select
-                            id="role"
-                            value={values.role}
-                            name="role"
-                            onChange={handleChange}
-                            error={Boolean(touched.role && errors.role)}
-                            fullWidth
-                          >
-                            <MenuItem value="admin">Quản trị viên</MenuItem>
-                            <MenuItem value="user">Người dùng</MenuItem>
-                            <MenuItem value="editor">Biên tập viên</MenuItem>
-                          </Select>
-                          {touched.role && errors.role && <FormHelperText error>{errors.role}</FormHelperText>}
-                        </Stack>
-                      </Grid>
+        <Formik
+          initialValues={{
+            userName: '',
+            email: '',
+            phoneNumber: '',
+            fullname: '',
+            gender: true,
+            dob: null,
+            role: '',
+            avatarURL: '',
+            isAccountActive: false,
+            submit: null
+          }}
+          validationSchema={Yup.object().shape({
+            userName: Yup.string().required('Tên đăng nhập là bắt buộc'),
+            email: Yup.string().email('Email không hợp lệ').required('Email là bắt buộc'),
+            phoneNumber: Yup.string()
+              .matches(/^[0-9]{10}$/, 'Số điện thoại không hợp lệ')
+              .required('Số điện thoại là bắt buộc'),
+            fullname: Yup.string().required('Họ tên là bắt buộc'),
+            role: Yup.string().required('Vai trò là bắt buộc'),
+            dob: Yup.date().nullable().required('Ngày sinh là bắt buộc')
+          })}
+          onSubmit={async (values, { setSubmitting }) => {
+            console.log(values);
+            try {
+              await dispatch(
+                createAccount({
+                  ...values,
+                  dob: dayjs(values.dob).format('YYYY-MM-DD')
+                })
+              ).unwrap();
+              navigate(ADMIN_URLs.ACCOUNT.INDEX);
+            } catch (err: any) {
+              setError(err.message || 'Có lỗi xảy ra');
+            } finally {
+              setSubmitting(false);
+            }
+          }}
+        >
+          {({ errors, handleBlur, handleChange, handleSubmit, touched, values, setFieldValue }) => (
+            <form noValidate onSubmit={handleSubmit}>
+              <Grid container spacing={3}>
+                {/* Avatar Upload */}
+                <Grid item xs={12}>
+                  <Stack spacing={1} alignItems={'center'}>
+                    <InputLabel>Ảnh đại diện</InputLabel>
+                    <FileUploader value={values.avatarURL} onChange={(url) => setFieldValue('avatarURL', url)} accept="image/*" />
+                  </Stack>
+                </Grid>
+                {/* Username & Role */}
+                <Grid item xs={12}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel htmlFor="userName">Tên đăng nhập*</InputLabel>
+                        <OutlinedInput
+                          id="userName"
+                          value={values.userName}
+                          name="userName"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          placeholder="Nhập tên đăng nhập"
+                          fullWidth
+                          error={Boolean(touched.userName && errors.userName)}
+                        />
+                        {touched.userName && errors.userName && <FormHelperText error>{errors.userName}</FormHelperText>}
+                      </Stack>
                     </Grid>
-                  </Grid>
-
-                  {/* Email & Số điện thoại */}
-                  <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={1}>
-                          <InputLabel htmlFor="email">Email*</InputLabel>
-                          <OutlinedInput
-                            id="email"
-                            type="email"
-                            value={values.email}
-                            name="email"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            placeholder="Nhập email"
-                            fullWidth
-                            error={Boolean(touched.email && errors.email)}
-                          />
-                          {touched.email && errors.email && <FormHelperText error>{errors.email}</FormHelperText>}
-                        </Stack>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={1}>
-                          <InputLabel htmlFor="phone">Số điện thoại*</InputLabel>
-                          <OutlinedInput
-                            id="phone"
-                            type="tel"
-                            value={values.phone}
-                            name="phone"
-                            onBlur={handleBlur}
-                            onChange={handleChange}
-                            placeholder="Nhập số điện thoại"
-                            fullWidth
-                            error={Boolean(touched.phone && errors.phone)}
-                          />
-                          {touched.phone && errors.phone && <FormHelperText error>{errors.phone}</FormHelperText>}
-                        </Stack>
-                      </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel htmlFor="role">Vai trò*</InputLabel>
+                        <Select
+                          value={values.role}
+                          name="role"
+                          onChange={handleChange}
+                          error={Boolean(touched.role && errors.role)}
+                          fullWidth
+                        >
+                          {ListRole.map((role: TAccountRole) => (
+                            <MenuItem key={role.id} value={role.id}>
+                              {role.name}
+                            </MenuItem>
+                          ))}
+                        </Select>
+                        {touched.role && errors.role && <FormHelperText error>{errors.role}</FormHelperText>}
+                      </Stack>
                     </Grid>
-                  </Grid>
-
-                  {/* Giới tính & Trạng thái */}
-                  <Grid item xs={12}>
-                    <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={1}>
-                          <InputLabel id="status-label">Trạng thái</InputLabel>
-                          <Select labelId="status-label" id="status" value={values.status} name="status" onChange={handleChange} fullWidth>
-                            <MenuItem value="active">Đang hoạt động</MenuItem>
-                            <MenuItem value="inactive">Không hoạt động</MenuItem>
-                            <MenuItem value="pending">Chờ xác nhận</MenuItem>
-                          </Select>
-                        </Stack>
-                      </Grid>
-                      <Grid item xs={12} sm={6}>
-                        <Stack spacing={1}>
-                          <InputLabel id="gender-label">Giới tính</InputLabel>
-                          <FormControl>
-                            <RadioGroup row name="gender" value={values.gender} onChange={handleChange}>
-                              <FormControlLabel value="male" control={<Radio />} label="Nam" />
-                              <FormControlLabel value="female" control={<Radio />} label="Nữ" />
-                            </RadioGroup>
-                          </FormControl>
-                        </Stack>
-                      </Grid>
-                    </Grid>
-                  </Grid>
-
-                  {/* Địa chỉ */}
-                  <Grid item xs={12}>
-                    <Stack spacing={1}>
-                      <InputLabel htmlFor="address">Địa chỉ*</InputLabel>
-                      <OutlinedInput
-                        id="address"
-                        type="text"
-                        value={values.address}
-                        name="address"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        placeholder="Nhập địa chỉ"
-                        fullWidth
-                        multiline
-                        rows={3}
-                        error={Boolean(touched.address && errors.address)}
-                      />
-                      {touched.address && errors.address && <FormHelperText error>{errors.address}</FormHelperText>}
-                    </Stack>
-                  </Grid>
-
-                  {/* Submit Button */}
-                  <Grid item xs={12}>
-                    <AnimateButton>
-                      <Button disableElevation fullWidth size="large" type="submit" variant="contained" color="primary">
-                        Tạo mới
-                      </Button>
-                    </AnimateButton>
                   </Grid>
                 </Grid>
-              </form>
-            )}
-          </Formik>
-        </Box>
+
+                {/* Full Name & Date of Birth */}
+                <Grid item xs={12}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel htmlFor="fullname">Họ tên*</InputLabel>
+                        <OutlinedInput
+                          id="fullname"
+                          value={values.fullname}
+                          name="fullname"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          placeholder="Nhập họ tên"
+                          fullWidth
+                          error={Boolean(touched.fullname && errors.fullname)}
+                        />
+                        {touched.fullname && errors.fullname && <FormHelperText error>{errors.fullname}</FormHelperText>}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel>Ngày sinh*</InputLabel>
+                        <DatePicker
+                          value={values.dob}
+                          onChange={(date) => setFieldValue('dob', date)}
+                          slotProps={{
+                            textField: {
+                              error: Boolean(touched.dob && errors.dob),
+                              helperText: touched.dob && errors.dob
+                            }
+                          }}
+                        />
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Grid>
+
+                {/* Email & Phone */}
+                <Grid item xs={12}>
+                  <Grid container spacing={2}>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel htmlFor="email">Email*</InputLabel>
+                        <OutlinedInput
+                          id="email"
+                          type="email"
+                          value={values.email}
+                          name="email"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          placeholder="Nhập email"
+                          fullWidth
+                          error={Boolean(touched.email && errors.email)}
+                        />
+                        {touched.email && errors.email && <FormHelperText error>{errors.email}</FormHelperText>}
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel htmlFor="phoneNumber">Số điện thoại*</InputLabel>
+                        <OutlinedInput
+                          id="phoneNumber"
+                          value={values.phoneNumber}
+                          name="phoneNumber"
+                          onBlur={handleBlur}
+                          onChange={handleChange}
+                          placeholder="Nhập số điện thoại"
+                          fullWidth
+                          error={Boolean(touched.phoneNumber && errors.phoneNumber)}
+                        />
+                        {touched.phoneNumber && errors.phoneNumber && <FormHelperText error>{errors.phoneNumber}</FormHelperText>}
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Grid>
+                <Grid item xs={12}>
+                  <Grid container spacing={2}>
+                    {/* Gender */}
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel>Giới tính</InputLabel>
+                        <RadioGroup
+                          row
+                          name="gender"
+                          value={values.gender}
+                          onChange={(e) => setFieldValue('gender', e.target.value === 'true')}
+                        >
+                          <FormControlLabel value={true} control={<Radio />} label="Nam" />
+                          <FormControlLabel value={false} control={<Radio />} label="Nữ" />
+                        </RadioGroup>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      <Stack spacing={1}>
+                        <InputLabel>Trạng thái tài khoản</InputLabel>
+                        <FormControl>
+                          <Stack direction="row" spacing={1} alignItems="center">
+                            <Switch
+                              checked={values.isAccountActive}
+                              onChange={(e) => setFieldValue('isAccountActive', e.target.checked)}
+                              name="isAccountActive"
+                            />
+                            <Typography>{values.isAccountActive ? 'Đang hoạt động' : 'Đã khóa'}</Typography>
+                          </Stack>
+                        </FormControl>
+                      </Stack>
+                    </Grid>
+                    <Grid item xs={12} sm={6}>
+                      {error && <Alert severity="error">{error}</Alert>}
+                    </Grid>
+                  </Grid>
+                </Grid>
+                {/* Update Submit Button */}
+
+                <Grid item xs={12}>
+                  <Button
+                    disableElevation
+                    fullWidth
+                    size="large"
+                    type="submit"
+                    variant="contained"
+                    color="primary"
+                    disabled={createLoading}
+                  >
+                    {createLoading ? 'Đang xử lý...' : 'Tạo mới'}
+                  </Button>
+                </Grid>
+              </Grid>
+            </form>
+          )}
+        </Formik>
       </AppCard>
     </Stack>
   );

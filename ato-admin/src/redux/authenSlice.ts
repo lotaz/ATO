@@ -119,8 +119,8 @@ const authenSlice = createSlice({
       })
       .addCase(verifyOTP.rejected, (state, action) => {
         state.verifyOTPStatus = 'failed';
-        state.verifyOTPError = action.error.message;
-        enqueueSnackbar('Mã OTP không chính xác', { variant: 'error' });
+        state.verifyOTPError = action.error.message || 'Mã OTP không chính xác';
+        enqueueSnackbar(state.verifyOTPError, { variant: 'error' });
       });
 
     builder
@@ -134,8 +134,8 @@ const authenSlice = createSlice({
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.changePasswordStatus = 'failed';
-        state.changePasswordError = action.error.message;
-        enqueueSnackbar('Đổi mật khẩu thất bại', { variant: 'error' });
+        state.changePasswordError = action.error.message || 'Đổi mật khẩu thất bại';
+        enqueueSnackbar(state.changePasswordError, { variant: 'error' });
       });
   }
 });

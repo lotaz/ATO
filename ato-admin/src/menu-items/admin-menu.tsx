@@ -4,6 +4,7 @@ import {
   DashboardOutlined,
   MailOutlined,
   MessageOutlined,
+  MoneyCollectOutlined,
   ProfileOutlined,
   SettingOutlined,
   TeamOutlined
@@ -84,6 +85,36 @@ const adminMenu: TMenu = {
       ]
     },
     {
+      id: 'facility',
+      title: 'Quản lý cơ sở du lịch',
+      type: 'item',
+      url: ADMIN_URLs.FACILITY.INDEX,
+      icon: CarOutlined,
+      subItems: [
+        {
+          id: 'create-facility',
+          title: 'Thêm mới cơ sở du lịch',
+          type: 'item',
+          url: ADMIN_URLs.FACILITY.CREATE,
+          icon: ProfileOutlined
+        },
+        {
+          id: 'view-facility',
+          title: 'Thông tin cơ sở du lịch',
+          type: 'item',
+          url: ADMIN_URLs.FACILITY.DETAILS,
+          icon: ProfileOutlined
+        },
+        {
+          id: 'update-facility',
+          title: 'Chỉnh sửa thông tin cơ sở du lịch',
+          type: 'item',
+          url: ADMIN_URLs.FACILITY.UPDATE,
+          icon: ProfileOutlined
+        }
+      ]
+    },
+    {
       id: 'request',
       title: 'Quản lý yêu cầu',
       type: 'item',
@@ -100,20 +131,18 @@ const adminMenu: TMenu = {
       ]
     },
     {
-      id: 'config',
-      title: 'Cấu hình',
+      id: 'config-email',
+      title: 'Cấu hình email',
       type: 'item',
-      icon: SettingOutlined,
-      url: ADMIN_URLs.CONFIG.EMAIL,
-      subItems: [
-        {
-          id: 'email-config',
-          title: 'Cấu hình Email',
-          type: 'item',
-          url: ADMIN_URLs.CONFIG.EMAIL,
-          icon: MailOutlined
-        }
-      ]
+      icon: MailOutlined,
+      url: ADMIN_URLs.CONFIG.EMAIL
+    },
+    {
+      id: 'config-vnpay',
+      title: 'Cấu hình VNPay',
+      type: 'item',
+      icon: MoneyCollectOutlined,
+      url: ADMIN_URLs.CONFIG.VNPAY
     }
   ]
 };
