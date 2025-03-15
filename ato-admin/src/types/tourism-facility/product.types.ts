@@ -17,14 +17,3 @@ export interface Product {
   updateDate: string;
   descriptionAPI: string;
 }
-
-export interface ProductResponse {
-  data: Product[];
-  total: number;
-}
-
-export interface ProductParams {
-  page?: number;
-  pageSize?: number;
-  search?: string;
-}
