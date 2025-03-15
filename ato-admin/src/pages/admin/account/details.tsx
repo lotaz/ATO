@@ -10,7 +10,7 @@ import { RootState } from '../../../redux/store';
 import { User } from '../../../types';
 
 const UserDetails = () => {
-  const account: User = useSelector((state: RootState) => state.account.specific);
+  const account = useSelector((state: RootState) => state.account.specific) as any as User;
 
   const location = useLocation();
   const params = new URLSearchParams(location.search);
@@ -46,9 +46,8 @@ const UserDetails = () => {
                 height: 80,
                 backgroundColor: (theme) => theme.palette.primary.light
               }}
-            >
-              <UserOutlined style={{ fontSize: '2rem' }} />
-            </Avatar>
+              src={account?.avatarURL}
+            />
             <Stack spacing={1}>
               <Typography variant="h4">{account?.fullname}</Typography>
               <Stack direction="row" spacing={1}>
@@ -76,8 +75,6 @@ const UserDetails = () => {
               <InfoRow label="Giới tính" value={account?.gender ? 'Nam' : 'Nữ'} />
             </Stack>
           </Box>
-
-          <Divider />
         </Stack>
       </AppCard>
     </Stack>
