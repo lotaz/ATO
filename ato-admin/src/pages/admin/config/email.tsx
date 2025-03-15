@@ -1,50 +1,33 @@
-import { MailOutlined, LockOutlined } from '@ant-design/icons';
+import { LockOutlined, MailOutlined } from '@ant-design/icons';
 import { Box, Button, FormHelperText, Grid, InputLabel, OutlinedInput, Stack, Typography } from '@mui/material';
 import { Formik } from 'formik';
-import { useEffect, useState } from 'react';
-import { enqueueSnackbar } from 'notistack';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import * as Yup from 'yup';
-import AnimateButton from '../../../components/@extended/AnimateButton';
 import AppCard from '../../../components/cards/AppCard';
-import { configService } from '../../../services/config';
+import { RootState } from '../../../redux/store';
+import { getEmailConfig, updateEmailConfig } from '../../../redux/emailConfigSlice';
 import { IEmailConfig } from '../../../services/config/types';
 
 const EmailConfig = () => {
-  const [loading, setLoading] = useState(false);
-  const [initialValues, setInitialValues] = useState<IEmailConfig>({
-    email: '',
-    appPassword: ''
-  });
+  const dispatch = useDispatch<any>();
+  const { config, loading } = useSelector((state: RootState) => state.emailConfig);
 
   useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const response = await configService.getEmailConfig();
-        if (response.success && response.data) {
-          setInitialValues(response.data);
-        }
-      } catch (error) {
-        enqueueSnackbar('Không thể tải cấu hình email', { variant: 'error' });
-      }
-    };
-    fetchConfig();
-  }, []);
+    dispatch(getEmailConfig());
+  }, [dispatch]);
 
   const handleSubmit = async (values: IEmailConfig, { setSubmitting }: any) => {
     try {
-      setLoading(true);
-      const response = await configService.updateEmailConfig(values);
-      if (response.success) {
-        enqueueSnackbar('Cập nhật cấu hình email thành công', { variant: 'success' });
-      } else {
-        enqueueSnackbar(response.message || 'Cập nhật thất bại', { variant: 'error' });
-      }
-    } catch (error) {
-      enqueueSnackbar('Có lỗi xảy ra', { variant: 'error' });
+      await dispatch(updateEmailConfig(values));
     } finally {
-      setLoading(false);
       setSubmitting(false);
     }
+  };
+
+  const initialValues: IEmailConfig = {
+    email: config?.email || '',
+    appPassword: config?.appPassword || ''
   };
 
   return (
