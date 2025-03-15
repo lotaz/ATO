@@ -1,31 +1,30 @@
-import { Grid, Stack, Typography, Divider, Box, Chip, Button } from '@mui/material';
-import AppCard from '../../../components/cards/AppCard';
-import { useNavigate } from 'react-router-dom';
-import { ADMIN_URLs } from '../../../constants/admin-urls';
 import { EditOutlined } from '@ant-design/icons';
+import { Avatar, Box, Button, Chip, Divider, Grid, Stack, Typography } from '@mui/material';
+import dayjs from 'dayjs';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLocation, useNavigate } from 'react-router-dom';
+import AppCard from '../../../components/cards/AppCard';
+import { ADMIN_URLs } from '../../../constants/admin-urls';
+import { getCompany } from '../../../redux/companySlice';
+import { RootState } from '../../../redux/store';
 
 const CompanyDetails = () => {
   const navigate = useNavigate();
+  const dispatch = useDispatch<any>();
+  const location = useLocation();
+  const params = new URLSearchParams(location.search);
+  const companyId = params.get('id');
 
-  // Mock data - replace with API call later
-  const companyInfo = {
-    name: 'Công ty Du lịch ABC',
-    foundedDate: '2010/01/01',
-    address: '123 Nguyễn Huệ, Quận 1, TP.HCM',
-    email: 'contact@abctravel.com',
-    phone: '02812345678',
-    status: 'active',
-    description: 'Công ty chuyên tổ chức các tour du lịch trong và ngoài nước...',
-    website: 'www.abctravel.com',
-    taxCode: '0123456789',
-    representative: 'Nguyễn Văn A',
-    representativePosition: 'Giám đốc',
-    businessType: 'Công ty TNHH',
-    employeeCount: '50-100',
-    image: 'https://caodang.fpt.edu.vn/wp-content/uploads/2024/05/Artboard-3.png'
-  };
+  const company = useSelector((state: RootState) => state.company.specific);
+  console.log('company', company);
+  useEffect(() => {
+    if (companyId) {
+      dispatch(getCompany(companyId));
+    }
+  }, [dispatch, companyId]);
 
-  const InfoRow = ({ label, value }: { label: string; value: string }) => (
+  const InfoRow = ({ label, value }: { label: string; value: string | null }) => (
     <Grid container spacing={2} sx={{ py: 1 }}>
       <Grid item xs={12} sm={4}>
         <Typography variant="subtitle1" color="textSecondary">
@@ -33,10 +32,12 @@ const CompanyDetails = () => {
         </Typography>
       </Grid>
       <Grid item xs={12} sm={8}>
-        <Typography variant="body1">{value}</Typography>
+        <Typography variant="body1">{value || '-'}</Typography>
       </Grid>
     </Grid>
   );
+
+  if (!company) return null;
 
   return (
     <Stack spacing={3}>
@@ -47,8 +48,8 @@ const CompanyDetails = () => {
             <Stack direction="row" spacing={3} alignItems="center">
               <Box
                 component="img"
-                src={companyInfo.image}
-                alt={companyInfo.name}
+                src={company.logoURL}
+                alt={company.companynName}
                 sx={{
                   width: 200,
                   height: 120,
@@ -57,35 +58,58 @@ const CompanyDetails = () => {
                 }}
               />
               <Stack spacing={1}>
-                <Typography variant="h4">{companyInfo.name}</Typography>
+                <Typography variant="h4">{company.companynName}</Typography>
                 <Stack direction="row" spacing={1}>
                   <Chip
-                    label={companyInfo.status === 'active' ? 'Đang hoạt động' : 'Không hoạt động'}
-                    color={companyInfo.status === 'active' ? 'success' : 'default'}
+                    label={company.website ? 'Website có sẵn' : 'Chưa có website'}
+                    color={company.website ? 'success' : 'default'}
                     size="small"
                   />
-                  <Chip label={companyInfo.businessType} color="primary" size="small" />
                 </Stack>
               </Stack>
             </Stack>
-            <Button variant="contained" color="primary" startIcon={<EditOutlined />} onClick={() => navigate(ADMIN_URLs.COMPANY.UPDATE)}>
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<EditOutlined />}
+              onClick={() => navigate(`${ADMIN_URLs.COMPANY.UPDATE}?id=${company.tourCompanyId}`)}
+            >
               Chỉnh sửa
             </Button>
           </Stack>
 
           <Divider />
-
+          <Box>
+            <Typography variant="h5" sx={{ mb: 2 }}>
+              Người phụ trách
+            </Typography>
+            {company.account ? (
+              <Stack direction="row" spacing={2} alignItems="center">
+                <Avatar src={company.account.avatarURL!} alt={company.account.fullname} sx={{ width: 64, height: 64 }} />
+                <Stack spacing={0.5}>
+                  <Typography variant="h6">{company.account.fullname}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {company.account.email}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {company.account.phoneNumber}
+                  </Typography>
+                </Stack>
+              </Stack>
+            ) : (
+              <Typography color="text.secondary">Chưa có người phụ trách</Typography>
+            )}
+          </Box>
           {/* Basic Information */}
           <Box>
             <Typography variant="h5" sx={{ mb: 2 }}>
               Thông tin cơ bản
             </Typography>
             <Stack spacing={1}>
-              <InfoRow label="Tên công ty" value={companyInfo.name} />
-              <InfoRow label="Loại hình doanh nghiệp" value={companyInfo.businessType} />
-              <InfoRow label="Mã số thuế" value={companyInfo.taxCode} />
-              <InfoRow label="Ngày thành lập" value={companyInfo.foundedDate} />
-              <InfoRow label="Website" value={companyInfo.website} />
+              <InfoRow label="Tên công ty" value={company.companynName} />
+              <InfoRow label="Website" value={company.website} />
+              <InfoRow label="Ngày tạo" value={dayjs(company.createDate).format('DD/MM/YYYY HH:mm')} />
+              {company.updateTime && <InfoRow label="Cập nhật lần cuối" value={dayjs(company.updateTime).format('DD/MM/YYYY HH:mm')} />}
             </Stack>
           </Box>
 
@@ -97,47 +121,21 @@ const CompanyDetails = () => {
               Thông tin liên hệ
             </Typography>
             <Stack spacing={1}>
-              <InfoRow label="Địa chỉ" value={companyInfo.address} />
-              <InfoRow label="Email" value={companyInfo.email} />
-              <InfoRow label="Số điện thoại" value={companyInfo.phone} />
+              <InfoRow label="Địa chỉ" value={company.addressCompany} />
+              <InfoRow label="Email" value={company.emailCompany} />
             </Stack>
           </Box>
 
           <Divider />
 
-          {/* Representative Information */}
+          {/* Description */}
           <Box>
             <Typography variant="h5" sx={{ mb: 2 }}>
-              Người đại diện
+              Mô tả
             </Typography>
-            <Stack spacing={1}>
-              <InfoRow label="Họ và tên" value={companyInfo.representative} />
-              <InfoRow label="Chức vụ" value={companyInfo.representativePosition} />
-            </Stack>
-          </Box>
-
-          <Divider />
-
-          {/* Additional Information */}
-          <Box>
-            <Typography variant="h5" sx={{ mb: 2 }}>
-              Thông tin bổ sung
+            <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
+              {company.companyDescription || 'Chưa có mô tả'}
             </Typography>
-            <Stack spacing={1}>
-              <InfoRow label="Quy mô nhân sự" value={companyInfo.employeeCount} />
-              <Grid container spacing={2} sx={{ py: 1 }}>
-                <Grid item xs={12} sm={4}>
-                  <Typography variant="subtitle1" color="textSecondary">
-                    Mô tả
-                  </Typography>
-                </Grid>
-                <Grid item xs={12} sm={8}>
-                  <Typography variant="body1" sx={{ whiteSpace: 'pre-line' }}>
-                    {companyInfo.description}
-                  </Typography>
-                </Grid>
-              </Grid>
-            </Stack>
           </Box>
         </Stack>
       </AppCard>

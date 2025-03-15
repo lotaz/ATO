@@ -39,7 +39,7 @@ const AuthForgotPassword = () => {
       })}
       onSubmit={async (values, { setSubmitting }) => {
         try {
-          dispatch(setUsername(values.email));
+          await dispatch(setUsername(values.email));
           await dispatch(forgotPassword(values.email));
           setSubmitting(false);
         } catch (err) {
