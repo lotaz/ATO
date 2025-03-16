@@ -127,6 +127,7 @@ const ProductList = () => {
                           size="small"
                           onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?id=${product.productId}`)}
                         >
+
                           <EditOutlined />
                         </IconButton>
                       </Stack>

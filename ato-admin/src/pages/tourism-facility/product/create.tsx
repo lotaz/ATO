@@ -23,6 +23,7 @@ const validationSchema = Yup.object().shape({
   productCategory: Yup.number().required('Product category is required').typeError('Product category must be a number')
 });
 
+
 const initialValues: TCreateProduct = {
   productName: '',
   imgs: [],
