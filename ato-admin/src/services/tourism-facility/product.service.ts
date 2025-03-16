@@ -1,21 +1,24 @@
 import { API_URLs } from '../../constants/api';
 import { get, post, put } from '../../helpers/axios-helper';
-import type { Product, ProductParams, ProductResponse } from '../../types/tourism-facility/product.types';
+import type { Product, TCreateProduct } from '../../types/tourism-facility/product.types';
 
 export const productService = {
-  getProducts: (params: ProductParams) => {
-    return get<ProductResponse>(API_URLs.FACILITY_OWNER.PRODUCT.LIST, { params });
+  getProducts: async () => {
+    const response = await get<Product[]>(API_URLs.FACILITY_OWNER.PRODUCT.LIST);
+    console.log('response', response);
+
+    return response.data;
   },
 
-  getProduct: (id: string) => {
-    return get<Product>(`${API_URLs.FACILITY_OWNER.PRODUCT.GET.replace(':id', id)}`);
+  getProduct: async (id: string) => {
+    return await get<Product>(`${API_URLs.FACILITY_OWNER.PRODUCT.GET.replace(':id', id)}`);
   },
 
-  createProduct: (data: Omit<Product, 'productId' | 'createDate' | 'updateDate' | 'descriptionAPI'>) => {
-    return post<Product>(API_URLs.FACILITY_OWNER.PRODUCT.CREATE, data);
+  createProduct: async (data: TCreateProduct) => {
+    return await post<Product>(API_URLs.FACILITY_OWNER.PRODUCT.CREATE, data);
   },
 
-  updateProduct: (id: string, data: Partial<Product>) => {
-    return put<Product>(`${API_URLs.FACILITY_OWNER.PRODUCT.UPDATE}/${id}`, data);
+  updateProduct: async (id: string, data: Partial<Product>) => {
+    return await put<Product>(`${API_URLs.FACILITY_OWNER.PRODUCT.UPDATE}/${id}`, data);
   }
 };
