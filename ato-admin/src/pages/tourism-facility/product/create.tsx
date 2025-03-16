@@ -1,6 +1,6 @@
 import { LoadingButton } from '@mui/lab';
-import { Button, Card, CardContent, Grid, InputAdornment, MenuItem, Stack, TextField, Typography } from '@mui/material';
-import { Form, Formik } from 'formik';
+import { Box, Button, Card, CardContent, Divider, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Formik } from 'formik';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
@@ -8,11 +8,11 @@ import { MultipleFileUploader } from '../../../components/upload/MultipleFileUpl
 import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
 import { createProduct } from '../../../redux/tourism-facility/product.slice';
 import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
+import { TCreateProduct } from '../../../types/tourism-facility/product.types';
 
 const validationSchema = Yup.object().shape({
   productName: Yup.string().required('Product name is required'),
   imgs: Yup.array().min(1, 'At least one image is required'),
-  price: Yup.number().required('Price is required').min(0, 'Price must be positive').typeError('Price must be a number'),
   description: Yup.string().required('Description is required'),
   manufacturer: Yup.string().required('Manufacturer is required'),
   addressManufacturer: Yup.string().required('Manufacturer address is required'),
@@ -23,10 +23,10 @@ const validationSchema = Yup.object().shape({
   productCategory: Yup.number().required('Product category is required').typeError('Product category must be a number')
 });
 
-const initialValues = {
+
+const initialValues: TCreateProduct = {
   productName: '',
   imgs: [],
-  price: '',
   description: '',
   additional: '',
   nutritionType: '',
@@ -36,7 +36,7 @@ const initialValues = {
   origin: '',
   manufacturer: '',
   addressManufacturer: '',
-  unitProduct: '',
+  unitProduct: 0,
   productCategory: ProductCategory.Food // Set default category
 };
 
@@ -44,8 +44,10 @@ const CreateProduct = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
 
-  const handleSubmit = async (values: any, { setSubmitting }: any) => {
+  const handleSubmit = async (values: TCreateProduct, { setSubmitting }: any) => {
+    console.log('here');
     try {
+      console.log('here');
       await dispatch(createProduct(values)).unwrap();
       navigate(TOURISM_FACILITY_URLs.PRODUCT.INDEX);
     } catch (error) {
@@ -58,23 +60,38 @@ const CreateProduct = () => {
   return (
     <Card>
       <CardContent>
-        <Typography variant="h5" gutterBottom>
-          Create New Product
+        <Typography variant="h4" textAlign={'center'} gutterBottom>
+          Tạo mới sản phẩm
         </Typography>
 
-        <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-          {({ values, errors, touched, handleChange, handleBlur, isSubmitting, setFieldValue }) => (
-            <Form>
+        <Formik onSubmit={handleSubmit} initialValues={initialValues} validationSchema={validationSchema}>
+          {({ values, errors, touched, handleChange, handleBlur, isSubmitting, handleSubmit, setFieldValue }) => (
+            <form noValidate onSubmit={handleSubmit}>
               <Grid container spacing={3}>
+                {/* Product Images */}
                 <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom>
+                    Hình ảnh sản phẩm
+                  </Typography>
                   <MultipleFileUploader values={values.imgs} onChange={(urls) => setFieldValue('imgs', urls)} />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <Divider />
+                </Grid>
+
+                {/* Basic Information */}
+                <Grid item xs={12}>
+                  <Typography variant="h6" gutterBottom>
+                    Thông tin cơ bản
+                  </Typography>
                 </Grid>
 
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
                     name="productName"
-                    label="Product Name"
+                    label="Tên sản phẩm"
                     value={values.productName}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -89,7 +106,7 @@ const CreateProduct = () => {
                     select
                     fullWidth
                     name="productCategory"
-                    label="Product Category"
+                    label="Danh mục"
                     value={values.productCategory}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -109,7 +126,7 @@ const CreateProduct = () => {
                   <TextField
                     fullWidth
                     name="unitProduct"
-                    label="Unit Product"
+                    label="Số lượng"
                     type="number"
                     value={values.unitProduct}
                     onChange={handleChange}
@@ -120,45 +137,21 @@ const CreateProduct = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    name="price"
-                    label="Price"
-                    type="number"
-                    value={values.price}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.price && Boolean(errors.price)}
-                    helperText={touched.price && errors.price}
-                    InputProps={{
-                      startAdornment: <InputAdornment position="start">$</InputAdornment>
-                    }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-
+                {/* Manufacturer Information */}
                 <Grid item xs={12}>
-                  <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    name="description"
-                    label="Description"
-                    value={values.description}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.description && Boolean(errors.description)}
-                    helperText={touched.description && errors.description}
-                    InputLabelProps={{ shrink: true }}
-                  />
+                  <Divider />
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Thông tin nhà sản xuất
+                    </Typography>
+                  </Box>
                 </Grid>
 
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
                     name="manufacturer"
-                    label="Manufacturer"
+                    label="Nhà sản xuất"
                     value={values.manufacturer}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -172,7 +165,7 @@ const CreateProduct = () => {
                   <TextField
                     fullWidth
                     name="addressManufacturer"
-                    label="Manufacturer Address"
+                    label="Địa chỉ nhà sản xuất"
                     value={values.addressManufacturer}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -185,8 +178,46 @@ const CreateProduct = () => {
                 <Grid item xs={12} md={6}>
                   <TextField
                     fullWidth
+                    name="origin"
+                    label="Nguồn gốc"
+                    value={values.origin}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+
+                {/* Product Details */}
+                <Grid item xs={12}>
+                  <Divider />
+                  <Box sx={{ mt: 2 }}>
+                    <Typography variant="h6" gutterBottom>
+                      Chi tiết sản phẩm
+                    </Typography>
+                  </Box>
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    name="description"
+                    label="Mô tả"
+                    value={values.description}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.description && Boolean(errors.description)}
+                    helperText={touched.description && errors.description}
+                    InputLabelProps={{ shrink: true }}
+                  />
+                </Grid>
+
+                <Grid item xs={12} md={6}>
+                  <TextField
+                    fullWidth
                     name="nutritionType"
-                    label="Nutrition Type"
+                    label="Loại dinh dưỡng"
                     value={values.nutritionType}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -198,7 +229,7 @@ const CreateProduct = () => {
                   <TextField
                     fullWidth
                     name="age"
-                    label="Age"
+                    label="Tuổi"
                     value={values.age}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -210,7 +241,7 @@ const CreateProduct = () => {
                   <TextField
                     fullWidth
                     name="ingredient"
-                    label="Ingredient"
+                    label="Thành phần"
                     value={values.ingredient}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -222,7 +253,7 @@ const CreateProduct = () => {
                   <TextField
                     fullWidth
                     name="volume"
-                    label="Volume"
+                    label="Khối lượng"
                     value={values.volume}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -230,25 +261,13 @@ const CreateProduct = () => {
                   />
                 </Grid>
 
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    name="origin"
-                    label="Origin"
-                    value={values.origin}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={12}>
+                <Grid item xs={12}>
                   <TextField
                     fullWidth
                     multiline
                     rows={4}
                     name="additional"
-                    label="Additional Information"
+                    label="Thông tin thêm"
                     value={values.additional}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -259,15 +278,15 @@ const CreateProduct = () => {
                 <Grid item xs={12}>
                   <Stack direction="row" spacing={2} justifyContent="flex-end">
                     <Button variant="outlined" onClick={() => navigate(TOURISM_FACILITY_URLs.PRODUCT.INDEX)}>
-                      Cancel
+                      Hủy
                     </Button>
                     <LoadingButton variant="contained" type="submit" loading={isSubmitting}>
-                      Create Product
+                      Tạo sản phẩm
                     </LoadingButton>
                   </Stack>
                 </Grid>
               </Grid>
-            </Form>
+            </form>
           )}
         </Formik>
       </CardContent>

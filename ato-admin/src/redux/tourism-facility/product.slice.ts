@@ -1,7 +1,7 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { enqueueSnackbar } from 'notistack';
 import { productService } from '../../services/tourism-facility/product.service';
-import type { Product } from '../../types/tourism-facility/product.types';
+import type { Product, TCreateProduct } from '../../types/tourism-facility/product.types';
 
 interface ProductState {
   products: Product[];
@@ -31,13 +31,10 @@ export const fetchProduct = createAsyncThunk('product/fetchProduct', async (id: 
   return response.data;
 });
 
-export const createProduct = createAsyncThunk(
-  'product/createProduct',
-  async (data: Omit<Product, 'productId' | 'createDate' | 'updateDate' | 'descriptionAPI'>) => {
-    const response = await productService.createProduct(data);
-    return response.data;
-  }
-);
+export const createProduct = createAsyncThunk('product/createProduct', async (data: TCreateProduct) => {
+  const response = await productService.createProduct(data);
+  return response.data;
+});
 
 export const updateProduct = createAsyncThunk('product/updateProduct', async ({ id, data }: { id: string; data: Partial<Product> }) => {
   const response = await productService.updateProduct(id, data);

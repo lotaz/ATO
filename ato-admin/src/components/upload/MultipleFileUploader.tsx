@@ -100,9 +100,9 @@ export const MultipleFileUploader = ({ values = [], onChange, accept = 'image/*'
         <UploadWrapper onClick={() => fileInputRef.current?.click()}>
           <Stack spacing={1} alignItems="center">
             <CameraOutlined color="primary" />
-            <Typography variant="body1">Click to upload images</Typography>
+            <Typography variant="body1">Bấm để tải ảnh</Typography>
             <Typography variant="caption" color="textSecondary">
-              {`You can upload up to ${maxFiles} images (${maxFiles - values.length} remaining)`}
+              {`Bạn có thể tải lên tối đa ${maxFiles} hình ảnh (${maxFiles - values.length} còn lại)`}
             </Typography>
           </Stack>
         </UploadWrapper>

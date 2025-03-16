@@ -13,7 +13,8 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField
+  TextField,
+  Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,7 +25,7 @@ import { fetchProducts } from '../../../redux/tourism-facility/product.slice';
 import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
 import { NoDataDisplay } from '../../../components/no-data/NoDataDisplay';
 import AppSearchBar from '../../../components/table/SearchBar';
-import { ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
+import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 
 const ProductList = () => {
   const dispatch = useDispatch<any>();
@@ -74,30 +75,59 @@ const ProductList = () => {
             <Table>
               <TableHead>
                 <TableRow>
-                  <TableCell>Product Name</TableCell>
-                  <TableCell>Manufacturer</TableCell>
-                  <TableCell>Origin</TableCell>
-                  <TableCell>Unit Product</TableCell>
-                  <TableCell>Category</TableCell>
-                  <TableCell align="right">Actions</TableCell>
+                  <TableCell width={500}>Tên sản phẩm</TableCell>
+                  <TableCell>Nhà sản xuất</TableCell>
+                  <TableCell>Nguồn gốc</TableCell>
+                  <TableCell>Số lượng</TableCell>
+                  <TableCell>Danh mục</TableCell>
+                  <TableCell align="right">Hành động</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
                 {currentProducts?.map((product) => (
                   <TableRow key={product.productId}>
-                    <TableCell>{product.productName}</TableCell>
-                    <TableCell>{product.manufacturer}</TableCell>
+                    <TableCell>
+                      <Typography
+                        sx={{
+                          maxWidth: 500,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {product.productName}
+                      </Typography>
+                    </TableCell>
+                    <TableCell>
+                      <Typography
+                        sx={{
+                          maxWidth: 150,
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          whiteSpace: 'nowrap'
+                        }}
+                      >
+                        {product.manufacturer}
+                      </Typography>
+                    </TableCell>
                     <TableCell>{product.origin}</TableCell>
                     <TableCell>{product.unitProduct}</TableCell>
                     <TableCell>
-                      <Chip label={ProductCategoryLabels[product.productCategory]} color="primary" size="small" />
+                      <Chip label={ProductCategoryLabels[product.productCategory as ProductCategory]} color="primary" size="small" />
                     </TableCell>
                     <TableCell align="right">
                       <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <IconButton size="small" onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}/${product.productId}`)}>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?id=${product.productId}`)}
+                        >
                           <EyeOutlined />
                         </IconButton>
-                        <IconButton size="small" onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}/${product.productId}`)}>
+                        <IconButton
+                          size="small"
+                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?id=${product.productId}`)}
+                        >
+
                           <EditOutlined />
                         </IconButton>
                       </Stack>
