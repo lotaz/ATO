@@ -1,7 +1,7 @@
+import { EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
-  CardContent,
   Chip,
   IconButton,
   Paper,
@@ -13,18 +13,16 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { NoDataDisplay } from '../../../components/no-data/NoDataDisplay';
+import AppSearchBar from '../../../components/table/SearchBar';
 import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
 import type { RootState } from '../../../redux/store';
 import { fetchProducts } from '../../../redux/tourism-facility/product.slice';
-import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
-import { NoDataDisplay } from '../../../components/no-data/NoDataDisplay';
-import AppSearchBar from '../../../components/table/SearchBar';
 import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 
 const ProductList = () => {
@@ -119,15 +117,14 @@ const ProductList = () => {
                       <Stack direction="row" spacing={1} justifyContent="flex-end">
                         <IconButton
                           size="small"
-                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?id=${product.productId}`)}
+                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${product.productId}`)}
                         >
                           <EyeOutlined />
                         </IconButton>
                         <IconButton
                           size="small"
-                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?id=${product.productId}`)}
+                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?productId=${product.productId}`)}
                         >
-
                           <EditOutlined />
                         </IconButton>
                       </Stack>
