@@ -1,24 +1,28 @@
+import { ArrowLeftOutlined, PlusOutlined } from '@ant-design/icons';
+import { Box, Button, Card, CardContent, Chip, Divider, Grid, Stack, Typography } from '@mui/material';
+import dayjs from 'dayjs';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate, useParams } from 'react-router-dom';
-import { Box, Button, Card, CardContent, Chip, Divider, Grid, ImageList, ImageListItem, Stack, Typography } from '@mui/material';
-import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
-import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
-import { RootState } from '../../../redux/store';
-import { ArrowLeftOutlined } from '@ant-design/icons';
-import { fetchProduct } from '../../../redux/tourism-facility/product.slice';
+import { useNavigate } from 'react-router-dom';
 import { ImageCarousel } from '../../../components/carousel/ImageCarousel';
+import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
+import { RootState } from '../../../redux/store';
+import { fetchCertificates } from '../../../redux/tourism-facility/certificate.slice';
+import { fetchProduct } from '../../../redux/tourism-facility/product.slice';
+import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 
 const ProductDetails = () => {
   const params = new URLSearchParams(location.search);
-  const id = params.get('id');
+  const id = params.get('productId');
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
   const { product, loading } = useSelector((state: RootState) => state.productSlice);
+  const { certificates } = useSelector((state: RootState) => state.certificateSlice);
 
   useEffect(() => {
     if (id) {
       dispatch(fetchProduct(id));
+      dispatch(fetchCertificates(Number(id)));
     }
   }, [dispatch, id]);
 
@@ -97,6 +101,72 @@ const ProductDetails = () => {
               </Box>
             </Grid>
           </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Add Certificate Management Section */}
+      <Card>
+        <CardContent>
+          <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
+            <Typography variant="h6" fontWeight={'bold'}>
+              Chứng chỉ sản phẩm
+            </Typography>
+            <Button
+              variant="contained"
+              startIcon={<PlusOutlined />}
+              onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.CREATE_CERTIFICATE}?productId=${id}`)}
+            >
+              Thêm chứng chỉ
+            </Button>
+          </Stack>
+
+          {certificates && certificates.length > 0 ? (
+            <Grid container spacing={2}>
+              {certificates.map((cert) => (
+                <Grid item xs={12} md={6} key={cert.certificationId}>
+                  <Card variant="outlined">
+                    <CardContent>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={1}>
+                        <Typography variant="subtitle1" fontWeight="bold">
+                          {cert.certificationName}
+                        </Typography>
+                        <Chip
+                          label={cert.statusApproval ? 'Đã duyệt' : 'Chưa duyệt'}
+                          color={cert.statusApproval ? 'success' : 'warning'}
+                          size="small"
+                        />
+                      </Stack>
+                      <DetailItem label="Tổ chức cấp" value={cert.issuingOrganization} />
+                      <DetailItem label="Ngày cấp" value={dayjs(cert.issueDate).format('DD/MM/YYYY')} />
+                      {cert.expiryDate && <DetailItem label="Ngày hết hạn" value={dayjs(cert.expiryDate).format('DD/MM/YYYY')} />}
+                      <Stack direction="row" spacing={1} mt={2}>
+                        <Button
+                          size="small"
+                          onClick={() =>
+                            navigate(`${TOURISM_FACILITY_URLs.PRODUCT.VIEW_CERTIFICATE}?id=${cert.certificationId}&productId=${id}`)
+                          }
+                        >
+                          Chi tiết
+                        </Button>
+                        <Button
+                          size="small"
+                          onClick={() =>
+                            navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE_CERTIFICATE}?id=${cert.certificationId}&productId=${id}`)
+                          }
+                        >
+                          Cập nhật
+                        </Button>
+                      </Stack>
+                    </CardContent>
+                  </Card>
+                </Grid>
+              ))}
+            </Grid>
+          ) : (
+            <Box textAlign="center" py={3}>
+              <Typography color="text.secondary">Chưa có chứng chỉ nào</Typography>
+            </Box>
+          )}
         </CardContent>
       </Card>
     </Stack>

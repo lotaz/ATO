@@ -21,8 +21,8 @@ const menuData: Menu[] = [
   },
   {
     id: 4,
-    title: "Sản phẩm OCOP",
-    path: "/blog",
+    title: "Công ty du lịch",
+    path: "/companies",
     newTab: false,
   },
   {
