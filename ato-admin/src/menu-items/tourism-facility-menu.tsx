@@ -1,5 +1,5 @@
 // assets
-import { ProductOutlined } from '@ant-design/icons';
+import { BoxPlotOutlined, PaperClipOutlined, ProductOutlined, ShopOutlined } from '@ant-design/icons';
 import { TOURISM_FACILITY_URLs } from '../constants/tourism-facility-urls';
 import { TMenu } from './types';
 
@@ -36,6 +36,20 @@ const tourismFacilityMenu: TMenu = {
           icon: ProductOutlined
         }
       ]
+    },
+    {
+      id: 'package',
+      title: 'Quản lý gói du lịch',
+      type: 'item',
+      url: TOURISM_FACILITY_URLs.PACKAGE.INDEX,
+      icon: BoxPlotOutlined
+    },
+    {
+      id: 'orders',
+      title: 'Quản lý hóa đơn',
+      type: 'item',
+      url: TOURISM_FACILITY_URLs.ORDER.INDEX,
+      icon: ShopOutlined
     }
   ]
 };
