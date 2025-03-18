@@ -1,15 +1,10 @@
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  images: {
-    domains: ["localhost"],
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "cdn.sanity.io",
-        port: "",
-      },
-    ],
+module.exports = {
+  devIndicators: {},
+  publicRuntimeConfig: {
+    // Available on both server and client
+    theme: "DEFAULT",
+    currency: "VND",
+    apiUrl: process.env.NEXT_PUBLIC_API_URL,
+    environment: process.env.NEXT_ENV,
   },
 };
-
-module.exports = nextConfig;
