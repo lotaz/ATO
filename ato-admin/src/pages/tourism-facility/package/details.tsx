@@ -1,32 +1,39 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Box, Button, Card, CardContent, Divider, Grid, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
-import { RootState } from '../../../redux/store';
-import { fetchPackage } from '../../../redux/tourism-facility/package.slice';
+import { packageService } from '../../../services/tourism-facility/package.service';
+import { StatusApproval, StatusOperating, TimeType, TourismPackageResponse } from '../../../types/tourism-facility/package.types';
 import ActivityList from './activity';
 
 const PackageDetails = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<any>();
-
-  const location = useLocation();
-  const params = new URLSearchParams(location.search);
-  const packageId = params.get('id');
-
-  const { specific: packageData, loading } = useSelector((state: RootState) => state.packageSlice);
+  const { id } = useParams();
+  const [packageData, setPackageData] = useState<TourismPackageResponse | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    if (packageId) {
-      dispatch(fetchPackage(Number(packageId)));
+    if (id) {
+      fetchPackage(id);
     }
-  }, [dispatch, packageId]);
+  }, [id]);
 
-  if (loading || !packageData) {
-    return <div>Loading...</div>;
+  const fetchPackage = async (packageId: string) => {
+    try {
+      setIsLoading(true);
+      const response = await packageService.getPackage(packageId);
+      setPackageData(response.data);
+    } catch (error) {
+      console.error('Failed to fetch package:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading || !packageData) {
+    return <Typography>Đang tải...</Typography>;
   }
 
   const DetailItem = ({ label, value }: { label: string; value: any }) => (
@@ -56,7 +63,9 @@ const PackageDetails = () => {
               </Typography>
               <DetailItem label="Tên gói" value={packageData.packageName} />
               <DetailItem label="Giá" value={`${packageData.price.toLocaleString()} VND`} />
-              <DetailItem label="Thời gian" value={`${packageData.durations} ngày`} />
+              <DetailItem label="Thời gian" value={`${packageData.durations} ${getDurationType(packageData.durationsType)}`} />
+              <DetailItem label="Trạng thái duyệt" value={getStatusApprovalLabel(packageData.statusApproval)} />
+              <DetailItem label="Trạng thái hoạt động" value={getOperatingStatusLabel(packageData.statusOperating)} />
             </Grid>
 
             <Grid item xs={12}>
@@ -78,9 +87,9 @@ const PackageDetails = () => {
               <Typography variant="h6" gutterBottom>
                 Thông tin thời gian
               </Typography>
-              <DetailItem label="Ngày tạo" value={dayjs(packageData.createdDate).format('DD/MM/YYYY HH:mm')} />
-              {packageData.updatedDate && (
-                <DetailItem label="Cập nhật lần cuối" value={dayjs(packageData.updatedDate).format('DD/MM/YYYY HH:mm')} />
+              <DetailItem label="Ngày tạo" value={dayjs(packageData.createDate).format('DD/MM/YYYY HH:mm')} />
+              {packageData.updateDate && (
+                <DetailItem label="Cập nhật lần cuối" value={dayjs(packageData.updateDate).format('DD/MM/YYYY HH:mm')} />
               )}
             </Grid>
           </Grid>
@@ -92,11 +101,37 @@ const PackageDetails = () => {
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">Danh sách hoạt động</Typography>
           </Stack>
-          <ActivityList packageId={Number(packageId)} />
+          <ActivityList packageId={id} />
         </CardContent>
       </Card>
     </Stack>
   );
+};
+
+const getDurationType = (type: TimeType) => {
+  const types = {
+    [TimeType.SECOND]: 'Giây',
+    [TimeType.MINUTE]: 'Phút',
+    [TimeType.HOUR]: 'Giờ',
+    [TimeType.DAY]: 'Ngày',
+    [TimeType.MONTH]: 'Tháng',
+    [TimeType.YEAR]: 'Năm'
+  };
+  return types[type] || 'Không xác định';
+};
+
+const getStatusApprovalLabel = (status: StatusApproval) => {
+  const labels = {
+    [StatusApproval.APPROVED]: 'Đã duyệt',
+    [StatusApproval.PROCESSING]: 'Đang xử lý',
+    [StatusApproval.REJECT]: 'Từ chối',
+    [StatusApproval.UPDATE]: 'Cập nhật'
+  };
+  return labels[status] || 'Không xác định';
+};
+
+const getOperatingStatusLabel = (status: StatusOperating) => {
+  return status === StatusOperating.ACTIVE ? 'Hoạt động' : 'Không hoạt động';
 };
 
 export default PackageDetails;
