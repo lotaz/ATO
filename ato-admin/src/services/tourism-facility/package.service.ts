@@ -1,30 +1,25 @@
 import { get, post, put } from '../../helpers/axios-helper';
-import { mockPackages } from '../../mock/tourism-facility/package.mock';
-import { CreatePackageRequest, TourPackage } from '../../types/tourism-facility/package.types';
+import { TourismPackageResponse, CreatePackageRequest } from '../../types/tourism-facility/package.types';
 
-const BASE_URL = '/api/packages';
+const PACKAGE_API = '/afto/tourism-package';
 
 export const packageService = {
-  getAll: async (): Promise<TourPackage[]> => {
-    return mockPackages;
-    const response = await get(BASE_URL);
-    return response.data as TourPackage[];
-  },
+  getPackages: () => get<TourismPackageResponse[]>(PACKAGE_API + '/list-tourism-package'),
 
-  getById: async (id: number): Promise<TourPackage> => {
-    return mockPackages[0];
+  getPackage: (id: string) => get<TourismPackageResponse>(`${PACKAGE_API}/get-tourism-package/${id}`),
 
-    const response = await get(`${BASE_URL}/${id}`);
-    return response.data as TourPackage;
-  },
+  createPackage: (data: CreatePackageRequest) => post<TourismPackageResponse>(PACKAGE_API + '/create-tourism-package', data),
 
-  create: async (data: CreatePackageRequest): Promise<TourPackage> => {
-    const response = await post(BASE_URL, data);
-    return response.data as TourPackage;
-  },
+  updatePackage: (id: string, data: CreatePackageRequest) =>
+    put<TourismPackageResponse>(`${PACKAGE_API}/update-tourism-package/${id}`, data),
 
-  update: async (id: number, data: Partial<CreatePackageRequest>): Promise<TourPackage> => {
-    const response = await put(`${BASE_URL}/${id}`, data);
-    return response.data as TourPackage;
-  }
+  getPackageActivities: (packageId: string) => get<TourismPackageResponse>(`${PACKAGE_API}/${packageId}/activities`),
+
+  approvePackage: (packageId: string) => put<TourismPackageResponse>(`${PACKAGE_API}/${packageId}/approve`, {}),
+
+  rejectPackage: (packageId: string, replyRequest: string) =>
+    put<TourismPackageResponse>(`${PACKAGE_API}/${packageId}/reject`, { replyRequest }),
+
+  updatePackageStatus: (packageId: string, statusOperating: number) =>
+    put<TourismPackageResponse>(`${PACKAGE_API}/${packageId}/status`, { statusOperating })
 };
