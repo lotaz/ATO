@@ -2,6 +2,7 @@ import { CameraOutlined, DeleteOutlined } from '@ant-design/icons';
 import { Box, Grid, IconButton, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ChangeEvent, useRef } from 'react';
+import axios from 'axios';
 
 interface FileUploaderProps {
   values?: string[];
@@ -56,13 +57,35 @@ const DeleteOverlay = styled(Box)(({ theme }) => ({
 export const MultipleFileUploader = ({ values = [], onChange, accept = 'image/*', maxFiles = 5 }: FileUploaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
+  const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post('/api/file/upload-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response?.data?.fileUrl;
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  };
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files || []);
     const remainingSlots = maxFiles - values.length;
     const allowedFiles = files.slice(0, remainingSlots);
 
-    const newUrls = allowedFiles.map((file) => URL.createObjectURL(file));
-    onChange([...values, ...newUrls]);
+    try {
+      const uploadPromises = allowedFiles.map((file) => uploadFile(file));
+      const uploadedUrls = await Promise.all(uploadPromises);
+      onChange([...values, ...uploadedUrls]);
+    } catch (error) {
+      console.error('Error uploading files:', error);
+    }
 
     // Reset input value to allow selecting the same file again
     if (fileInputRef.current) {

@@ -26,7 +26,13 @@ export const API_URLs = {
     GET: '/admin/tour-company/get-tour-company/:id',
     CREATE: '/admin/tour-company/create-tour-company',
     UPDATE: '/admin/tour-company/update-tour-company',
-    UNASSIGED: '/admin/tour-company/unassigned-tour-companies'
+    UNASSIGED: '/admin/tour-company/unassigned-tour-companies',
+    DRIVER: {
+      LIST: '/tour-company/driver/get-list-drivers',
+      GET: '/tour-company/driver/get-driver/:id',
+      CREATE: '/tour-company/driver/add-driver',
+      UPDATE: '/tour-company/driver/update-driver/:id'
+    }
   },
   FACILITY: {
     LIST: '/admin/tourist-facility/list-tourist-facilities',
@@ -61,5 +67,11 @@ export const API_URLs = {
       CREATE: '/afto/contract/create-contract',
       UPDATE: '/afto/contract/update-contract/:id'
     }
+  },
+  ACCOMMODATION: {
+    LIST: '/tour-company/accommodation/get-list-accommodations',
+    GET: '/tour-company/accommodation/get-accommodation/:id',
+    CREATE: '/tour-company/accommodation/add-accommodation',
+    UPDATE: '/tour-company/accommodation/update-accommodation/:id'
   }
 };

@@ -2,6 +2,7 @@ import { CameraOutlined } from '@ant-design/icons';
 import { Avatar, Box, IconButton, Stack, Typography } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { ChangeEvent, useRef } from 'react';
+import axios from 'axios';
 
 interface FileUploaderProps {
   value?: string;
@@ -36,14 +37,40 @@ const UploadOverlay = styled(Box)(({ theme }) => ({
   cursor: 'pointer'
 }));
 
-export const FileUploader = ({ value, onChange, accept }: FileUploaderProps) => {
+export const FileUploader = ({ value, onChange, accept = 'image/*' }: FileUploaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const uploadFile = async (file: File): Promise<string> => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await axios.post('/api/file/upload-image', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data'
+        }
+      });
+      return response?.data?.fileUrl;
+    } catch (error) {
+      console.error('Error uploading file:', error);
+      throw error;
+    }
+  };
 
   const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      onChange(url);
+      try {
+        const imageUrl = await uploadFile(file);
+        onChange(imageUrl);
+      } catch (error) {
+        console.error('Error uploading file:', error);
+      }
+
+      // Reset input value to allow selecting the same file again
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -67,7 +94,7 @@ export const FileUploader = ({ value, onChange, accept }: FileUploaderProps) => 
         </UploadOverlay>
       </UploadWrapper>
 
-      <input type="file" accept="image/*" style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
+      <input type="file" accept={accept} style={{ display: 'none' }} ref={fileInputRef} onChange={handleFileChange} />
 
       <Typography variant="caption" color="textSecondary" align="center">
         Click để tải lên ảnh đại diện

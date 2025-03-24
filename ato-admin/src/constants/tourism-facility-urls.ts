@@ -14,8 +14,8 @@ export const TOURISM_FACILITY_URLs = {
   PACKAGE: {
     INDEX: `${TOURISM_FACILITY_BASE_URL}/package`,
     CREATE: `${TOURISM_FACILITY_BASE_URL}/package/create`,
-    UPDATE: `${TOURISM_FACILITY_BASE_URL}/package/update`,
-    DETAILS: `${TOURISM_FACILITY_BASE_URL}/package/details`,
+    UPDATE: `${TOURISM_FACILITY_BASE_URL}/package/update/:id`,
+    DETAILS: `${TOURISM_FACILITY_BASE_URL}/package/details/:id`,
     ACTIVITY: {
       INDEX: (packageId: number) => `${TOURISM_FACILITY_BASE_URL}/package/activities?packageId=${packageId}`,
       CREATE: (packageId: number) => `${TOURISM_FACILITY_BASE_URL}/package/activities/create?packageId=${packageId}`,
