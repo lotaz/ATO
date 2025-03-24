@@ -11,8 +11,7 @@ export const TOURISM_COMPANY_URLs = {
     INDEX: `${TOURISM_COMPANY_BASE_URL}/tour-guide-team`,
     CREATE: `${TOURISM_COMPANY_BASE_URL}/tour-guide-team/create`,
     UPDATE: `${TOURISM_COMPANY_BASE_URL}/tour-guide-team/update`,
-    DETAILS: `${TOURISM_COMPANY_BASE_URL}/tour-guide-team/details`,
-    REQUEST: `${TOURISM_COMPANY_BASE_URL}/tour-guide-team/request`
+    DETAILS: `${TOURISM_COMPANY_BASE_URL}/tour-guide-team/details`
   },
   TOUR_PACKAGE: {
     INDEX: `${TOURISM_COMPANY_BASE_URL}/tour-package`,
@@ -26,5 +25,17 @@ export const TOURISM_COMPANY_URLs = {
       `${TOURISM_COMPANY_BASE_URL}/tour-package/destinations/update?packageId=${packageId}&destinationId=${destinationId}`,
     DETAILS: (packageId: number, destinationId: number) =>
       `${TOURISM_COMPANY_BASE_URL}/tour-package/destinations/details?packageId=${packageId}&destinationId=${destinationId}`
+  },
+  DRIVER: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/drivers`,
+    CREATE: `${TOURISM_COMPANY_BASE_URL}/drivers/create`,
+    UPDATE: `${TOURISM_COMPANY_BASE_URL}/drivers/update/:id`,
+    DETAILS: `${TOURISM_COMPANY_BASE_URL}/drivers/details/:id`
+  },
+  ACCOMMODATION: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/accommodation`,
+    CREATE: `${TOURISM_COMPANY_BASE_URL}/accommodation/create`,
+    UPDATE: `${TOURISM_COMPANY_BASE_URL}/accommodation/update/:id`,
+    DETAILS: `${TOURISM_COMPANY_BASE_URL}/accommodation/details/:id`
   }
 };

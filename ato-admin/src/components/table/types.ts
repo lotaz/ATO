@@ -10,7 +10,7 @@ export type TColumn = {
 export type TAppTable = {
   columns: TColumn[];
   rows: any[];
-  rowKey: 'id' | 'email';
+  rowKey: 'id' | 'email' | 'driverId' | 'accommodationId' | 'guideId';
   handleViewDetails: (id: any) => void;
   handleUpdate: (id: any) => void;
 };
