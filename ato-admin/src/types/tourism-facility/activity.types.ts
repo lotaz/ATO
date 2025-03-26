@@ -14,11 +14,15 @@ export interface Activity {
 }
 
 export interface CreateActivityRequest {
-  name: string;
+  activityName: string;
   description: string;
-  durationInHours?: number;
+  durationInHours: number;
+  durationInHoursType: number;
   location?: string;
+  imgs: string[];
   breakTimeInMinutes: number;
-  packageId: number;
-  imgs: string;
+  breakTimeInMinutesType: number;
+  startTime: Date;
+  endTime: Date;
+  packageId: string;
 }

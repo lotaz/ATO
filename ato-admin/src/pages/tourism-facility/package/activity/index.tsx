@@ -15,19 +15,15 @@ import {
   TableRow
 } from '@mui/material';
 import dayjs from 'dayjs';
-import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { NoDataDisplay } from '../../../../components/no-data/NoDataDisplay';
 import AppSearchBar from '../../../../components/table/SearchBar';
 import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-urls';
-import { RootState } from '../../../../redux/store';
-import { fetchActivities } from '../../../../redux/tourism-facility/activity.slice';
+import { ActivityResponse } from '../../../../types/tourism-facility/package.types';
 
-const ActivityList = ({ packageId }: { packageId: number }) => {
-  const dispatch = useDispatch<any>();
+const ActivityList = ({ activities, packageId }: { activities: ActivityResponse[]; packageId: string | undefined }) => {
   const navigate = useNavigate();
-  const { activities } = useSelector((state: RootState) => state.activitySlice);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
@@ -44,17 +40,11 @@ const ActivityList = ({ packageId }: { packageId: number }) => {
   const filteredActivities =
     activities?.filter(
       (activity) =>
-        activity.name.toLowerCase().includes(searchText.toLowerCase()) ||
-        activity.description.toLowerCase().includes(searchText.toLowerCase())
+        activity.activityName?.toLowerCase().includes(searchText.toLowerCase()) ||
+        activity.description?.toLowerCase().includes(searchText.toLowerCase())
     ) || [];
 
   const currentActivities = filteredActivities.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
-
-  useEffect(() => {
-    if (packageId) {
-      dispatch(fetchActivities(Number(packageId)));
-    }
-  }, [dispatch, packageId]);
 
   return (
     <Stack spacing={2}>
@@ -63,7 +53,7 @@ const ActivityList = ({ packageId }: { packageId: number }) => {
         <Button
           variant="contained"
           startIcon={<PlusOutlined />}
-          onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.ACTIVITY.CREATE(Number(packageId)))}
+          onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.ACTIVITY.CREATE(packageId))}
         >
           Thêm hoạt động
         </Button>
@@ -86,28 +76,28 @@ const ActivityList = ({ packageId }: { packageId: number }) => {
               <TableBody>
                 {currentActivities?.map((activity) => (
                   <TableRow key={activity.activityId}>
-                    <TableCell>{activity.name}</TableCell>
+                    <TableCell>{activity.activityName}</TableCell>
                     <TableCell>{activity.durationInHours || '-'}</TableCell>
                     <TableCell>{activity.location || '-'}</TableCell>
                     <TableCell>
                       <Chip
-                        label={activity.approvalStatus ? 'Đã duyệt' : 'Chưa duyệt'}
-                        color={activity.approvalStatus ? 'success' : 'warning'}
+                        label={activity.statusApproval ? 'Đã duyệt' : 'Chưa duyệt'}
+                        color={activity.statusApproval ? 'success' : 'warning'}
                         size="small"
                       />
                     </TableCell>
-                    <TableCell>{dayjs(activity.createdDate).format('DD/MM/YYYY')}</TableCell>
+                    <TableCell>{dayjs(activity.createDate).format('DD/MM/YYYY')}</TableCell>
                     <TableCell align="right">
                       <Stack direction="row" spacing={1} justifyContent="flex-end">
                         <IconButton
                           size="small"
-                          onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.ACTIVITY.DETAILS(Number(packageId), activity.activityId))}
+                          onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.ACTIVITY.DETAILS(packageId, activity.activityId))}
                         >
                           <EyeOutlined />
                         </IconButton>
                         <IconButton
                           size="small"
-                          onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.ACTIVITY.UPDATE(Number(packageId), activity.activityId))}
+                          onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.ACTIVITY.UPDATE(packageId, activity.activityId))}
                         >
                           <EditOutlined />
                         </IconButton>
@@ -120,7 +110,7 @@ const ActivityList = ({ packageId }: { packageId: number }) => {
             <TablePagination
               rowsPerPageOptions={[10, 25, 100]}
               component="div"
-              count={filteredActivities.length}
+              count={filteredActivities?.length ?? 0}
               rowsPerPage={rowsPerPage}
               page={page}
               onPageChange={handleChangePage}

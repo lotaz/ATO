@@ -3,13 +3,10 @@ import { Button, Card, CardContent, Grid, MenuItem, Stack, TextField, Typography
 import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { Formik } from 'formik';
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
-import { fetchTourPackage, updateTourPackage } from '../../../redux/tourism-company/tour-package.slice';
-import { RootState } from '../../../redux/store';
 import { DurationType } from '../../../types/tourism-company/tour-package.types';
 
 const UpdateTourPackage = () => {
@@ -18,13 +15,6 @@ const UpdateTourPackage = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
-  const { specific: tourPackage, loading } = useSelector((state: RootState) => state.tourPackageSlice);
-
-  useEffect(() => {
-    if (id) {
-      dispatch(fetchTourPackage(Number(id)));
-    }
-  }, [dispatch, id]);
 
   const validationSchema = Yup.object().shape({
     packageName: Yup.string().required('Vui lòng nhập tên gói'),

@@ -1,6 +1,8 @@
+import { post } from '../../helpers/axios-helper';
 import { mockActivities } from '../../mock/tourism-facility/activity.mock';
 import { Activity, CreateActivityRequest } from '../../types/tourism-facility/activity.types';
 import dayjs from 'dayjs';
+const ACTIVITY_API = '/afto/tourism-package';
 
 export const activityService = {
   getAllByPackage: async (packageId: number): Promise<Activity[]> => {
@@ -13,17 +15,8 @@ export const activityService = {
     return activity;
   },
 
-  create: async (data: CreateActivityRequest): Promise<Activity> => {
-    const newActivity: any = {
-      ...data,
-      activityId: Math.max(...mockActivities.map((a) => a.activityId)) + 1,
-      approvalStatus: false,
-      approvalContent: null,
-      createdDate: dayjs().toISOString(),
-      updatedDate: null
-    };
-    mockActivities.push(newActivity);
-    return newActivity;
+  create: async (data: CreateActivityRequest) => {
+    return post<CreateActivityRequest>(`${ACTIVITY_API}/create-activity`, data);
   },
 
   update: async (id: number, data: Partial<CreateActivityRequest>): Promise<Activity> => {

@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, EditOutlined } from '@ant-design/icons';
-import { Button, Card, CardContent, Divider, Grid, ImageList, ImageListItem, Stack, Typography } from '@mui/material';
+import { Button, Card, CardContent, Divider, Grid, Stack, Typography } from '@mui/material';
 import { useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -24,8 +24,8 @@ const DriverDetails = () => {
     return <Typography>Đang tải...</Typography>;
   }
 
-  const getVehicleTypeLabel = (type: string) => {
-    const vehicleTypes: { [key: string]: string } = {
+  const getVehicleTypeDisplay = (type: VehicleType) => {
+    const displayNames: Record<VehicleType, string> = {
       [VehicleType.CAR_4]: 'Xe 4 chỗ',
       [VehicleType.CAR_7]: 'Xe 7 chỗ',
       [VehicleType.CAR_16]: 'Xe 16 chỗ',
@@ -35,7 +35,7 @@ const DriverDetails = () => {
       [VehicleType.SLEEPER_BUS_COUPLE]: 'Xe giường nằm đôi',
       [VehicleType.FLY]: 'Máy bay'
     };
-    return vehicleTypes[type] || type;
+    return displayNames[type] || type;
   };
 
   return (
@@ -47,23 +47,30 @@ const DriverDetails = () => {
           </Button>
           <Typography variant="h5">Chi tiết tài xế</Typography>
         </Stack>
-        <Button
-          variant="contained"
-          startIcon={<EditOutlined />}
-          onClick={() => navigate(`${TOURISM_COMPANY_URLs.DRIVER.UPDATE.replace(':id', id!)}`)}
-        >
+        <Button variant="contained" startIcon={<EditOutlined />} onClick={() => navigate(`${TOURISM_COMPANY_URLs.DRIVER.UPDATE}/${id}`)}>
           Chỉnh sửa
         </Button>
       </Stack>
 
       <Card>
         <CardContent>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                Tên tài xế
-              </Typography>
-              <Typography>{driver.driverName}</Typography>
+          <Grid container spacing={3}>
+            <Grid item xs={12} md={6}>
+              <Stack spacing={2}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Tên tài xế
+                </Typography>
+                <Typography>{driver.driverName}</Typography>
+              </Stack>
+            </Grid>
+
+            <Grid item xs={12} md={6}>
+              <Stack spacing={2}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Số điện thoại
+                </Typography>
+                <Typography>{driver.phoneNumber}</Typography>
+              </Stack>
             </Grid>
 
             <Grid item xs={12}>
@@ -71,42 +78,29 @@ const DriverDetails = () => {
             </Grid>
 
             <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                Số điện thoại
-              </Typography>
-              <Typography>{driver.phoneNumber}</Typography>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Divider />
-            </Grid>
-
-            <Grid item xs={12}>
-              <Typography variant="subtitle1" fontWeight="bold">
-                Loại xe
-              </Typography>
-              <Typography>{getVehicleTypeLabel(driver.vehicleType)}</Typography>
+              <Stack spacing={2}>
+                <Typography variant="subtitle1" fontWeight="bold">
+                  Loại xe
+                </Typography>
+                <Typography>{getVehicleTypeDisplay(driver.vehicleType)}</Typography>
+              </Stack>
             </Grid>
 
             {driver.imgs && driver.imgs.length > 0 && (
-              <>
-                <Grid item xs={12}>
-                  <Divider />
-                </Grid>
-
-                <Grid item xs={12}>
-                  <Typography variant="subtitle1" fontWeight="bold" gutterBottom>
+              <Grid item xs={12}>
+                <Stack spacing={2}>
+                  <Typography variant="subtitle1" fontWeight="bold">
                     Hình ảnh
                   </Typography>
-                  <ImageList sx={{ width: '100%' }} cols={3} rowHeight={200} gap={8}>
+                  <Grid container spacing={2}>
                     {driver.imgs.map((img, index) => (
-                      <ImageListItem key={index}>
-                        <img src={img} alt={`Driver ${index + 1}`} loading="lazy" style={{ height: '200px', objectFit: 'cover' }} />
-                      </ImageListItem>
+                      <Grid item key={index} xs={12} sm={6} md={4}>
+                        <img src={img} alt={`Driver ${index + 1}`} style={{ width: '100%', borderRadius: 8 }} />
+                      </Grid>
                     ))}
-                  </ImageList>
-                </Grid>
-              </>
+                  </Grid>
+                </Stack>
+              </Grid>
             )}
           </Grid>
         </CardContent>
