@@ -1,4 +1,7 @@
 module.exports = {
+  images: {
+    domains: ["firebasestorage.googleapis.com"],
+  },
   devIndicators: {},
   publicRuntimeConfig: {
     // Available on both server and client
