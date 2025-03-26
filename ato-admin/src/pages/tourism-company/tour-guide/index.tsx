@@ -7,6 +7,7 @@ import { tourGuideService } from '../../../services/tourism-company/tour-guide.s
 import { TourGuideResponse } from '../../../types/tourism-company/tour-guide.types';
 import dayjs from 'dayjs';
 import AppSearchBar from '../../../components/table/SearchBar';
+import { TColumn } from '../../../components/table/types';
 
 const TourGuideList = () => {
   const navigate = useNavigate();

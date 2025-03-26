@@ -38,8 +38,6 @@ export default function MainDrawer({ window }: any) {
     const token = sessionStorage.getItem('token');
 
     if (!token) {
-      enqueueSnackbar('Mã truy cập hết hạn vui lòng đăng nhập lại', { variant: 'error' });
-
       dispatch(signOut());
       navigate(AUTHEN_URLs.LOGIN);
     }

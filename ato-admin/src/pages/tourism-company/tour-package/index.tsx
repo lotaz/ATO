@@ -1,10 +1,9 @@
-import { EditOutlined, EyeOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons';
+import { EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
 import {
   Button,
   Card,
   CardContent,
   IconButton,
-  InputAdornment,
   Stack,
   Table,
   TableBody,
@@ -12,50 +11,57 @@ import {
   TableContainer,
   TableHead,
   TablePagination,
-  TableRow,
-  TextField,
-  Typography
+  TableRow
 } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
-import { RootState } from '../../../redux/store';
-import { fetchTourPackages } from '../../../redux/tourism-company/tour-package.slice';
-import { DurationType } from '../../../types/tourism-company/tour-package.types';
+import { agriculturalTourService } from '../../../services/tourism-company/agricultural-tour.service';
+import { AgriculturalTourPackageResponse } from '../../../types/tourism-company/agricultural-tour.types';
 import AppSearchBar from '../../../components/table/SearchBar';
+import { TimeType } from '../../../types/tourism-facility/package.types';
 
 const TourPackageList = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<any>();
-  const { list: packages } = useSelector((state: RootState) => state.tourPackageSlice);
+  const [packages, setPackages] = useState<AgriculturalTourPackageResponse[]>([]);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    dispatch(fetchTourPackages());
-  }, [dispatch]);
+    fetchPackages();
+  }, []);
+
+  const fetchPackages = async () => {
+    try {
+      setLoading(true);
+      const response = await agriculturalTourService.getPackages();
+      console.log('res', response);
+      setPackages(response.data);
+    } catch (error) {
+      console.error('Failed to fetch packages:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const filteredPackages = packages.filter(
     (pkg) =>
-      pkg.packageName.toLowerCase().includes(searchTerm.toLowerCase()) || pkg.description.toLowerCase().includes(searchTerm.toLowerCase())
+      pkg.packageName.toLowerCase().includes(searchTerm.toLowerCase()) || pkg.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const getDurationType = (type: DurationType) => {
-    switch (type) {
-      case DurationType.HOURS:
-        return 'Giờ';
-      case DurationType.DAYS:
-        return 'Ngày';
-      case DurationType.WEEKS:
-        return 'Tuần';
-      case DurationType.MONTHS:
-        return 'Tháng';
-      default:
-        return '';
-    }
+  const getDurationType = (type: TimeType) => {
+    const types = {
+      [TimeType.SECOND]: 'Giây',
+      [TimeType.MINUTE]: 'Phút',
+      [TimeType.HOUR]: 'Giờ',
+      [TimeType.DAY]: 'Ngày',
+      [TimeType.MONTH]: 'Tháng',
+      [TimeType.YEAR]: 'Năm'
+    };
+    return types[type] || 'Không xác định';
   };
 
   return (
@@ -85,6 +91,8 @@ const TourPackageList = () => {
                     <TableCell>Thời gian kết thúc</TableCell>
                     <TableCell>Thời lượng</TableCell>
                     <TableCell>Giá</TableCell>
+                    <TableCell>Điểm đến</TableCell>
+                    <TableCell>Hướng dẫn viên</TableCell>
                     <TableCell align="center">Thao tác</TableCell>
                   </TableRow>
                 </TableHead>
@@ -97,6 +105,8 @@ const TourPackageList = () => {
                       <TableCell>{dayjs(pkg.endTime).format('DD/MM/YYYY HH:mm')}</TableCell>
                       <TableCell>{`${pkg.durations} ${getDurationType(pkg.durationsType)}`}</TableCell>
                       <TableCell>{pkg.price.toLocaleString('vi-VN')} đ</TableCell>
+                      <TableCell>{pkg.tourDestinations?.length || 0}</TableCell>
+                      <TableCell>{pkg.tourGuides?.length || 0}</TableCell>
                       <TableCell align="center">
                         <Stack direction="row" spacing={1} justifyContent="center">
                           <IconButton

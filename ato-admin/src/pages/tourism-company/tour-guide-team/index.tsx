@@ -1,19 +1,16 @@
-import { Button, Stack, Typography } from '@mui/material';
+import { Button, Chip, Stack } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppTable from '../../../components/table/AppTable';
 import AppSearchBar from '../../../components/table/SearchBar';
 import { TColumn } from '../../../components/table/types';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
-import { useEffect, useState } from 'react';
-import { tourGuideService } from '../../../services/tour-guide';
-import { ITourGuide } from '../../../services/tour-guide/types';
-import { Chip } from '@mui/material';
-import dayjs from 'dayjs';
+import { tourGuideService } from '../../../services/tourism-company/tour-guide.service';
+import { TourGuideResponse } from '../../../types/tourism-company/tour-guide.types';
 
 const TourGuideList = () => {
   const navigate = useNavigate();
-  const [_, setLoading] = useState(false);
-  const [tourGuides, setTourGuides] = useState<ITourGuide[]>([]);
+  const [tourGuides, setTourGuides] = useState<TourGuideResponse[]>([]);
   const [searchText, setSearchText] = useState('');
 
   const columns: TColumn[] = [
@@ -21,43 +18,42 @@ const TourGuideList = () => {
       id: 'fullName',
       label: 'Họ tên',
       minWidth: 150,
-      format: (row) => row.user?.fullName || '-'
+      format: (row) => row.account?.fullName || '-'
     },
     {
       id: 'email',
       label: 'Email',
       minWidth: 200,
-      format: (row) => row.user?.email || '-'
+      format: (row) => row.account?.email || '-'
+    },
+    {
+      id: 'phone',
+      label: 'Số điện thoại',
+      minWidth: 150,
+      format: (row) => row.account?.phone || '-'
     },
     {
       id: 'languages',
       label: 'Ngôn ngữ',
       minWidth: 200,
-      format: (languages: string[]) => (
+      format: (row) => (
         <Stack direction="row" spacing={1}>
-          {languages.map((lang) => (
-            <Chip key={lang} label={lang} size="small" />
-          ))}
+          {row.languages?.split(',').map((lang) => <Chip key={lang.trim()} label={lang.trim()} size="small" />)}
         </Stack>
       )
     },
     {
       id: 'expertiseArea',
       label: 'Chuyên môn',
-      minWidth: 150
+      minWidth: 150,
+      format: (row) => row.expertiseArea || '-'
     },
     {
       id: 'rating',
       label: 'Đánh giá',
       minWidth: 100,
       align: 'right',
-      format: (rating: number) => rating?.toFixed(1) || '-'
-    },
-    {
-      id: 'createdDate',
-      label: 'Ngày gia nhập',
-      minWidth: 120,
-      format: (date: string) => dayjs(date).format('DD/MM/YYYY')
+      format: (row) => row.rating?.toFixed(1) || '-'
     }
   ];
 
@@ -67,13 +63,12 @@ const TourGuideList = () => {
 
   const fetchTourGuides = async () => {
     try {
-      setLoading(true);
-      const data = await tourGuideService.getTourGuides();
-      setTourGuides(data);
+      const response = await tourGuideService.getTourGuides();
+      console.log('response', response.data);
+      setTourGuides(response.data);
     } catch (error) {
       console.error('Failed to fetch tour guides:', error);
     } finally {
-      setLoading(false);
     }
   };
 
@@ -84,10 +79,10 @@ const TourGuideList = () => {
   const filteredData = tourGuides.filter((item) => {
     const searchLower = searchText.toLowerCase();
     return (
-      item.user?.fullname?.toLowerCase().includes(searchLower) ||
-      item.user?.email?.toLowerCase().includes(searchLower) ||
+      item.account?.userName?.toLowerCase().includes(searchLower) ||
+      item.account?.email?.toLowerCase().includes(searchLower) ||
       item.expertiseArea?.toLowerCase().includes(searchLower) ||
-      item.languages?.some((lang) => lang.toLowerCase().includes(searchLower))
+      item.languages?.toLowerCase().includes(searchLower)
     );
   });
 
@@ -103,7 +98,7 @@ const TourGuideList = () => {
       <AppTable
         columns={columns}
         rows={filteredData}
-        rowKey="id"
+        rowKey="guideId"
         handleViewDetails={(id) => navigate(`${TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.DETAILS}/${id}`)}
         handleUpdate={(id) => navigate(`${TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.UPDATE}/${id}`)}
       />

@@ -101,7 +101,7 @@ const PackageDetails = () => {
           <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
             <Typography variant="h6">Danh sách hoạt động</Typography>
           </Stack>
-          <ActivityList packageId={id} />
+          <ActivityList activities={packageData.activities ?? []} packageId={id} />
         </CardContent>
       </Card>
     </Stack>
