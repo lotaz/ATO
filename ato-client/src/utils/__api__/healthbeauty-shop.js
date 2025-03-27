@@ -80,6 +80,15 @@ const getBlogs = async () => {
     return [];
   }
 };
+const getBlogById = async (id) => {
+  try {
+    const response = await axiosInstance.get(API_URLs.BLOG.DETAILS + "/" + id);
+
+    return response.data;
+  } catch (error) {
+    return {};
+  }
+};
 
 export default {
   getProducts,
@@ -91,4 +100,5 @@ export default {
   getTestimonials,
   getBrands,
   getBlogs,
+  getBlogById,
 };
