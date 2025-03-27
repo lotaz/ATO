@@ -5,23 +5,27 @@ const navbarNavigations = [
   },
   {
     title: "Giới thiệu",
-    url: "/",
+    url: "/intro",
   },
   {
     title: "Tin tức",
-    url: "/",
+    url: "/blogs",
   },
   {
     title: "Công ty du lịch",
-    url: "/",
+    url: "/tour-companies",
   },
   {
-    title: "Khám phá",
-    url: "/",
+    title: "Tour du lịch",
+    url: "/tour-packages", // Update this line
+  },
+  {
+    title: "Sản phẩm OCOP",
+    url: "/products",
   },
   {
     title: "Liên hệ",
-    url: "/",
+    url: "/contact",
   },
 ];
 
