@@ -1,18 +1,14 @@
 import { Box, Stack } from "@mui/material";
 import SEO from "components/SEO";
 import Setting from "components/Setting";
+import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { MobileNavigationBar2 } from "components/mobile-navigation";
-import Footer from "components/footer/Footer";
 import HealthBeautySidenav from "components/page-sidenav/HealthBeautySideNav";
-import AllProducts from "pages-sections/home/AllProducts";
-import CategorySection from "pages-sections/home/CategorySection";
 import BannerSection from "pages-sections/home/BannerSection";
-import ServiceSection from "pages-sections/home/ServiceSection";
-import TopProducts from "pages-sections/home/TopProducts";
-import TestimonialSection from "pages-sections/home/TestimonialSection";
-import BrandSection from "pages-sections/home/BrandSection";
 import BlogSection from "pages-sections/home/BlogSection";
+import CategorySection from "pages-sections/home/CategorySection";
+import TopProducts from "pages-sections/home/TopProducts";
 import api from "utils/__api__/healthbeauty-shop";
 
 // ===============================================
