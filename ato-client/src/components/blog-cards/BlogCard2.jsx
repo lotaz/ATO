@@ -4,6 +4,7 @@ import { Box, Card, styled } from "@mui/material";
 import { FlexRowCenter } from "components/flex-box";
 import NavLink3 from "components/nav-link/NavLink3";
 import { H4, Paragraph } from "components/Typography"; // custom styled components
+import { useRouter } from "next/router";
 
 const ImageBox = styled(Box)(() => ({
   cursor: "pointer",
@@ -48,13 +49,20 @@ const StyledTitle = styled(H4)(() => ({
   lineHeight: "1.5em",
 }));
 // =====================================================
-const BlogCard2 = ({ image, title, date, description }) => {
+const BlogCard2 = ({ id, image, title, date, description }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/blogs/${id}`);
+  };
+
   return (
     <Card
       sx={{
         borderRadius: 0,
         boxShadow: 2,
       }}
+      onClick={handleClick}
     >
       <ImageBox p={2} maxHeight={220}>
         <img

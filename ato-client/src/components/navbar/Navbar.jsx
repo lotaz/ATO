@@ -6,6 +6,7 @@ import Category from "components/icons/Category";
 import NavLink from "components/nav-link/NavLink";
 import { Paragraph } from "components/Typography";
 import navbarNavigations from "data/navbarNavigations"; // NavList props interface
+import { useRouter } from "next/router";
 
 // const common css style
 const navLinkStyle = {
@@ -66,9 +67,15 @@ const FlexBox = styled(Box)`
 
 // ==========================================================
 const Navbar = ({ navListOpen, hideCategories, elevation, border }) => {
+  const navigate = useRouter();
+
   const renderNestedNav = (list = []) => {
     return list.map((nav) => {
-      return <FlexBox key={nav.title}>{nav.title}</FlexBox>;
+      return (
+        <FlexBox onClick={() => navigate.push(nav.url)} key={nav.title}>
+          {nav.title}
+        </FlexBox>
+      );
     });
   };
 
