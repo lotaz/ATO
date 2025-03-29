@@ -32,26 +32,18 @@ const Profile = ({ user }) => {
           bgcolor: "primary.light",
         }}
       >
-        Edit Profile
+        Chỉnh sửa thông tin
       </Button>
     </Link>
   );
   const infoList = [
     {
       title: "16",
-      subtitle: "All Orders",
+      subtitle: "Đơn hàng",
     },
     {
       title: "02",
-      subtitle: "Awaiting Payments",
-    },
-    {
-      title: "00",
-      subtitle: "Awaiting Shipment",
-    },
-    {
-      title: "01",
-      subtitle: "Awaiting Delivery",
+      subtitle: "Tour đã đặt",
     },
   ];
   return (
@@ -59,7 +51,7 @@ const Profile = ({ user }) => {
       {/* TITLE HEADER AREA */}
       <UserDashboardHeader
         icon={Person}
-        title="My Profile"
+        title="Thông tin tài khoản"
         button={HEADER_LINK}
         navigation={<CustomerDashboardNavigation />}
       />
@@ -77,7 +69,7 @@ const Profile = ({ user }) => {
               }}
             >
               <Avatar
-                src={user.avatar}
+                src={"#"}
                 sx={{
                   height: 64,
                   width: 64,
@@ -88,17 +80,7 @@ const Profile = ({ user }) => {
                 <FlexBetween flexWrap="wrap">
                   <div>
                     <H5 my="0px">{`${user.name.firstName} ${user.name.lastName}`}</H5>
-                    <FlexBox alignItems="center">
-                      <Typography color="grey.600">Balance:</Typography>
-                      <Typography ml={0.5} color="primary.main">
-                        {currency(500)}
-                      </Typography>
-                    </FlexBox>
                   </div>
-
-                  <Typography color="grey.600" letterSpacing="0.2em">
-                    SILVER USER
-                  </Typography>
                 </FlexBetween>
               </Box>
             </Card>
@@ -107,7 +89,7 @@ const Profile = ({ user }) => {
           <Grid item md={6} xs={12}>
             <Grid container spacing={4}>
               {infoList.map((item) => (
-                <Grid item lg={3} sm={6} xs={6} key={item.subtitle}>
+                <Grid item lg={6} sm={6} xs={6} key={item.subtitle}>
                   <Card
                     sx={{
                       height: "100%",
@@ -143,12 +125,11 @@ const Profile = ({ user }) => {
           }),
         }}
       >
-        <TableRowItem title="First Name" value={user.name.firstName} />
-        <TableRowItem title="Last Name" value={user.name.lastName} />
+        <TableRowItem title="Họ và tên" value={user.name.firstName} />
         <TableRowItem title="Email" value={user.email} />
-        <TableRowItem title="Phone" value={user.phone} />
+        <TableRowItem title="Số điện thoại" value={user.phone} />
         <TableRowItem
-          title="Birth date"
+          title="Ngày sinh"
           value={format(new Date(user.dateOfBirth), "dd MMM, yyyy")}
         />
       </TableRow>

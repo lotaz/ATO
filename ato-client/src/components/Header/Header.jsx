@@ -1,11 +1,17 @@
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Badge, Box, Button, Dialog, Drawer, styled } from "@mui/material";
 import Container from "@mui/material/Container";
 import { useTheme } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
-import { KeyboardArrowDown, PersonOutline } from "@mui/icons-material";
+import {
+  AccountCircleOutlined,
+  HistoryOutlined,
+  KeyboardArrowDown,
+  LogoutOutlined,
+  PersonOutline,
+} from "@mui/icons-material";
 import clsx from "clsx";
 import Image from "components/BazaarImage";
 import { FlexBox } from "components/flex-box";
@@ -19,6 +25,9 @@ import { useAppContext } from "contexts/AppContext";
 import Login from "pages-sections/sessions/Login";
 import { layoutConstant } from "utils/constants";
 import SearchBox from "../search-box/SearchBox"; // styled component
+import { useRouter } from "next/router";
+import { Menu, MenuItem, Avatar } from "@mui/material";
+import { AccountCircle, History, Logout } from "@mui/icons-material";
 
 export const HeaderWrapper = styled(Box)(({ theme }) => ({
   zIndex: 3,
@@ -39,11 +48,41 @@ const Header = ({ isFixed, className, searchBoxType = "type1" }) => {
   const [sidenavOpen, setSidenavOpen] = useState(false);
   const isMobile = useMediaQuery(theme.breakpoints.down("xs"));
   const downMd = useMediaQuery(theme.breakpoints.down(1150));
-
-  const toggleDialog = () => setDialogOpen(!dialogOpen);
+  const router = useRouter();
 
   const toggleSidenav = () => setSidenavOpen(!sidenavOpen);
 
+  const [anchorEl, setAnchorEl] = useState(null);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+    setIsLoggedIn(!!token);
+  }, []);
+
+  const handleProfileClick = (event) => {
+    if (isLoggedIn) {
+      console.log("event", event);
+      setAnchorEl(event.currentTarget);
+    } else {
+      router.push("/login");
+    }
+  };
+
+  const toggleDialog = (e) => handleProfileClick(e);
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem("jwt_token");
+    setIsLoggedIn(false);
+    handleMenuClose();
+    router.push("/login");
+  };
+
+  // Replace the existing profile button with this:
   return (
     <HeaderWrapper className={clsx(className)}>
       <Container
@@ -108,8 +147,51 @@ const Header = ({ isFixed, className, searchBoxType = "type1" }) => {
             bgcolor="grey.200"
             onClick={toggleDialog}
           >
-            <PersonOutline />
+            {isLoggedIn ? (
+              <Avatar sx={{ width: 24, height: 24, bgcolor: "primary.main" }}>
+                <PersonOutline />
+              </Avatar>
+            ) : (
+              <PersonOutline />
+            )}
           </Box>
+
+          <Menu
+            anchorEl={anchorEl}
+            open={Boolean(anchorEl)}
+            onClose={handleMenuClose}
+            anchorOrigin={{
+              vertical: "bottom",
+              horizontal: "right",
+            }}
+            transformOrigin={{
+              vertical: "top",
+              horizontal: "right",
+            }}
+          >
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                router.push("/profile");
+              }}
+            >
+              <AccountCircleOutlined sx={{ mr: 1 }} />
+              Thông tin cá nhân
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                router.push("/orders");
+              }}
+            >
+              <HistoryOutlined sx={{ mr: 1 }} />
+              Lịch sử đơn hàng
+            </MenuItem>
+            <MenuItem onClick={handleLogout}>
+              <LogoutOutlined sx={{ mr: 1 }} />
+              Đăng xuất
+            </MenuItem>
+          </Menu>
 
           <Badge badgeContent={state.cart.length} color="primary">
             <Box
@@ -134,7 +216,7 @@ const Header = ({ isFixed, className, searchBoxType = "type1" }) => {
         </Dialog>
 
         <Drawer open={sidenavOpen} anchor="right" onClose={toggleSidenav}>
-          <MiniCart toggleSidenav={() => {}} />
+          <MiniCart toggleSidenav={() => router.push("/cart")} />
         </Drawer>
 
         {downMd && <MobileMenu />}

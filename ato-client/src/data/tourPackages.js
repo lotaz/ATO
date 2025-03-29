@@ -288,7 +288,8 @@ export const tourPackages = [
     duration: "3 ngày 2 đêm",
     companyId: "1",
     companyName: "Du Lịch Bình Minh",
-    imageUrl: "/assets/images/tours/halong-food.jpg",
+    imageUrl:
+      "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDXEGDmxSKxT7lmVqk9J7zWPYSHi6XBj9ZVg&s",
     rating: 4.6,
     maxParticipants: 20,
     category: "Du lịch ẩm thực",

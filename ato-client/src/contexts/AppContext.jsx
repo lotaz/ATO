@@ -1,16 +1,33 @@
-import { createContext, useContext, useMemo, useReducer } from "react"; // =================================================================================
+import { useState } from "react";
+import {
+  createContext,
+  useContext,
+  useMemo,
+  useReducer,
+  useEffect,
+} from "react";
 
-// =================================================================================
 const INITIAL_CART = [];
 const INITIAL_STATE = {
   cart: INITIAL_CART,
 };
+
+// Load cart from session storage
+const loadCartFromStorage = () => {
+  if (typeof window !== "undefined") {
+    const savedCart = sessionStorage.getItem("cart");
+    return savedCart ? { cart: JSON.parse(savedCart) } : INITIAL_STATE;
+  }
+  return INITIAL_STATE;
+};
+
 const AppContext = createContext({
   state: INITIAL_STATE,
   dispatch: () => {},
 });
 
 const reducer = (state, action) => {
+  let newState;
   switch (action.type) {
     case "CHANGE_CART_AMOUNT":
       let cartList = state.cart;
@@ -19,27 +36,47 @@ const reducer = (state, action) => {
 
       if (cartItem.qty < 1) {
         const filteredCart = cartList.filter((item) => item.id !== cartItem.id);
-        return { ...state, cart: filteredCart };
-      } // IF PRODUCT ALREADY EXITS IN CART
-
-      if (exist) {
+        newState = { ...state, cart: filteredCart };
+      } else if (exist) {
         const newCart = cartList.map((item) =>
           item.id === cartItem.id ? { ...item, qty: cartItem.qty } : item
         );
-        return { ...state, cart: newCart };
+        newState = { ...state, cart: newCart };
+      } else {
+        newState = { ...state, cart: [...cartList, cartItem] };
       }
 
-      return { ...state, cart: [...cartList, cartItem] };
+      // Save to session storage
+      if (typeof window !== "undefined") {
+        sessionStorage.setItem("cart", JSON.stringify(newState.cart));
+      }
+      return newState;
 
     default: {
       return state;
     }
   }
-}; // =======================================================
+};
 
-// =======================================================
 export const AppProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(reducer, INITIAL_STATE);
+  const [state, dispatch] = useReducer(
+    reducer,
+    INITIAL_STATE,
+    loadCartFromStorage
+  );
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Sync state with session storage on mount
+  useEffect(() => {
+    if (state.cart.length > 0) {
+      sessionStorage.setItem("cart", JSON.stringify(state.cart));
+    }
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       state,
@@ -47,9 +84,14 @@ export const AppProvider = ({ children }) => {
     }),
     [state, dispatch]
   );
+  if (!isMounted) {
+    return null;
+  }
+
   return (
     <AppContext.Provider value={contextValue}>{children}</AppContext.Provider>
   );
 };
+
 export const useAppContext = () => useContext(AppContext);
 export default AppContext;
