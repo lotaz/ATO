@@ -12,7 +12,11 @@ const axiosInstance = axios.create({
 // Add request interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
-    // You can add auth tokens here
+    const token = localStorage.getItem("jwt_token");
+    console.log("to", token);
+    if (token) {
+      config.headers["Authorization"] = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -31,17 +35,24 @@ axiosInstance.interceptors.response.use(
 
 export const get = (url) => {
   try {
-    console.log("url", url);
     return axiosInstance.get(url);
   } catch (error) {}
 };
 
 export const post = (url, data) => {
-  return axiosInstance.post(url, data);
+  try {
+    return axiosInstance.post(url, data);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const put = (url, data) => {
-  return axiosInstance.put(url, data);
+  try {
+    return axiosInstance.put(url, data);
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 export const del = (url) => {

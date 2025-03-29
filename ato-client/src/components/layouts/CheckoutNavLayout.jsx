@@ -14,6 +14,7 @@ import ShopLayout1 from "./ShopLayout1";
 // ======================================================
 const CheckoutNavLayout = ({ children }) => {
   const [selectedStep, setSelectedStep] = useState(0);
+  const [list, setList] = useState(stepperList);
   const router = useRouter();
   const { pathname } = router;
 
@@ -24,15 +25,7 @@ const CheckoutNavLayout = ({ children }) => {
         break;
 
       case 1:
-        router.push("/checkout");
-        break;
-
-      case 2:
         router.push("/payment");
-        break;
-
-      case 3:
-        router.push("/orders");
         break;
 
       default:
@@ -46,12 +39,18 @@ const CheckoutNavLayout = ({ children }) => {
         setSelectedStep(1);
         break;
 
-      case "/checkout":
-        setSelectedStep(2);
-        break;
-
       case "/payment":
-        setSelectedStep(3);
+        setSelectedStep(2);
+        setList([
+          {
+            title: "Giỏ hàng",
+            disabled: false,
+          },
+          {
+            title: "Thanh toán",
+            disabled: false,
+          },
+        ]);
         break;
 
       default:
@@ -75,7 +74,7 @@ const CheckoutNavLayout = ({ children }) => {
           <Grid container spacing={3}>
             <Grid item xs={12}>
               <Stepper
-                stepperList={stepperList}
+                stepperList={list}
                 selectedStep={selectedStep}
                 onChange={handleStepChange}
               />
@@ -91,19 +90,11 @@ const CheckoutNavLayout = ({ children }) => {
 
 const stepperList = [
   {
-    title: "Cart",
+    title: "Giỏ hàng",
     disabled: false,
   },
   {
-    title: "Details",
-    disabled: false,
-  },
-  {
-    title: "Payment",
-    disabled: false,
-  },
-  {
-    title: "Review",
+    title: "Thanh toán",
     disabled: true,
   },
 ];

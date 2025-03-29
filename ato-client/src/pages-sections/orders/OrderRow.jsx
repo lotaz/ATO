@@ -5,25 +5,36 @@ import { Box, Chip, IconButton, Typography } from "@mui/material";
 import TableRow from "components/TableRow";
 import { H5 } from "components/Typography";
 import { currency } from "lib";
+import { StatusOrder } from "constants/order-enums";
 
-// =================================================
 const OrderRow = ({ order }) => {
   const getColor = (status) => {
     switch (status) {
-      case "Pending":
-        return "secondary";
-
-      case "Processing":
-        return "secondary";
-
-      case "Delivered":
+      case StatusOrder.Processing:
+        return "warning";
+      case StatusOrder.Shipped:
+        return "info";
+      case StatusOrder.Completed:
         return "success";
-
-      case "Cancelled":
+      case StatusOrder.Canceled:
         return "error";
-
       default:
-        return "";
+        return "secondary";
+    }
+  };
+
+  const getStatusLabel = (status) => {
+    switch (status) {
+      case StatusOrder.Processing:
+        return "Đang xử lý";
+      case StatusOrder.Shipped:
+        return "Đang giao hàng";
+      case StatusOrder.Completed:
+        return "Đã hoàn thành";
+      case StatusOrder.Canceled:
+        return "Đã hủy";
+      default:
+        return status;
     }
   };
 
@@ -37,13 +48,13 @@ const OrderRow = ({ order }) => {
           }}
         >
           <H5 m={0.75} textAlign="left">
-            {order.id.split("-")[0]}
+            {order.id}
           </H5>
 
           <Box m={0.75}>
             <Chip
               size="small"
-              label={order.status}
+              label={getStatusLabel(order.status)}
               sx={{
                 p: "0.25rem 0.5rem",
                 fontSize: 12,
@@ -58,11 +69,11 @@ const OrderRow = ({ order }) => {
           </Box>
 
           <Typography className="pre" m={0.75} textAlign="left">
-            {format(new Date(order.createdAt), "MMM dd, yyyy")}
+            {format(new Date(order.orderDate), "dd/MM/yyyy")}
           </Typography>
 
           <Typography m={0.75} textAlign="left">
-            {currency(order.totalPrice)}
+            {currency(order.totalAmount)}
           </Typography>
 
           <Typography

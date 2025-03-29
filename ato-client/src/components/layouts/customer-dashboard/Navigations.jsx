@@ -1,7 +1,16 @@
 import { Fragment } from "react";
 import { useRouter } from "next/router";
 import { Card, styled, Typography } from "@mui/material";
-import { CreditCard, FavoriteBorder, Person, Place } from "@mui/icons-material";
+import {
+  CardTravelOutlined,
+  CreditCard,
+  FavoriteBorder,
+  KeyOutlined,
+  PasswordOutlined,
+  Person,
+  Place,
+  PlaceOutlined,
+} from "@mui/icons-material";
 import ShoppingBagOutlined from "@mui/icons-material/ShoppingBagOutlined";
 import { FlexBox } from "components/flex-box";
 import CustomerService from "components/icons/CustomerService";
@@ -73,48 +82,34 @@ const Navigations = () => {
 
 const linkList = [
   {
-    title: "DASHBOARD",
+    title: "Trang chủ",
     list: [
       {
         href: "/orders",
-        title: "Orders",
+        title: "Đơn hàng",
         icon: ShoppingBagOutlined,
         count: 5,
       },
       {
-        href: "/wish-list",
-        title: "Wishlist",
-        icon: FavoriteBorder,
-        count: 19,
-      },
-      {
-        href: "/support-tickets",
-        title: "Support Tickets",
-        icon: CustomerService,
-        count: 1,
+        href: "#",
+        title: "Tour",
+        icon: CardTravelOutlined,
+        count: 5,
       },
     ],
   },
   {
-    title: "ACCOUNT SETTINGS",
+    title: "Cài đặt tài khoản",
     list: [
       {
         href: "/profile",
-        title: "Profile Info",
+        title: "Thông tin tài khoản",
         icon: Person,
-        count: 3,
       },
       {
-        href: "/address",
-        title: "Addresses",
-        icon: Place,
-        count: 16,
-      },
-      {
-        href: "/payment-methods",
-        title: "Payment Methods",
-        icon: CreditCard,
-        count: 4,
+        href: "#",
+        title: "Đổi mật khẩu",
+        icon: KeyOutlined,
       },
     ],
   },

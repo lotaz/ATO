@@ -45,7 +45,7 @@ const ProfileEditor = ({ user }) => {
           bgcolor: "primary.light",
         }}
       >
-        Back to Profile
+        Trở về
       </Button>
     </Link>
   ); // Show a loading state when the fallback is rendered
@@ -59,7 +59,7 @@ const ProfileEditor = ({ user }) => {
       {/* TITLE HEADER AREA */}
       <UserDashboardHeader
         icon={Person}
-        title="Edit Profile"
+        title="Chỉnh sửa thông tin"
         button={HEADER_LINK}
         navigation={<CustomerDashboardNavigation />}
       />
@@ -119,29 +119,16 @@ const ProfileEditor = ({ user }) => {
             <form onSubmit={handleSubmit}>
               <Box mb={4}>
                 <Grid container spacing={3}>
-                  <Grid item md={6} xs={12}>
+                  <Grid item md={12} xs={12}>
                     <TextField
                       fullWidth
                       name="first_name"
-                      label="First Name"
+                      label="Họ và tên"
                       onBlur={handleBlur}
                       onChange={handleChange}
                       value={values.first_name}
                       error={!!touched.first_name && !!errors.first_name}
                       helperText={touched.first_name && errors.first_name}
-                    />
-                  </Grid>
-
-                  <Grid item md={6} xs={12}>
-                    <TextField
-                      fullWidth
-                      name="last_name"
-                      label="Last Name"
-                      onBlur={handleBlur}
-                      onChange={handleChange}
-                      value={values.last_name}
-                      error={!!touched.last_name && !!errors.last_name}
-                      helperText={touched.last_name && errors.last_name}
                     />
                   </Grid>
 
@@ -162,7 +149,7 @@ const ProfileEditor = ({ user }) => {
                   <Grid item md={6} xs={12}>
                     <TextField
                       fullWidth
-                      label="Phone"
+                      label="Số điện thoại"
                       name="contact"
                       onBlur={handleBlur}
                       value={values.contact}
@@ -175,7 +162,7 @@ const ProfileEditor = ({ user }) => {
                   <Grid item md={6} xs={12}>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
                       <DatePicker
-                        label="Birth Date"
+                        label="Ngày sinh"
                         maxDate={new Date()}
                         value={values.birth_date}
                         inputFormat="dd MMMM, yyyy"
@@ -201,7 +188,7 @@ const ProfileEditor = ({ user }) => {
               </Box>
 
               <Button type="submit" variant="contained" color="primary">
-                Save Changes
+                Lưu thay đổi
               </Button>
             </form>
           )}

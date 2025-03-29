@@ -10,14 +10,16 @@ import { FlexBox } from "components/flex-box";
 import { Paragraph } from "components/Typography";
 import useWindowSize from "hooks/useWindowSize";
 
-const PaymentForm = () => {
-  const [paymentMethod, setPaymentMethod] = useState("credit-card");
+const PaymentForm = ({ onPayment }) => {
+  const [paymentMethod, setPaymentMethod] = useState("paypal");
   const width = useWindowSize();
   const router = useRouter();
   const isMobile = width < 769;
 
-  const handleFormSubmit = async (values) => router.push("/payment");
-
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    onPayment(paymentMethod);
+  };
   const handlePaymentMethodChange = ({ target: { name } }) => {
     setPaymentMethod(name);
   };
@@ -30,121 +32,12 @@ const PaymentForm = () => {
         }}
       >
         <FormControlLabel
-          sx={{
-            mb: 3,
-          }}
-          name="credit-card"
-          onChange={handlePaymentMethodChange}
-          label={<Paragraph fontWeight={600}>Pay with credit card</Paragraph>}
-          control={
-            <Radio
-              checked={paymentMethod === "credit-card"}
-              color="primary"
-              size="small"
-            />
-          }
-        />
-
-        <Divider
-          sx={{
-            mb: 3,
-            mx: -4,
-          }}
-        />
-
-        {paymentMethod === "credit-card" && (
-          <Formik
-            onSubmit={handleFormSubmit}
-            initialValues={initialValues}
-            validationSchema={checkoutSchema}
-          >
-            {({
-              values,
-              errors,
-              touched,
-              handleChange,
-              handleBlur,
-              handleSubmit,
-            }) => (
-              <form onSubmit={handleSubmit}>
-                <Box mb={3}>
-                  <Grid container spacing={3}>
-                    <Grid item sm={6} xs={12}>
-                      <TextField
-                        fullWidth
-                        name="card_no"
-                        label="Card Number"
-                        onBlur={handleBlur}
-                        value={values.card_no}
-                        onChange={handleChange}
-                        helperText={touched.card_no && errors.card_no}
-                      />
-                    </Grid>
-                    <Grid item sm={6} xs={12}>
-                      <TextField
-                        fullWidth
-                        name="exp_date"
-                        label="Exp Date"
-                        placeholder="MM/YY"
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        value={values.exp_date}
-                        helperText={touched.exp_date && errors.exp_date}
-                      />
-                    </Grid>
-                    <Grid item sm={6} xs={12}>
-                      <TextField
-                        fullWidth
-                        name="name"
-                        onBlur={handleBlur}
-                        value={values.name}
-                        label="Name on Card"
-                        onChange={handleChange}
-                        helperText={touched.name && errors.name}
-                      />
-                    </Grid>
-                    <Grid item sm={6} xs={12}>
-                      <TextField
-                        fullWidth
-                        name="name"
-                        onBlur={handleBlur}
-                        value={values.name}
-                        label="Name on Card"
-                        onChange={handleChange}
-                        helperText={touched.name && errors.name}
-                      />
-                    </Grid>
-                  </Grid>
-                </Box>
-
-                <Button
-                  variant="outlined"
-                  color="primary"
-                  sx={{
-                    mb: 4,
-                  }}
-                >
-                  Submit
-                </Button>
-
-                <Divider
-                  sx={{
-                    mb: 3,
-                    mx: -4,
-                  }}
-                />
-              </form>
-            )}
-          </Formik>
-        )}
-
-        <FormControlLabel
           name="paypal"
           sx={{
             mb: 3,
           }}
           onChange={handlePaymentMethodChange}
-          label={<Paragraph fontWeight={600}>Pay with Paypal</Paragraph>}
+          label={<Paragraph fontWeight={600}>Thanh toán qua VNPay</Paragraph>}
           control={
             <Radio
               checked={paymentMethod === "paypal"}
@@ -161,36 +54,12 @@ const PaymentForm = () => {
           }}
         />
 
-        {paymentMethod === "paypal" && (
-          <Fragment>
-            <FlexBox alignItems="flex-end" mb={4}>
-              <TextField
-                fullWidth
-                name="email"
-                type="email"
-                label="Paypal Email"
-                sx={{
-                  mr: isMobile ? "1rem" : "30px",
-                }}
-              />
-              <Button variant="outlined" color="primary" type="button">
-                Submit
-              </Button>
-            </FlexBox>
-
-            <Divider
-              sx={{
-                mb: 3,
-                mx: -4,
-              }}
-            />
-          </Fragment>
-        )}
-
         <FormControlLabel
           name="cod"
           onChange={handlePaymentMethodChange}
-          label={<Paragraph fontWeight={600}>Cash On Delivery</Paragraph>}
+          label={
+            <Paragraph fontWeight={600}>Thanh toán khi nhận hàng</Paragraph>
+          }
           control={
             <Radio
               checked={paymentMethod === "cod"}
@@ -205,17 +74,21 @@ const PaymentForm = () => {
         <Grid item sm={6} xs={12}>
           <Link href="/checkout" passHref>
             <Button variant="outlined" color="primary" type="button" fullWidth>
-              Back to checkout details
+              Trở về giỏ hàng
             </Button>
           </Link>
         </Grid>
 
         <Grid item sm={6} xs={12}>
-          <Link href="/orders" passHref>
-            <Button variant="contained" color="primary" type="submit" fullWidth>
-              Review
-            </Button>
-          </Link>
+          <Button
+            onClick={handleSubmit}
+            variant="contained"
+            color="primary"
+            type="button"
+            fullWidth
+          >
+            Xác nhận đơn hàng
+          </Button>
         </Grid>
       </Grid>
     </Fragment>
