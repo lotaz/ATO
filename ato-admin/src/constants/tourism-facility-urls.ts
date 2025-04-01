@@ -9,7 +9,15 @@ export const TOURISM_FACILITY_URLs = {
     CERTIFICATES: '/tourism-facility/product/certificates',
     CREATE_CERTIFICATE: '/tourism-facility/product/certificates/create',
     UPDATE_CERTIFICATE: '/tourism-facility/product/certificates/update',
-    VIEW_CERTIFICATE: '/tourism-facility/product/certificates/view'
+    VIEW_CERTIFICATE: '/tourism-facility/product/certificates/view',
+    // Add OCOP sale routes
+    OCOP_SELL: {
+      CREATE: (productId: string) => `${TOURISM_FACILITY_BASE_URL}/product/ocop-sell/create?productId=${productId}`,
+      UPDATE: (productId: string, ocopSellId: string) =>
+        `${TOURISM_FACILITY_BASE_URL}/product/ocop-sell/update?productId=${productId}&id=${ocopSellId}`,
+      VIEW: (productId: string, ocopSellId: string) =>
+        `${TOURISM_FACILITY_BASE_URL}/product/ocop-sell/view?productId=${productId}&id=${ocopSellId}`
+    }
   },
   PACKAGE: {
     INDEX: `${TOURISM_FACILITY_BASE_URL}/package`,
