@@ -16,22 +16,23 @@ const initialState: CertificateState = {
   error: null
 };
 
-export const fetchCertificates = createAsyncThunk('certificate/fetchByProduct', async (productId: number) => {
+export const fetchCertificates = createAsyncThunk('certificate/fetchByProduct', async (productId: string) => {
   const response = await certificateService.getByProduct(productId);
   return response;
 });
 
-export const fetchCertificate = createAsyncThunk('certificate/fetchOne', async (id: number) => {
+export const fetchCertificate = createAsyncThunk('certificate/fetchOne', async (id: string) => {
   const response = await certificateService.getById(id);
   return response;
 });
 
 export const createCertificate = createAsyncThunk('certificate/create', async (data: any) => {
   const response = await certificateService.create(data);
+  console.log('create', response);
   return response;
 });
 
-export const updateCertificate = createAsyncThunk('certificate/update', async ({ id, data }: { id: number; data: any }) => {
+export const updateCertificate = createAsyncThunk('certificate/update', async ({ id, data }: { id: string; data: any }) => {
   const response = await certificateService.update(id, data);
   return response;
 });

@@ -15,7 +15,7 @@ export interface Certificate {
 }
 
 export interface CreateCertificateRequest {
-  productId: number;
+  productId: string;
   certificationName: string;
   issuingOrganization: string;
   issueDate: string;
