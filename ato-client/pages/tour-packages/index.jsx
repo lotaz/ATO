@@ -19,6 +19,7 @@ import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { tourCategories, tourLocations, tourPackages } from "data/tourPackages";
 import { useState } from "react";
+import { useRouter } from "next/router";
 
 const TourPackages = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -27,6 +28,8 @@ const TourPackages = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+
+  const router = useRouter();
 
   const filteredPackages = tourPackages.filter((pack) => {
     const matchesSearch =
@@ -253,11 +256,22 @@ const TourPackages = () => {
                   <Grid container spacing={3}>
                     {paginatedPackages.map((pack) => (
                       <Grid item xs={12} sm={6} md={4} key={pack.id}>
-                        <Card sx={{ height: "100%" }}>
+                        <Card
+                          sx={{
+                            cursor: "pointer",
+                            transition: "transform 0.2s",
+                            "&:hover": {
+                              transform: "translateY(-4px)",
+                              boxShadow: 3,
+                            },
+                          }}
+                          onClick={() =>
+                            router.push(`/tour-packages/${pack.id}`)
+                          }
+                        >
                           <Box
                             sx={{
                               height: 200,
-                              overflow: "hidden",
                               position: "relative",
                             }}
                           >

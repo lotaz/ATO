@@ -1,8 +1,10 @@
 import { Box, styled } from "@mui/material";
-import navigations from "data/navigations";
+import useSWR from "swr";
 import CategoryMenuItem from "./CategoryMenuItem";
 import MegaMenu1 from "./mega-menu/MegaMenu1";
-import MegaMenu2 from "./mega-menu/MegaMenu2"; // styled component
+import MegaMenu2 from "./mega-menu/MegaMenu2";
+import { get } from "helpers/axios-helper";
+import { API_URLs } from "constants/api-url";
 
 const Wrapper = styled(Box)(({ theme, position, open }) => ({
   left: 0,
@@ -37,26 +39,48 @@ const Wrapper = styled(Box)(({ theme, position, open }) => ({
 })); // ===============================================================
 
 // ===============================================================
+const fetcher = (url) => get(url).then((res) => res.data);
+
 const CategoryMenuCard = (props) => {
   const { open, position } = props;
+  const { data, error, isLoading } = useSWR(API_URLs.COMPANY.LIST, fetcher);
+
   const megaMenu = {
     MegaMenu1,
     MegaMenu2,
   };
+
+  if (isLoading)
+    return (
+      <Wrapper open={open} position={position}>
+        Đang tải ...
+      </Wrapper>
+    );
+  if (error) return <Wrapper open={open} position={position}></Wrapper>;
+
+  const companies = data || [];
+
+  console.log("data", data);
+
+  const companyNavigations =
+    companies?.map((company) => ({
+      title: company.companynName,
+      href: `/tour-companies/${company.tourCompanyId}`,
+      iconSrc: company.logoURL || "/assets/images/default-company.png",
+      menuComponent: "MegaMenu1",
+    })) || [];
+
   return (
     <Wrapper open={open} position={position}>
-      {navigations.map((item) => {
-        let MegaMenu = megaMenu[item.menuComponent];
+      {companyNavigations.map((item) => {
         return (
           <CategoryMenuItem
             key={item.title}
             href={item.href}
             iconSrc={item.iconSrc}
             title={item.title}
-            caret={!!item.menuData}
-          >
-            <MegaMenu data={item.menuData || {}} />
-          </CategoryMenuItem>
+            caret={false}
+          />
         );
       })}
     </Wrapper>
@@ -66,4 +90,5 @@ const CategoryMenuCard = (props) => {
 CategoryMenuCard.defaultProps = {
   position: "absolute",
 };
+
 export default CategoryMenuCard;
