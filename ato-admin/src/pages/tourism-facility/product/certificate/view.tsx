@@ -21,7 +21,7 @@ const ViewCertificate = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchCertificate(Number(id)));
+      dispatch(fetchCertificate(id));
     }
   }, [dispatch, id]);
 

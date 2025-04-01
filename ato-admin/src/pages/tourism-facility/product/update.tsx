@@ -10,6 +10,7 @@ import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls'
 import { RootState } from '../../../redux/store';
 import { fetchProduct, updateProduct } from '../../../redux/tourism-facility/product.slice';
 import { ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
+import { number } from 'prop-types';
 
 const validationSchema = Yup.object().shape({
   productName: Yup.string().required('Tên sản phẩm là bắt buộc'),
@@ -46,7 +47,15 @@ const UpdateProduct = () => {
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
-      await dispatch(updateProduct({ id, data: values } as any)).unwrap();
+      await dispatch(
+        updateProduct({
+          id,
+          data: {
+            ...values,
+            productCategory: Number(values.productCategory)
+          }
+        } as any)
+      ).unwrap();
       navigate(TOURISM_FACILITY_URLs.PRODUCT.INDEX);
     } catch (error) {
       console.error('Failed to update product:', error);

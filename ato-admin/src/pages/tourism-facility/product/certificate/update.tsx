@@ -31,7 +31,7 @@ const UpdateCertificate = () => {
 
   useEffect(() => {
     if (id) {
-      dispatch(fetchCertificate(Number(id)));
+      dispatch(fetchCertificate(id));
     }
   }, [dispatch, id]);
 
@@ -41,8 +41,8 @@ const UpdateCertificate = () => {
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
-      await dispatch(updateCertificate({ id: Number(id), data: values })).unwrap();
-      navigate(`${TOURISM_FACILITY_URLs.PRODUCT.CERTIFICATES}?productId=${productId}`);
+      await dispatch(updateCertificate({ id: id!, data: values })).unwrap();
+      navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${productId}`);
     } catch (error) {
       console.error('Failed to update certificate:', error);
     } finally {
@@ -64,7 +64,8 @@ const UpdateCertificate = () => {
             issueDate: dayjs(certificate.issueDate).format('YYYY-MM-DD'),
             expiryDate: certificate.expiryDate ? dayjs(certificate.expiryDate).format('YYYY-MM-DD') : '',
             certificationDetails: certificate.certificationDetails,
-            imgs: certificate.imgs || []
+            imgs: certificate.imgs || [],
+            productId: productId
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
