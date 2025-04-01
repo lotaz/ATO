@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
     },
     server: {
       open: true,
-      port: 3000,
+      port: 3001,
       host: true, // needed for docker
       proxy: {
         '/api': {
@@ -38,7 +38,7 @@ export default defineConfig(({ mode }) => {
     },
     preview: {
       open: true,
-      port: 3000
+      port: 3001
     }
   };
 });
