@@ -36,7 +36,7 @@ const CategoryMenuItem = (props) => {
   const { settings } = useSettings();
   return (
     <Wrapper>
-      <Link href={href} passHref>
+      <Link href={href} target="_blank" passHref>
         <MenuItem className="category-dropdown-link">
           {rest?.iconSrc && <img src={rest?.iconSrc} width={32} height={32} />}
           <span className="title">{title}</span>
