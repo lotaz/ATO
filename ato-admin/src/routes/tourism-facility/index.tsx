@@ -4,6 +4,7 @@ import { TRoute } from '../types';
 import tourismFacilityActivityRoutes from './activities';
 import tourismFacilityCertificatesRoutes from './certificates';
 import tourismFacilityContractRoutes from './contract';
+import ocopSellRoutes from './ocop-sell';
 import tourismFacilityOrderRoutes from './order';
 import tourismFacilityPackagesRoutes from './packages';
 import productRoutes from './product';
@@ -17,7 +18,8 @@ const TourFacilityoutes: TRoute = {
     ...tourismFacilityPackagesRoutes,
     ...tourismFacilityActivityRoutes,
     ...tourismFacilityOrderRoutes,
-    ...tourismFacilityContractRoutes
+    ...tourismFacilityContractRoutes,
+    ...ocopSellRoutes
   ]
 };
 
