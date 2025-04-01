@@ -59,7 +59,7 @@ export const API_URLs = {
       LIST: '/afto/product/get-products',
       GET: '/afto/product/get-product/:id',
       CREATE: '/afto/product/create-product',
-      UPDATE: '/afto/product/update-product/:id'
+      UPDATE: '/afto/product/update-product'
     },
     CONTRACT: {
       LIST: '/afto/contract/get-contracts',
