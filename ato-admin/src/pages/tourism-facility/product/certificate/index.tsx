@@ -49,8 +49,8 @@ const CertificateList = () => {
   const filteredCertificates =
     certificates?.filter(
       (cert) =>
-        cert.certificationName.toLowerCase().includes(searchText.toLowerCase()) ||
-        cert.issuingOrganization.toLowerCase().includes(searchText.toLowerCase())
+        cert?.certificationName?.toLowerCase()?.includes(searchText?.toLowerCase()) ||
+        cert?.issuingOrganization?.toLowerCase()?.includes(searchText?.toLowerCase())
     ) || [];
 
   const currentCertificates = filteredCertificates.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);

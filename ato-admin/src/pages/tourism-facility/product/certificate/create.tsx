@@ -8,6 +8,7 @@ import * as Yup from 'yup';
 import { MultipleFileUploader } from '../../../../components/upload/MultipleFileUploader';
 import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-urls';
 import { CreateCertificateRequest } from '../../../../types/tourism-facility/certificate.types';
+import { createCertificate } from '../../../../redux/tourism-facility/certificate.slice';
 
 const validationSchema = Yup.object().shape({
   certificationName: Yup.string().required('Tên chứng chỉ là bắt buộc'),
@@ -31,7 +32,7 @@ const CreateCertificate = () => {
   }, [productId, navigate]);
 
   const initialValues: CreateCertificateRequest = {
-    productId: Number(productId),
+    productId: productId!,
     certificationName: '',
     issuingOrganization: '',
     issueDate: '',
@@ -43,8 +44,8 @@ const CreateCertificate = () => {
   const handleSubmit = async (values: CreateCertificateRequest, { setSubmitting }: any) => {
     try {
       // TODO: Add create certificate action
-      // await dispatch(createCertificate(values)).unwrap();
-      navigate(`${TOURISM_FACILITY_URLs.PRODUCT.CERTIFICATES}?productId=${productId}`);
+      await dispatch(createCertificate(values)).unwrap();
+      navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${productId}`);
     } catch (error) {
       console.error('Failed to create certificate:', error);
     } finally {

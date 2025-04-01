@@ -13,22 +13,19 @@ import {
   TablePagination,
   TableRow
 } from '@mui/material';
+import dayjs from 'dayjs';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import AppSearchBar from '../../../components/table/SearchBar';
 import { ADMIN_URLs } from '../../../constants/admin-urls';
+import { IssueType, IssueTypeLabels, UserSupport } from '../../../types/admin/support.types';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchUserSupports } from '../../../redux/admin/support.slice';
+import { RootState } from '../../../redux/store';
 
-export interface RequestData {
-  id: string;
-  title: string;
-  sender: string;
-  date: string;
-  status: 'pending' | 'replied' | 'closed';
-  priority: 'high' | 'medium' | 'low';
-}
-
-export interface RequestTableColumn {
-  id: keyof RequestData;
+interface RequestTableColumn {
+  id: keyof UserSupport;
   label: string;
   minWidth?: number;
   align?: 'right' | 'left' | 'center';
@@ -36,135 +33,22 @@ export interface RequestTableColumn {
 }
 
 const columns: RequestTableColumn[] = [
-  { id: 'id', label: 'Mã YC', minWidth: 100 },
-  { id: 'title', label: 'Tiêu đề', minWidth: 200 },
-  { id: 'sender', label: 'Người gửi', minWidth: 150 },
-  { id: 'date', label: 'Ngày gửi', minWidth: 150 },
-  {
-    id: 'priority',
-    label: 'Độ ưu tiên',
-    minWidth: 100,
-    format: (value: string) => {
-      switch (value) {
-        case 'high':
-          return 'Cao';
-        case 'medium':
-          return 'Trung bình';
-        case 'low':
-          return 'Thấp';
-        default:
-          return value;
-      }
-    }
-  },
-  {
-    id: 'status',
-    label: 'Trạng thái',
-    minWidth: 100,
-    format: (value: string) => {
-      switch (value) {
-        case 'pending':
-          return 'Chờ xử lý';
-        case 'replied':
-          return 'Đã trả lời';
-        case 'closed':
-          return 'Đã đóng';
-        default:
-          return value;
-      }
-    }
-  }
-];
-
-const sampleRequests: RequestData[] = [
-  {
-    id: 'YC-001',
-    title: 'Vấn đề truy cập tài khoản',
-    sender: 'nguyen.van.a@company.com',
-    date: '20/02/2024',
-    status: 'pending',
-    priority: 'high'
-  },
-  {
-    id: 'YC-002',
-    title: 'Yêu cầu đặt lại mật khẩu',
-    sender: 'tran.thi.b@company.com',
-    date: '19/02/2024',
-    status: 'replied',
-    priority: 'medium'
-  },
-  {
-    id: 'YC-003',
-    title: 'Thắc mắc về nâng cấp dịch vụ',
-    sender: 'le.van.c@company.com',
-    date: '18/02/2024',
-    status: 'pending',
-    priority: 'low'
-  },
-  {
-    id: 'YC-004',
-    title: 'Sai sót trong hóa đơn',
-    sender: 'pham.thi.d@company.com',
-    date: '17/02/2024',
-    status: 'closed',
-    priority: 'high'
-  },
-  {
-    id: 'YC-005',
-    title: 'Cần hỗ trợ kỹ thuật',
-    sender: 'hoang.van.e@company.com',
-    date: '16/02/2024',
-    status: 'pending',
-    priority: 'medium'
-  },
-  {
-    id: 'YC-006',
-    title: 'Đề xuất tính năng mới',
-    sender: 'nguyen.thi.f@company.com',
-    date: '15/02/2024',
-    status: 'replied',
-    priority: 'low'
-  },
-  {
-    id: 'YC-007',
-    title: 'Báo cáo sự cố dịch vụ',
-    sender: 'tran.van.g@company.com',
-    date: '14/02/2024',
-    status: 'pending',
-    priority: 'high'
-  },
-  {
-    id: 'YC-008',
-    title: 'Xác minh tài khoản',
-    sender: 'le.thi.h@company.com',
-    date: '13/02/2024',
-    status: 'closed',
-    priority: 'medium'
-  },
-  {
-    id: 'YC-009',
-    title: 'Yêu cầu xuất dữ liệu',
-    sender: 'pham.van.i@company.com',
-    date: '12/02/2024',
-    status: 'replied',
-    priority: 'low'
-  },
-  {
-    id: 'YC-010',
-    title: 'Vấn đề bảo mật',
-    sender: 'hoang.thi.k@company.com',
-    date: '11/02/2024',
-    status: 'pending',
-    priority: 'high'
-  }
+  { id: 'supportId', label: 'Mã YC', minWidth: 100 },
+  { id: 'issueType', label: 'Loại yêu cầu', minWidth: 150, format: (value: IssueType) => IssueTypeLabels[value] },
+  { id: 'fullname', label: 'Người gửi', minWidth: 150 },
+  { id: 'email', label: 'Email', minWidth: 200 },
+  { id: 'requestDate', label: 'Ngày gửi', minWidth: 120, format: (value: string) => dayjs(value).format('DD/MM/YYYY HH:mm') },
+  { id: 'isResolved', label: 'Trạng thái', minWidth: 100 }
 ];
 
 const Index = () => {
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [searchTerm, setSearchTerm] = useState('');
-  const [rows, setRows] = useState<RequestData[]>(sampleRequests);
   const navigate = useNavigate();
+
+  // Replace with actual API call
+  const [rows, setRows] = useState<UserSupport[]>([]);
 
   const handleChangePage = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -175,48 +59,44 @@ const Index = () => {
     setPage(0);
   };
 
-  const handleReply = (requestId: string) => {
-    navigate(`${ADMIN_URLs.REQUEST.REPLY}`);
+  const handleReply = (supportId: string) => {
+    navigate(`${ADMIN_URLs.REQUEST.REPLY}?id=${supportId}`);
   };
 
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'pending':
-        return 'warning';
-      case 'replied':
-        return 'success';
-      case 'closed':
-        return 'default';
-      default:
-        return 'default';
-    }
+  const getStatusColor = (isResolved: boolean) => {
+    return isResolved ? 'success' : 'warning';
   };
 
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'high':
-        return 'error';
-      case 'medium':
-        return 'warning';
-      case 'low':
-        return 'info';
-      default:
-        return 'default';
-    }
+  const getStatusLabel = (isResolved: boolean) => {
+    return isResolved ? 'Đã xử lý' : 'Chờ xử lý';
   };
 
-  const filteredRows = rows.filter((row) =>
-    Object.values(row).some((value) => value.toString().toLowerCase().includes(searchTerm.toLowerCase()))
+  const dispatch = useDispatch<any>();
+  const { supports, loading } = useSelector((state: RootState) => state.supportSlice);
+
+  useEffect(() => {
+    dispatch(fetchUserSupports());
+  }, [dispatch]);
+
+  // Replace the rows state with the API data
+  const filteredRows = supports.filter((row) =>
+    Object.values(row).some((value) => 
+      value?.toString().toLowerCase().includes(searchTerm.toLowerCase())
+    )
   );
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <Stack spacing={2}>
       <Box>
-        <AppSearchBar placeholder="Tìm kếm yêu cầu" />
+        <AppSearchBar placeholder="Tìm kiếm yêu cầu" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} />
       </Box>
       <Paper sx={{ width: '100%', overflow: 'hidden' }}>
         <TableContainer sx={{ maxHeight: 400 }}>
-          <Table>
+          <Table stickyHeader>
             <TableHead>
               <TableRow>
                 <TableCell align="center" style={{ width: 20 }}>
@@ -234,16 +114,14 @@ const Index = () => {
             </TableHead>
             <TableBody>
               {filteredRows.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row, index) => (
-                <TableRow hover key={row.id}>
+                <TableRow hover key={row.supportId}>
                   <TableCell align="center">{page * rowsPerPage + index + 1}</TableCell>
                   {columns.map((column) => {
                     const value = row[column.id];
                     return (
                       <TableCell key={column.id} align={column.align}>
-                        {column.id === 'status' ? (
-                          <Chip label={value} color={getStatusColor(value)} size="small" />
-                        ) : column.id === 'priority' ? (
-                          <Chip label={value} color={getPriorityColor(value)} size="small" />
+                        {column.id === 'isResolved' ? (
+                          <Chip label={getStatusLabel(value as boolean)} color={getStatusColor(value as boolean)} size="small" />
                         ) : column.format ? (
                           column.format(value)
                         ) : (
@@ -252,13 +130,13 @@ const Index = () => {
                       </TableCell>
                     );
                   })}
-                  <TableCell align="center" sx={{ width: '120px' }}>
+                  <TableCell align="center">
                     <Button
                       variant="contained"
                       size="small"
                       startIcon={<MessageOutlined />}
-                      onClick={() => handleReply(row.id)}
-                      disabled={row.status === 'closed'}
+                      onClick={() => handleReply(row.supportId)}
+                      disabled={row.isResolved}
                     >
                       Phản hồi
                     </Button>
