@@ -19,6 +19,8 @@ import tourPackageSlice from './tourism-company/tour-package.slice';
 import tourDestinationSlice from './tourism-company/tour-destination.slice';
 import driverSlice from './tourism-company/driver.slice';
 import accommodationSlice from './tourism-company/accommodation.slice';
+import ocopSellSlice from './tourism-facility/ocop-sell.slice';
+import supportSlice from './admin/support.slice';
 
 const persistConfig = {
   key: 'root',
@@ -42,7 +44,9 @@ const rootReducers = combineReducers({
   tourPackageSlice: tourPackageSlice.reducer,
   tourDestinationSlice: tourDestinationSlice.reducer,
   driverSlice: driverSlice.reducer,
-  accommodationSlice: accommodationSlice.reducer
+  accommodationSlice: accommodationSlice.reducer,
+  ocopSellSlice: ocopSellSlice.reducer,
+  supportSlice: supportSlice.reducer
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);

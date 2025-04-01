@@ -96,23 +96,23 @@ const CompanyDetails = ({ company }) => {
               onChange={handleTabChange}
               sx={{ borderBottom: 1, borderColor: "divider" }}
             >
-              <Tab label="Tour Packages" />
-              <Tab label="About" />
-              <Tab label="Contact" />
+              <Tab label="Tour du lịch" />
+              <Tab label="Về chúng tôi" />
+              <Tab label="Liên hệ" />
             </Tabs>
 
             <Box p={3}>
               {tabValue === 0 && (
                 <Box>
                   {/* Tour packages will be added here */}
-                  <Typography>Tour packages coming soon...</Typography>
+                  <Typography>Tour du lịch coming soon...</Typography>
                 </Box>
               )}
 
               {tabValue === 1 && (
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    About {company.companynName}
+                    Về công ty {company.companynName}
                   </Typography>
                   <Typography>{company.companyDescription}</Typography>
                 </Box>
@@ -121,7 +121,7 @@ const CompanyDetails = ({ company }) => {
               {tabValue === 2 && (
                 <Box>
                   <Typography variant="h6" gutterBottom>
-                    Contact Information
+                    Thông tin liên hệ
                   </Typography>
                   <Box
                     sx={{ display: "flex", flexDirection: "column", gap: 2 }}
