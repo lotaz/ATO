@@ -48,8 +48,8 @@ const ProductSearchResult = () => {
           }}
         >
           <Box>
-            <H5>Searching for “ mobile phone ”</H5>
-            <Paragraph color="grey.600">48 results found</Paragraph>
+            <H5>Tìm kiếm cho “ mobile phone ”</H5>
+            <Paragraph color="grey.600">48 kết quả tìm thấy</Paragraph>
           </Box>
 
           <FlexBox
