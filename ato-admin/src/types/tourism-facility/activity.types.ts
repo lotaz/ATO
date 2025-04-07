@@ -1,3 +1,5 @@
+import { TimeType } from './package.types';
+
 export interface Activity {
   activityId: number;
   name: string;
@@ -26,3 +28,24 @@ export interface CreateActivityRequest {
   endTime: Date;
   packageId: string;
 }
+
+export interface ProductActivityRequest {
+  productId: string;
+}
+
+export interface ActivityRequest {
+  activityName: string;
+  description?: string;
+  durationInHours: number;
+  durationInHoursType: TimeType;
+  location?: string;
+  imgs?: string[];
+  breakTimeInMinutes: number;
+  breakTimeInMinutesType: TimeType;
+  startTime: Date;
+  endTime: Date;
+  packageId?: string;
+  products?: ProductActivityRequest[];
+}
+
+// Make sure TimeType is imported or defined in your types

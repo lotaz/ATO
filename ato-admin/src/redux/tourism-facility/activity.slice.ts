@@ -1,10 +1,10 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { Activity } from '../../types/tourism-facility/activity.types';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { activityService } from '../../services/tourism-facility/activity.service';
+import { ActivityResponse } from '../../types/tourism-facility/package.types';
 
 interface ActivityState {
-  activities: Activity[];
-  specific: Activity | null;
+  activities: ActivityResponse[];
+  specific: ActivityResponse | null;
   loading: boolean;
   error: string | null;
 }
@@ -16,25 +16,18 @@ const initialState: ActivityState = {
   error: null
 };
 
-export const fetchActivities = createAsyncThunk('activity/fetchByPackage', async (packageId: number) => {
-  const response = await activityService.getAllByPackage(packageId);
-  console.log('re', response);
-
-  return response;
-});
-
-export const fetchActivity = createAsyncThunk('activity/fetchOne', async (activityId: number) => {
-  const response = await activityService.getById(activityId);
+export const fetchActivity = createAsyncThunk('activity/fetchOne', async (activityId: string) => {
+  const response = await activityService.getActivity(activityId);
   return response;
 });
 
 export const createActivity = createAsyncThunk('activity/create', async (data: any) => {
-  const response = await activityService.create(data);
+  const response = await activityService.createActivity(data);
   return response;
 });
 
-export const updateActivity = createAsyncThunk('activity/update', async ({ id, data }: { id: number; data: any }) => {
-  const response = await activityService.update(id, data);
+export const updateActivity = createAsyncThunk('activity/update', async ({ id, data }: { id: string; data: any }) => {
+  const response = await activityService.updateActivity(id, data);
   return response;
 });
 
@@ -48,19 +41,7 @@ const activitySlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
-      // Fetch Activities
-      .addCase(fetchActivities.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
-      .addCase(fetchActivities.fulfilled, (state, action) => {
-        state.loading = false;
-        state.activities = action.payload;
-      })
-      .addCase(fetchActivities.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.error.message || 'Failed to fetch activities';
-      })
+
       // Fetch Single Activity
       .addCase(fetchActivity.pending, (state) => {
         state.loading = true;
