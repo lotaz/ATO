@@ -40,6 +40,11 @@ export enum StatusApproval {
   UPDATE = 3
 }
 
+export interface Product_ActivityResponse {
+  productId: string;
+  productName: string;
+}
+
 export interface ActivityResponse {
   activityId: string;
   activityName: string;
@@ -54,6 +59,7 @@ export interface ActivityResponse {
   updateDate?: string;
   statusApproval: StatusApproval;
   replyRequest?: string;
+  products?: Product_ActivityResponse[]; // Add products field
 }
 
 export interface TourismPackageResponse {
