@@ -3,13 +3,9 @@ import {
   Box,
   Card,
   Container,
-  FormControl,
   Grid,
   InputAdornment,
-  InputLabel,
-  MenuItem,
   Pagination,
-  Select,
   Slider,
   TextField,
   Typography,
@@ -17,9 +13,15 @@ import {
 import { H2 } from "components/Typography";
 import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
-import { tourCategories, tourLocations, tourPackages } from "data/tourPackages";
-import { useState } from "react";
 import { useRouter } from "next/router";
+import { useState } from "react";
+import { TimeType } from "types/tour.ts";
+// Add these imports at the top
+import { get } from "helpers/axios-helper";
+import useSWR from "swr";
+
+// Add this fetcher function
+const fetcher = (url) => get(url).then((res) => res.data);
 
 const TourPackages = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -28,22 +30,35 @@ const TourPackages = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [startDate, setStartDate] = useState(null);
   const [endDate, setEndDate] = useState(null);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 6;
 
   const router = useRouter();
 
+  // Replace mock data with API call
+  const {
+    data: tourPackages = [],
+    error,
+    isLoading,
+  } = useSWR(
+    "/agricultural-tour-package/get-list-agricultural-tour-packages",
+    fetcher
+  );
+  console.log("----", tourPackages);
+
   const filteredPackages = tourPackages.filter((pack) => {
-    const matchesSearch =
-      pack.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      pack.companyName.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesSearch = pack.packageName
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase());
     const matchesPrice =
       pack.price >= priceRange[0] && pack.price <= priceRange[1];
-    const matchesLocation =
-      !selectedLocation || pack.location === selectedLocation;
-    const matchesCategory =
-      !selectedCategory || pack.category === selectedCategory;
+    // Update location filter if needed (currently not in API response)
+    const matchesLocation = !selectedLocation || true;
+    // Update category filter if needed (currently not in API response)
+    const matchesCategory = !selectedCategory || true;
     const matchesDate =
-      (!startDate || new Date(pack.startDate) >= startDate) &&
-      (!endDate || new Date(pack.endDate) <= endDate);
+      (!startDate || new Date(pack.startTime) >= startDate) &&
+      (!endDate || new Date(pack.endTime) <= endDate);
 
     return (
       matchesSearch &&
@@ -53,10 +68,6 @@ const TourPackages = () => {
       matchesDate
     );
   });
-
-  // Add pagination calculation after filteredPackages
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 6;
 
   const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
   const paginatedPackages = filteredPackages.slice(
@@ -175,44 +186,7 @@ const TourPackages = () => {
                   step={500000}
                   sx={{ mb: 3 }}
                 />
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Địa điểm</InputLabel>
-                  <Select
-                    value={selectedLocation}
-                    onChange={(e) => {
-                      setSelectedLocation(e.target.value);
-                      setPage(1); // Reset page
-                    }}
-                    label="Địa điểm"
-                    sx={{ height: 56 }} // Add this
-                  >
-                    <MenuItem value="">Tất cả</MenuItem>
-                    {tourLocations.map((location) => (
-                      <MenuItem key={location} value={location}>
-                        {location}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-                <FormControl fullWidth sx={{ mb: 3 }}>
-                  <InputLabel>Loại tour</InputLabel>
-                  <Select
-                    value={selectedCategory}
-                    onChange={(e) => {
-                      setSelectedCategory(e.target.value);
-                      setPage(1); // Reset page
-                    }}
-                    label="Loại tour"
-                    sx={{ height: 56 }} // Add this
-                  >
-                    <MenuItem value="">Tất cả</MenuItem>
-                    {tourCategories.map((category) => (
-                      <MenuItem key={category} value={category}>
-                        {category}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
+
                 <TextField
                   type="date"
                   label="Ngày bắt đầu"
@@ -255,29 +229,23 @@ const TourPackages = () => {
                 <>
                   <Grid container spacing={3}>
                     {paginatedPackages.map((pack) => (
-                      <Grid item xs={12} sm={6} md={4} key={pack.id}>
+                      <Grid item xs={12} sm={6} md={4} key={pack.tourId}>
                         <Card
-                          sx={{
-                            cursor: "pointer",
-                            transition: "transform 0.2s",
-                            "&:hover": {
-                              transform: "translateY(-4px)",
-                              boxShadow: 3,
-                            },
-                          }}
+                          sx={{ height: "100%", cursor: "pointer" }}
                           onClick={() =>
-                            router.push(`/tour-packages/${pack.id}`)
+                            router.push(`/tour-packages/${pack.tourId}`)
                           }
                         >
                           <Box
                             sx={{
                               height: 200,
+                              overflow: "hidden",
                               position: "relative",
                             }}
                           >
                             <img
-                              src={pack.imageUrl}
-                              alt={pack.name}
+                              src={pack.imgs?.[0] || "/placeholder.jpg"}
+                              alt={pack.packageName}
                               style={{
                                 width: "100%",
                                 height: "100%",
@@ -287,21 +255,22 @@ const TourPackages = () => {
                           </Box>
                           <Box sx={{ p: 2 }}>
                             <Typography variant="h6" gutterBottom noWrap>
-                              {pack.name}
+                              {pack.packageName}
                             </Typography>
                             <Typography
                               variant="body2"
                               color="text.secondary"
                               mb={1}
                             >
-                              {pack.location}
+                              {new Date(pack.startTime).toLocaleDateString()} -{" "}
+                              {new Date(pack.endTime).toLocaleDateString()}
                             </Typography>
                             <Typography
                               variant="body2"
                               color="text.secondary"
                               mb={1}
                             >
-                              {pack.duration}
+                              {pack.durations} {TimeType[pack.durationsType]}
                             </Typography>
                             <Typography variant="h6" color="primary.main">
                               {pack.price.toLocaleString("vi-VN")} VNĐ

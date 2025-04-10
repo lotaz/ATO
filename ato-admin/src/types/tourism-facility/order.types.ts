@@ -2,28 +2,28 @@ import { UnitProduct } from '../content-moderator/certification.types';
 import { ProductCategory } from './product-category.enum';
 
 export enum OrderType {
-  Online = 'Online',
-  Onsite = 'Onsite'
+  Online = 0,
+  Onsite = 1
 }
 
 export enum PaymentStatus {
-  Paid = 'Paid',
-  UnPaid = 'UnPaid',
-  Failed = 'Failed',
-  Refunded = 'Refunded'
+  Paid = 0,
+  UnPaid = 1,
+  Failed = 2,
+  Refunded = 3
 }
 
 export enum PaymentType {
-  CashOnDelivery = 'CashOnDelivery',
-  Transfer = 'Transfer',
-  Refunded = 'Refunded'
+  CashOnDelivery = 0,
+  Transfer = 1,
+  Refunded = 2
 }
 
 export enum StatusOrder {
-  Processing = 'Processing',
-  Shipped = 'Shipped',
-  Completed = 'Completed',
-  Canceled = 'Canceled'
+  Processing = 0,
+  Shipped = 1,
+  Completed = 2,
+  Canceled = 3
 }
 
 export interface ProductDTO_Order {
@@ -78,5 +78,6 @@ export interface OrderResponse {
   createDate: Date;
   updateDate?: Date;
   orderDetails: OrderDetailResponse[];
+  shipAddressId: string;
   vnPayPaymentResponses: VNPayPaymentResponseDTO[];
 }

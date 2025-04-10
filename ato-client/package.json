@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "node server.config.js",
+    "dev": "node server.config.js -p 3001",
     "build": "next build",
     "start": "NODE_ENV=production node server.config.js",
     "build:dev": "cross-env NEXT_ENV=development next build",

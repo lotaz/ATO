@@ -1,7 +1,7 @@
-import { useEffect, useState } from "react";
+import { Container } from "@mui/material";
+import { H2 } from "components/Typography";
 import { useRouter } from "next/router";
-import { Box, Container, Grid } from "@mui/material";
-import Stepper from "components/stepper/Stepper";
+import { useEffect, useState } from "react";
 import ShopLayout1 from "./ShopLayout1";
 /**
  *  Used:
@@ -59,29 +59,13 @@ const CheckoutNavLayout = ({ children }) => {
   }, [pathname]);
   return (
     <ShopLayout1>
+      <H2 sx={{ marginTop: "30px", textAlign: "center" }}>Giỏ hàng của bạn</H2>
       <Container
         sx={{
           my: 4,
+          mt: 2,
         }}
       >
-        <Box
-          mb={3}
-          display={{
-            sm: "block",
-            xs: "none",
-          }}
-        >
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Stepper
-                stepperList={list}
-                selectedStep={selectedStep}
-                onChange={handleStepChange}
-              />
-            </Grid>
-          </Grid>
-        </Box>
-
         {children}
       </Container>
     </ShopLayout1>

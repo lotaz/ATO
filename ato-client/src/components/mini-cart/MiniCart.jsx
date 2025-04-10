@@ -179,7 +179,7 @@ const MiniCart = ({ toggleSidenav }) => {
             }}
             onClick={toggleSidenav}
           >
-            Thanh toán ${getTotalPrice().toFixed(2)}
+            Thanh toán {currency(getTotalPrice())}
           </Button>
 
           <Button

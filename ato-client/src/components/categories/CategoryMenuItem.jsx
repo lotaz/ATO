@@ -38,7 +38,14 @@ const CategoryMenuItem = (props) => {
     <Wrapper>
       <Link href={href} target="_blank" passHref>
         <MenuItem className="category-dropdown-link">
-          {rest?.iconSrc && <img src={rest?.iconSrc} width={32} height={32} />}
+          {rest?.iconSrc && (
+            <img
+              src={rest?.iconSrc}
+              style={{ objectFit: "contain" }}
+              width={32}
+              height={32}
+            />
+          )}
           <span className="title">{title}</span>
           {caret &&
             (settings.direction === "ltr" ? (

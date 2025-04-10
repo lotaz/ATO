@@ -66,7 +66,7 @@ const ContentWrapper = styled(Box)(() => ({
     textOverflow: "ellipsis",
   },
 })); // ========================================================
-
+import { useRouter } from "next/router";
 // ========================================================
 const ProductCard1 = ({
   id,
@@ -80,6 +80,12 @@ const ProductCard1 = ({
   discount = 5,
   showProductSize,
 }) => {
+  const router = useRouter();
+
+  const handleClick = () => {
+    router.push(`/products/${id}`);
+  };
+
   const { enqueueSnackbar } = useSnackbar();
   const { state, dispatch } = useAppContext();
   const [openModal, setOpenModal] = useState(false);
@@ -108,149 +114,155 @@ const ProductCard1 = ({
   };
 
   return (
-    <StyledBazaarCard hoverEffect={hoverEffect}>
-      <ImageWrapper>
-        {!!discount && (
-          <StyledChip color="primary" size="small" label={`${discount}% off`} />
-        )}
-
-        <HoverIconWrapper className="hover-box">
-          <IconButton onClick={toggleDialog}>
-            <RemoveRedEye color="disabled" fontSize="small" />
-          </IconButton>
-
-          <IconButton onClick={toggleIsFavorite}>
-            {isFavorite ? (
-              <Favorite color="primary" fontSize="small" />
-            ) : (
-              <FavoriteBorder fontSize="small" color="disabled" />
-            )}
-          </IconButton>
-        </HoverIconWrapper>
-
-        <Link href={`/product/${slug}`}>
-          <a>
-            <LazyImage
-              src={imgUrl}
-              width={0}
-              height={0}
-              layout="responsive"
-              alt={title}
+    <div onClick={handleClick} style={{ cursor: "pointer" }}>
+      <StyledBazaarCard hoverEffect={hoverEffect}>
+        <ImageWrapper>
+          {!!discount && (
+            <StyledChip
+              color="primary"
+              size="small"
+              label={`${discount}% off`}
             />
-          </a>
-        </Link>
-      </ImageWrapper>
+          )}
 
-      <ProductViewDialog
-        openDialog={openModal}
-        handleCloseDialog={toggleDialog}
-        product={{
-          title,
-          price,
-          id,
-          slug,
-          imgGroup: [imgUrl, imgUrl],
-        }}
-      />
+          <HoverIconWrapper className="hover-box">
+            <IconButton onClick={toggleDialog}>
+              <RemoveRedEye color="disabled" fontSize="small" />
+            </IconButton>
 
-      <ContentWrapper>
-        <FlexBox>
-          <Box flex="1 1 0" minWidth="0px" mr={1}>
-            <Link href={`/product/${slug}`}>
-              <a>
-                <H3
-                  mb={1}
-                  title={title}
-                  fontSize="14px"
-                  fontWeight="600"
-                  className="title"
-                  color="text.secondary"
-                >
-                  {title}
-                </H3>
-              </a>
-            </Link>
+            <IconButton onClick={toggleIsFavorite}>
+              {isFavorite ? (
+                <Favorite color="primary" fontSize="small" />
+              ) : (
+                <FavoriteBorder fontSize="small" color="disabled" />
+              )}
+            </IconButton>
+          </HoverIconWrapper>
 
-            {!hideRating && (
-              <BazaarRating value={rating || 0} color="warn" readOnly />
-            )}
+          <Link href={`/product/${slug}`}>
+            <a>
+              <LazyImage
+                src={imgUrl}
+                width={0}
+                height={0}
+                layout="responsive"
+                alt={title}
+              />
+            </a>
+          </Link>
+        </ImageWrapper>
 
-            {showProductSize && (
-              <Span color="grey.600" mb={1} display="block">
-                {showProductSize}
-              </Span>
-            )}
+        <ProductViewDialog
+          openDialog={openModal}
+          handleCloseDialog={toggleDialog}
+          product={{
+            title,
+            price,
+            id,
+            slug,
+            imgGroup: [imgUrl, imgUrl],
+          }}
+        />
 
-            <FlexBox alignItems="center" gap={1} mt={0.5}>
-              <Box fontWeight="600" color="primary.main">
-                {calculateDiscount(price, discount)}
-              </Box>
+        <ContentWrapper>
+          <FlexBox>
+            <Box flex="1 1 0" minWidth="0px" mr={1}>
+              <Link href={`/product/${slug}`}>
+                <a>
+                  <H3
+                    mb={1}
+                    title={title}
+                    fontSize="14px"
+                    fontWeight="600"
+                    className="title"
+                    color="text.secondary"
+                  >
+                    {title}
+                  </H3>
+                </a>
+              </Link>
 
-              {!!discount && (
-                <Box color="grey.600" fontWeight="600">
-                  <del>{currency(price)}</del>
+              {!hideRating && (
+                <BazaarRating value={rating || 0} color="warn" readOnly />
+              )}
+
+              {showProductSize && (
+                <Span color="grey.600" mb={1} display="block">
+                  {showProductSize}
+                </Span>
+              )}
+
+              <FlexBox alignItems="center" gap={1} mt={0.5}>
+                <Box fontWeight="600" color="primary.main">
+                  {calculateDiscount(price, discount)}
                 </Box>
+
+                {!!discount && (
+                  <Box color="grey.600" fontWeight="600">
+                    <del>{currency(price)}</del>
+                  </Box>
+                )}
+              </FlexBox>
+            </Box>
+
+            <FlexBox
+              width="30px"
+              alignItems="center"
+              className="add-cart"
+              flexDirection="column-reverse"
+              justifyContent={!!cartItem?.qty ? "space-between" : "flex-start"}
+            >
+              <Button
+                color="primary"
+                variant="outlined"
+                sx={{
+                  padding: "3px",
+                }}
+                onClick={handleCartAmountChange({
+                  id,
+                  slug,
+                  price,
+                  imgUrl,
+                  name: title,
+                  qty: (cartItem?.qty || 0) + 1,
+                })}
+              >
+                <Add fontSize="small" />
+              </Button>
+
+              {!!cartItem?.qty && (
+                <Fragment>
+                  <Box color="text.primary" fontWeight="600">
+                    {cartItem?.qty}
+                  </Box>
+
+                  <Button
+                    color="primary"
+                    variant="outlined"
+                    sx={{
+                      padding: "3px",
+                    }}
+                    onClick={handleCartAmountChange(
+                      {
+                        id,
+                        slug,
+                        price,
+                        imgUrl,
+                        name: title,
+                        qty: (cartItem?.qty || 0) - 1,
+                      },
+                      "remove"
+                    )}
+                  >
+                    <Remove fontSize="small" />
+                  </Button>
+                </Fragment>
               )}
             </FlexBox>
-          </Box>
-
-          <FlexBox
-            width="30px"
-            alignItems="center"
-            className="add-cart"
-            flexDirection="column-reverse"
-            justifyContent={!!cartItem?.qty ? "space-between" : "flex-start"}
-          >
-            <Button
-              color="primary"
-              variant="outlined"
-              sx={{
-                padding: "3px",
-              }}
-              onClick={handleCartAmountChange({
-                id,
-                slug,
-                price,
-                imgUrl,
-                name: title,
-                qty: (cartItem?.qty || 0) + 1,
-              })}
-            >
-              <Add fontSize="small" />
-            </Button>
-
-            {!!cartItem?.qty && (
-              <Fragment>
-                <Box color="text.primary" fontWeight="600">
-                  {cartItem?.qty}
-                </Box>
-
-                <Button
-                  color="primary"
-                  variant="outlined"
-                  sx={{
-                    padding: "3px",
-                  }}
-                  onClick={handleCartAmountChange(
-                    {
-                      id,
-                      slug,
-                      price,
-                      imgUrl,
-                      name: title,
-                      qty: (cartItem?.qty || 0) - 1,
-                    },
-                    "remove"
-                  )}
-                >
-                  <Remove fontSize="small" />
-                </Button>
-              </Fragment>
-            )}
           </FlexBox>
-        </FlexBox>
-      </ContentWrapper>
-    </StyledBazaarCard>
+        </ContentWrapper>
+      </StyledBazaarCard>
+    </div>
   );
 };
 

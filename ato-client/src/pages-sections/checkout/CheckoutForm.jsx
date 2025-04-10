@@ -1,23 +1,117 @@
-import { Box, Stack, TextField, Typography, Button } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  Stack,
+  Typography,
+} from "@mui/material";
+import { OrderType, PaymentStatus, PaymentType } from "constants/order-enums";
+import { useAppContext } from "contexts/AppContext";
 import { Formik } from "formik";
+import { get, post } from "helpers/axios-helper";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
+import paymentService from "services/payment.service";
 import * as yup from "yup";
+import { currency } from "lib";
 
 const CheckoutForm = () => {
   const router = useRouter();
   const [initialFormValues, setInitialFormValues] = useState(initialValues);
+  const [addresses, setAddresses] = useState([]);
+  const [shippingFee, setShippingFee] = useState(0);
+  const [addressId, setAddressId] = useState(null);
+  const { state } = useAppContext();
 
   useEffect(() => {
     const storedValues = sessionStorage.getItem("shippingInfo");
     if (storedValues) {
       setInitialFormValues(JSON.parse(storedValues));
     }
+    fetchAddresses();
   }, []);
+
+  const fetchAddresses = async () => {
+    const response = await get("/tourist/shipp-address/list-ship-addresses");
+    setAddresses(response.data || []);
+  };
+
+  const calculateShippingFee = async (address) => {
+    if (!address) return;
+
+    const response = await post("/tourist/order/calculate-shipping-fee", {
+      toWardCode: address.toWardCode,
+      toDistrictId: address.toDistrictId,
+      weight: 15,
+    });
+
+    console.log("response", response);
+    setShippingFee(response.data?.data?.total || 0);
+  };
+
+  const handleAddressSelect = (address, setFieldValue) => {
+    setFieldValue("toName", address.toName);
+    setFieldValue("toPhone", address.toPhone);
+    setFieldValue("toWardCode", address.toWardCode);
+    setFieldValue("toDistrictId", address.toDistrictId);
+    setFieldValue("shipAddressId", address.shipAddressId);
+    setAddressId(address.shipAddressId);
+    calculateShippingFee(address);
+  };
 
   const handleFormSubmit = async (values) => {
     sessionStorage.setItem("shippingInfo", JSON.stringify(values));
     router.push("/payment");
+  };
+
+  // Add this function to calculate cart total
+  const calculateCartTotal = () => {
+    return state.cart.reduce((total, item) => total + item.price * item.qty, 0);
+  };
+
+  // Update the handlePayment function
+  const handlePayment = async (paymentType) => {
+    try {
+      const orderDetails = state.cart.map((item) => ({
+        ProductId: item.id,
+        Quantity: item.qty,
+        UnitPrice: item.price,
+      }));
+
+      const cartTotal = calculateCartTotal();
+      const totalAmount = cartTotal + shippingFee;
+
+      const orderRequest = {
+        OrderType: OrderType.Online,
+        PaymentType: PaymentType.Transfer,
+        PaymentStatus: PaymentStatus.UnPaid,
+        OrderDetails: orderDetails,
+        ShipAddressId: addressId,
+        ShippingFee: shippingFee,
+        TotalAmount: totalAmount,
+      };
+
+      const response = await paymentService.createOrder(orderRequest);
+
+      // // Clear cart and shipping info after successful order
+      // sessionStorage.removeItem("shippingInfo");
+
+      if (response?.status === true) {
+        sessionStorage.removeItem("cart");
+        router.push("/payment-result?vnp_ResponseCode=00");
+      }
+
+      if (response) {
+        router.push(response);
+      }
+      // Redirect to order confirmation
+    } catch (error) {
+      console.error("Order creation failed:", error);
+      // Handle error appropriately
+    }
   };
 
   return (
@@ -37,74 +131,68 @@ const CheckoutForm = () => {
         setFieldValue,
       }) => (
         <form onSubmit={handleSubmit}>
-          <Box
-            sx={{
-              mb: 4,
-            }}
-          >
+          <Box mb={4}>
             <Typography fontWeight="600" mb={2}>
               Thông tin thanh toán
             </Typography>
 
             <Stack spacing={2}>
-              <TextField
-                fullWidth
-                sx={{
-                  mb: 2,
-                }}
-                label="Họ và tên"
-                onBlur={handleBlur}
-                name="shipping_name"
-                onChange={handleChange}
-                value={values.shipping_name}
-                error={!!touched.shipping_name && !!errors.shipping_name}
-                helperText={touched.shipping_name && errors.shipping_name}
-              />
-              <TextField
-                fullWidth
-                sx={{
-                  mb: 2,
-                }}
-                onBlur={handleBlur}
-                label="Số điện thoại"
-                onChange={handleChange}
-                name="shipping_contact"
-                value={values.shipping_contact}
-                error={!!touched.shipping_contact && !!errors.shipping_contact}
-                helperText={touched.shipping_contact && errors.shipping_contact}
-              />
+              <Box>
+                <Typography variant="subtitle1" gutterBottom>
+                  Chọn địa chỉ giao hàng
+                </Typography>
+                <RadioGroup
+                  name="shipAddressId"
+                  value={values.shipAddressId || ""}
+                  onChange={(e) => {
+                    const selectedAddress = addresses.find(
+                      (a) => a.shipAddressId === e.target.value
+                    );
+                    handleAddressSelect(selectedAddress, setFieldValue);
+                  }}
+                >
+                  {addresses.map((address) => (
+                    <Card key={address.shipAddressId} sx={{ mb: 2, p: 2 }}>
+                      <FormControlLabel
+                        value={address.shipAddressId}
+                        control={<Radio />}
+                        label={
+                          <Box>
+                            <Typography fontWeight="600">
+                              {address.toName} - {address.toPhone}
+                              {address.defaultAddress && " (Mặc định)"}
+                            </Typography>
+                            <Typography variant="body2" color="text.secondary">
+                              {address.toWardCode}, {address.toDistrictId}
+                            </Typography>
+                          </Box>
+                        }
+                      />
+                    </Card>
+                  ))}
+                </RadioGroup>
+              </Box>
 
-              <TextField
-                fullWidth
-                label="Địa chỉ"
-                onBlur={handleBlur}
-                onChange={handleChange}
-                name="shipping_address1"
-                value={values.shipping_address1}
-                error={
-                  !!touched.shipping_address1 && !!errors.shipping_address1
-                }
-                helperText={
-                  touched.shipping_address1 && errors.shipping_address1
-                }
-              />
-              <TextField
-                fullWidth
-                type="email"
-                sx={{
-                  mb: 2,
-                }}
-                onBlur={handleBlur}
-                name="shipping_email"
-                label="Email"
-                onChange={handleChange}
-                value={values.shipping_email}
-                error={!!touched.shipping_email && !!errors.shipping_email}
-                helperText={touched.shipping_email && errors.shipping_email}
-              />
+              {shippingFee > 0 && (
+                <>
+                  <Typography variant="body1">
+                    Phí vận chuyển: {currency(shippingFee)}
+                  </Typography>
+                  <Typography variant="h6" sx={{ mt: 1 }}>
+                    Tổng cộng:
+                    {currency(calculateCartTotal() + shippingFee)}
+                  </Typography>
+                </>
+              )}
             </Stack>
           </Box>
-          <Button type="submit" variant="contained" color="primary" fullWidth>
+          <Button
+            onClick={handlePayment}
+            type="button"
+            variant="contained"
+            color="primary"
+            fullWidth
+          >
             Thanh toán ngay
           </Button>
         </form>
@@ -117,8 +205,12 @@ const initialValues = {
   shipping_name: "",
   shipping_email: "",
   shipping_contact: "",
-  shipping_address1: "",
-}; // uncomment these fields below for from validation
+  shipAddressId: "",
+  toName: "",
+  toPhone: "",
+  toWardCode: "",
+  toDistrictId: "",
+};
 
 const checkoutSchema = yup.object().shape({
   shipping_name: yup.string().required("Vui lòng nhập họ tên"),
@@ -127,6 +219,6 @@ const checkoutSchema = yup.object().shape({
     .email("Email không hợp lệ")
     .required("Vui lòng nhập email"),
   shipping_contact: yup.string().required("Vui lòng nhập số điện thoại"),
-  shipping_address1: yup.string().required("Vui lòng nhập địa chỉ"),
+  shipAddressId: yup.string().required("Vui lòng chọn địa chỉ giao hàng"),
 });
 export default CheckoutForm;

@@ -1,13 +1,4 @@
-import {
-  AccessTime,
-  Description,
-  DirectionsBus,
-  EventNote,
-  Group,
-  Hotel,
-  LocationOn,
-  Restaurant,
-} from "@mui/icons-material";
+import { AccessTime, EventNote, Group, LocationOn } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -24,110 +15,41 @@ import {
   Typography,
 } from "@mui/material";
 import { H3, H4 } from "components/Typography";
+import FeedbackSection from "components/feedback/FeedbackSection";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { get } from "helpers/axios-helper";
 import { currency } from "lib";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from "swr";
-const mockTour = {
-  id: "tour-123",
-  name: "Du lịch Đà Lạt - Thành phố mộng mơ",
-  price: 5990000,
-  duration: 4,
-  maxGroupSize: 20,
-  availableSeats: 8,
-  destination: "Đà Lạt, Lâm Đồng",
-  startDate: "2024-03-15",
-  images: [
-    "https://images.unsplash.com/photo-1528127269322-539801943592",
-    "https://images.unsplash.com/photo-1470004914212-05527e49370b",
-    "https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1",
-    "https://images.unsplash.com/photo-1506929562872-bb421503ef21",
-  ],
-  schedule: [
-    {
-      description: "Khởi hành từ TP.HCM - Đà Lạt",
-      activities: [
-        {
-          type: "transport",
-          description: "Xe đón tại sân bay Tân Sơn Nhất",
-        },
-        {
-          type: "meal",
-          description: "Ăn trưa tại nhà hàng địa phương",
-        },
-        {
-          type: "accommodation",
-          description: "Nhận phòng khách sạn 4 sao tại trung tâm",
-        },
-      ],
-    },
-    {
-      description: "Khám phá thành phố Đà Lạt",
-      activities: [
-        {
-          type: "transport",
-          description: "Tham quan Dinh Bảo Đại",
-        },
-        {
-          type: "meal",
-          description: "Ăn trưa buffet tại nhà hàng",
-        },
-        {
-          type: "transport",
-          description: "Thăm quan Thiền Viện Trúc Lâm",
-        },
-      ],
-    },
-    {
-      description: "Tham quan các điểm du lịch nổi tiếng",
-      activities: [
-        {
-          type: "transport",
-          description: "Thung lũng Tình Yêu",
-        },
-        {
-          type: "meal",
-          description: "Ăn trưa tại làng người Dao",
-        },
-        {
-          type: "transport",
-          description: "Tham quan đồi chè Cầu Đất",
-        },
-      ],
-    },
-    {
-      description: "Trở về TP.HCM",
-      activities: [
-        {
-          type: "meal",
-          description: "Ăn sáng tại khách sạn",
-        },
-        {
-          type: "transport",
-          description: "Di chuyển ra sân bay Liên Khương",
-        },
-        {
-          type: "transport",
-          description: "Bay về TP.HCM",
-        },
-      ],
-    },
-  ],
-};
+import { TimeType } from "types/tour.ts";
+import Timeline from "@mui/lab/Timeline";
+import TimelineConnector from "@mui/lab/TimelineConnector";
+import TimelineContent from "@mui/lab/TimelineContent";
+import TimelineDot from "@mui/lab/TimelineDot";
+import TimelineItem from "@mui/lab/TimelineItem";
+import TimelineSeparator from "@mui/lab/TimelineSeparator";
+import { HoverImageGallery } from "components/image-list";
 const fetcher = (url) => get(url).then((res) => res.data);
 
 const TourPackageDetails = () => {
   const router = useRouter();
   const { id } = router.query;
-  const { data, error } = useSWR(
-    id ? `/tourist/tour/get-tour-by-id/${id}` : null,
+  const {
+    data: tour,
+    error,
+    isLoading,
+  } = useSWR(
+    id
+      ? `/agricultural-tour-package/get-agricultural-tour-package/${id}`
+      : null,
     fetcher
   );
   const [selectedImage, setSelectedImage] = useState(0);
 
-  const tour = mockTour;
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading tour details</div>;
+  if (!tour) return <div>Tour not found</div>;
 
   return (
     <ShopLayout2>
@@ -139,8 +61,8 @@ const TourPackageDetails = () => {
             <Card sx={{ mb: 3 }}>
               <Box sx={{ position: "relative", height: 400 }}>
                 <img
-                  src={tour.images[selectedImage]}
-                  alt={tour.name}
+                  src={tour.imgs?.[selectedImage] || "/placeholder.jpg"}
+                  alt={tour.packageName}
                   style={{
                     width: "100%",
                     height: "100%",
@@ -149,7 +71,7 @@ const TourPackageDetails = () => {
                 />
               </Box>
               <ImageList sx={{ height: 100 }} cols={6}>
-                {tour.images.map((img, index) => (
+                {tour.imgs?.map((img, index) => (
                   <ImageListItem
                     key={index}
                     sx={{
@@ -171,6 +93,7 @@ const TourPackageDetails = () => {
             {/* Tour Overview */}
             <Card sx={{ p: 3, mb: 3 }}>
               <H3 mb={2}>Tổng quan</H3>
+              <Typography paragraph>{tour.description}</Typography>
               <List>
                 <ListItem>
                   <ListItemIcon>
@@ -178,7 +101,9 @@ const TourPackageDetails = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="Thời gian"
-                    secondary={`${tour.duration} ngày`}
+                    secondary={`${tour.durations} ${
+                      TimeType[tour.durationsType]
+                    }`}
                   />
                 </ListItem>
                 <ListItem>
@@ -187,54 +112,189 @@ const TourPackageDetails = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="Số lượng"
-                    secondary={`${tour.maxGroupSize} người`}
-                  />
-                </ListItem>
-                <ListItem>
-                  <ListItemIcon>
-                    <LocationOn />
-                  </ListItemIcon>
-                  <ListItemText
-                    primary="Điểm đến"
-                    secondary={tour.destination}
+                    secondary={`${tour.slot} người`}
                   />
                 </ListItem>
               </List>
             </Card>
 
-            {/* Tour Schedule */}
-            <Card sx={{ p: 3, mb: 3 }}>
-              <H3 mb={2}>Lịch trình</H3>
-              {tour.schedule.map((day, index) => (
-                <Box key={index} sx={{ mb: 3 }}>
-                  <H4 color="primary.main" mb={1}>
-                    Ngày {index + 1}
-                  </H4>
-                  <Typography>{day.description}</Typography>
-                  <List dense>
-                    {day.activities.map((activity, idx) => (
-                      <ListItem key={idx}>
-                        <ListItemIcon>
-                          {activity.type === "transport" ? (
-                            <DirectionsBus />
-                          ) : activity.type === "accommodation" ? (
-                            <Hotel />
-                          ) : activity.type === "meal" ? (
-                            <Restaurant />
-                          ) : (
-                            <Description />
-                          )}
-                        </ListItemIcon>
-                        <ListItemText primary={activity.description} />
-                      </ListItem>
-                    ))}
-                  </List>
-                  {index < tour.schedule.length - 1 && (
-                    <Divider sx={{ mt: 2 }} />
-                  )}
-                </Box>
-              ))}
-            </Card>
+            {/* Tour Destinations */}
+            {tour.tourDestinations?.length > 0 && (
+              <Card sx={{ p: 3, mb: 3 }}>
+                <H3 mb={2}>Lịch trình điểm đến</H3>
+                <Timeline position="alternate">
+                  {tour.tourDestinations.map((destination, index) => (
+                    <TimelineItem key={index}>
+                      <TimelineSeparator>
+                        <TimelineDot color="primary" />
+                        {index < tour.tourDestinations.length - 1 && (
+                          <TimelineConnector />
+                        )}
+                      </TimelineSeparator>
+                      <TimelineContent
+                        sx={{
+                          position: "relative",
+                          "&:hover .image-gallery": {
+                            display: "block",
+                          },
+                        }}
+                      >
+                        <Card sx={{ p: 3, mb: 3, boxShadow: 3 }}>
+                          <Box
+                            display="flex"
+                            flexDirection={{ xs: "column", md: "row" }}
+                            gap={3}
+                          >
+                            {/* Destination Images */}
+                            {destination.activity?.imgs?.length > 0 && (
+                              <HoverImageGallery
+                                images={destination.activity.imgs}
+                                title={destination.title}
+                              />
+                            )}
+                            {/* Destination Details */}
+                            <Box flex={2}>
+                              <Box
+                                display="flex"
+                                alignItems="center"
+                                gap={1}
+                                mb={1}
+                              >
+                                <LocationOn color="primary" />
+                                <H4 color="primary.main">
+                                  {destination.title} (Thứ tự:{" "}
+                                  {destination.visitOrder})
+                                </H4>
+                              </Box>
+
+                              <Typography paragraph>
+                                {destination.description}
+                              </Typography>
+
+                              {/* Activity Section */}
+                              {destination.activity && (
+                                <Box
+                                  sx={{
+                                    mt: 2,
+                                    p: 2,
+                                    bgcolor: "background.paper",
+                                    borderRadius: 1,
+                                  }}
+                                >
+                                  <Typography
+                                    variant="subtitle1"
+                                    fontWeight="bold"
+                                  >
+                                    Hoạt động:
+                                  </Typography>
+                                  <Typography>
+                                    {destination.activity.activityName} (
+                                    {destination.activity.durationInHours} giờ)
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    {destination.activity.description}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    Địa điểm: {destination.activity.location}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              {/* Driver Section */}
+                              {destination.driver && (
+                                <Box sx={{ mt: 2 }}>
+                                  <Typography variant="subtitle1">
+                                    Phương tiện:
+                                  </Typography>
+                                  <Typography>
+                                    {destination.driver.driverName} (
+                                    {destination.driver.vehicleType})
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    SĐT: {destination.driver.phoneNumber}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              {/* Accommodation Section */}
+                              {destination.accommodation && (
+                                <Box sx={{ mt: 2 }}>
+                                  <Typography variant="subtitle1">
+                                    Nơi ở:
+                                  </Typography>
+                                  <Typography>
+                                    {
+                                      destination.accommodation
+                                        .accommodationName
+                                    }
+                                    {destination.accommodation.star &&
+                                      ` (${destination.accommodation.star} sao)`}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    Địa chỉ: {destination.accommodation.address}
+                                  </Typography>
+                                  <Typography variant="body2">
+                                    SĐT: {destination.accommodation.phoneNumber}
+                                  </Typography>
+                                </Box>
+                              )}
+
+                              {index < tour.tourDestinations.length - 1 && (
+                                <Divider sx={{ mt: 2 }} />
+                              )}
+                            </Box>
+                          </Box>
+                        </Card>
+                      </TimelineContent>
+                    </TimelineItem>
+                  ))}
+                </Timeline>
+              </Card>
+            )}
+
+            {/* Tour Guides */}
+            {tour.tourGuides?.length > 0 && (
+              <Card sx={{ p: 3, mb: 3 }}>
+                <H3 mb={2}>Hướng dẫn viên</H3>
+                {tour.tourGuides.map((guide, index) => (
+                  <Box key={index} sx={{ mb: 3 }}>
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <img
+                        src={guide.account?.avatarURL || "/placeholder.jpg"}
+                        alt={guide.account?.fullname}
+                        style={{ width: 60, height: 60, borderRadius: "50%" }}
+                      />
+                      <Box>
+                        <Typography variant="subtitle1">
+                          {guide.account?.fullname}
+                        </Typography>
+                        <Typography variant="body2">
+                          Đánh giá: {guide.rating}/5
+                        </Typography>
+                      </Box>
+                    </Box>
+
+                    <Box sx={{ mt: 2 }}>
+                      <Typography variant="body2">
+                        <strong>Giới thiệu:</strong> {guide.bio}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Ngôn ngữ:</strong> {guide.languages}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Chuyên môn:</strong> {guide.expertiseArea}
+                      </Typography>
+                    </Box>
+
+                    {index < tour.tourGuides.length - 1 && (
+                      <Divider sx={{ mt: 2 }} />
+                    )}
+                  </Box>
+                ))}
+              </Card>
+            )}
+
+            <FeedbackSection entityId={id} entityType="tour" />
           </Grid>
 
           {/* Right Column - Booking Card */}
@@ -251,7 +311,7 @@ const TourPackageDetails = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="Ngày khởi hành"
-                    secondary={new Date(tour.startDate).toLocaleDateString(
+                    secondary={new Date(tour.startTime).toLocaleDateString(
                       "vi-VN"
                     )}
                   />
@@ -262,7 +322,9 @@ const TourPackageDetails = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="Thời gian"
-                    secondary={`${tour.duration} ngày`}
+                    secondary={`${tour.durations} ${
+                      TimeType[tour.durationsType]
+                    }`}
                   />
                 </ListItem>
                 <ListItem>
@@ -271,19 +333,19 @@ const TourPackageDetails = () => {
                   </ListItemIcon>
                   <ListItemText
                     primary="Số chỗ còn lại"
-                    secondary={`${tour.availableSeats} chỗ`}
+                    secondary={`${tour.slot} chỗ`}
                   />
                 </ListItem>
               </List>
 
               <Button
+                onClick={() => router.push(`/tour-packages/book?id=${id}`)}
                 fullWidth
                 size="large"
                 variant="contained"
                 sx={{ mt: 2 }}
-                onClick={() => router.push(`/checkout/${id}`)}
               >
-                Đặt tour
+                Đặt tour ngay
               </Button>
             </Card>
           </Grid>
@@ -293,4 +355,5 @@ const TourPackageDetails = () => {
   );
 };
 
+// Remove the existing ImageList component for destination images
 export default TourPackageDetails;

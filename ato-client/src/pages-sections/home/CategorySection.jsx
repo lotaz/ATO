@@ -4,8 +4,10 @@ import CategorySectionCreator from "components/CategorySectionCreator";
 import LazyImage from "components/LazyImage";
 import { H6, Paragraph, Tiny } from "components/Typography";
 import Carousel from "components/carousel/Carousel";
+import { API_URLs } from "constants/api-url";
 import useWindowSize from "hooks/useWindowSize";
 import { useEffect, useState } from "react";
+import useSWR from "swr";
 // styled component
 // Add the Company interface
 export const mockCompanies = [
@@ -101,7 +103,13 @@ const SubTitle = styled(Paragraph)(({ theme }) => ({
 
 // ===========================================================
 // Rename component and update props
-const CompanySection = ({ companies = mockCompanies }) => {
+const CompanySection = () => {
+  const fetcher = (url) => get(url).then((res) => res.data);
+
+  const { data, error, isLoading } = useSWR(API_URLs.COMPANY.LIST, fetcher);
+
+  const companies = data || [];
+
   const width = useWindowSize();
   const { palette } = useTheme();
   const [visibleSlides, setVisibleSlides] = useState(4);
@@ -141,7 +149,7 @@ const CompanySection = ({ companies = mockCompanies }) => {
                   height="100%"
                   alt={company.companynName}
                   src={company.logoURL}
-                  objectFit="cover"
+                  objectFit="contain"
                 />
               </Box>
 
