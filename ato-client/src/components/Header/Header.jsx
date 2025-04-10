@@ -7,6 +7,7 @@ import IconButton from "@mui/material/IconButton";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import {
   AccountCircleOutlined,
+  CardTravelOutlined,
   HistoryOutlined,
   KeyboardArrowDown,
   LogoutOutlined,
@@ -186,6 +187,15 @@ const Header = ({ isFixed, className, searchBoxType = "type1" }) => {
             >
               <HistoryOutlined sx={{ mr: 1 }} />
               Lịch sử đơn hàng
+            </MenuItem>
+            <MenuItem
+              onClick={() => {
+                handleMenuClose();
+                router.push("/booked-tours");
+              }}
+            >
+              <CardTravelOutlined sx={{ mr: 1 }} />
+              Tour của bạn
             </MenuItem>
             <MenuItem onClick={handleLogout}>
               <LogoutOutlined sx={{ mr: 1 }} />

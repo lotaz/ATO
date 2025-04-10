@@ -91,8 +91,8 @@ const linkList = [
         count: 5,
       },
       {
-        href: "#",
-        title: "Tour",
+        href: "/booked-tours",
+        title: "Tour của bạn",
         icon: CardTravelOutlined,
         count: 5,
       },

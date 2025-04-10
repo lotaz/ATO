@@ -1,6 +1,7 @@
 export const API_URLs = {
   PRODUCT: {
     LIST: "/product/get-products",
+    DETAILS: "/product/get-product",
   },
   COMPANY: {
     LIST: "/tour-company/list-tour-companies",

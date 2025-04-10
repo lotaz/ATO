@@ -22,3 +22,9 @@ export const StatusOrder = {
   Completed: 2,
   Canceled: 3,
 };
+
+export const StatusBooking = {
+  Processing: 0,
+  Completed: 1,
+  Canceled: 2,
+};
