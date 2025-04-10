@@ -141,9 +141,17 @@ const OrderDetails = () => {
         </Button>
         <Typography variant="h5">Chi tiết đơn hàng #{order.orderId}</Typography>
         {order.statusOrder === StatusOrder.Processing && (
-          <LoadingButton variant="contained" color="primary" loading={shipping} onClick={handleShipOrder} sx={{ ml: 'auto' }}>
-            Giao hàng
-          </LoadingButton>
+          <>
+            {order.bookingId !== undefined && order.bookingId !== null ? (
+              <LoadingButton variant="contained" color="primary" loading={shipping} sx={{ ml: 'auto' }}>
+                Xác nhận
+              </LoadingButton>
+            ) : (
+              <LoadingButton variant="contained" color="primary" loading={shipping} onClick={handleShipOrder} sx={{ ml: 'auto' }}>
+                Giao hàng
+              </LoadingButton>
+            )}
+          </>
         )}
       </Stack>
 
@@ -177,7 +185,7 @@ const OrderDetails = () => {
                       <Typography>{shipAddress.toName}</Typography>
                       <Typography>{shipAddress.toPhone}</Typography>
                       <Typography>
-                        {shipAddress.toWardCode}, District ID: {shipAddress.toDistrictId}
+                        {shipAddress?.toWardName}, {shipAddress?.toDistrictName}
                       </Typography>
                       {shipAddress.defaultAddress && <Chip label="Default Address" color="primary" size="small" sx={{ mt: 1 }} />}
                     </Box>

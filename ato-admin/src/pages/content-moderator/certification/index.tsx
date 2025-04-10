@@ -18,6 +18,7 @@ import { certificationService } from '../../../services/content-moderator/certif
 import { CertificationResponseCM, StatusApproval } from '../../../types/content-moderator/certification.types';
 import { useNavigate } from 'react-router-dom';
 import { CONTENT_MODERATOR_URLs } from '../../../constants/content-moderator-urls';
+import { MenuItem, Select } from '@mui/material';
 
 const CertificationList = () => {
   const [certifications, setCertifications] = useState<CertificationResponseCM[]>([]);
@@ -54,10 +55,13 @@ const CertificationList = () => {
     setPage(0);
   };
 
+  const [statusFilter, setStatusFilter] = useState<StatusApproval | 'all'>(StatusApproval.Processing);
+
   const filteredCertifications = certifications.filter(
     (cert) =>
-      cert.certificationName.toLowerCase().includes(searchText.toLowerCase()) ||
-      cert.issuingOrganization.toLowerCase().includes(searchText.toLowerCase())
+      (cert.certificationName.toLowerCase().includes(searchText.toLowerCase()) ||
+        cert.issuingOrganization.toLowerCase().includes(searchText.toLowerCase())) &&
+      (statusFilter === 'all' || cert.statusApproval === statusFilter)
   );
 
   const getStatusColor = (status: StatusApproval) => {
@@ -100,61 +104,84 @@ const CertificationList = () => {
   return (
     <Stack spacing={2}>
       <Box>
-        <AppSearchBar placeholder="Tìm kiếm chứng chỉ" value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          <AppSearchBar
+            placeholder="Tìm kiếm chứng chỉ"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            sx={{ flex: 1 }}
+          />
+          <Select
+            value={statusFilter}
+            onChange={(e) => setStatusFilter(e.target.value as StatusApproval | 'all')}
+            size="small"
+            sx={{ minWidth: 180 }}
+          >
+            <MenuItem value="all">Tất cả trạng thái</MenuItem>
+            <MenuItem value={StatusApproval.Approved}>Đã duyệt</MenuItem>
+            <MenuItem value={StatusApproval.Processing}>Đang xử lý</MenuItem>
+            <MenuItem value={StatusApproval.Reject}>Từ chối</MenuItem>
+            <MenuItem value={StatusApproval.Update}>Cần cập nhật</MenuItem>
+          </Select>
+        </Box>
       </Box>
 
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer sx={{ maxHeight: 440 }}>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>STT</TableCell>
-                <TableCell>Tên chứng chỉ</TableCell>
-                <TableCell>Tổ chức cấp</TableCell>
-                <TableCell>Sản phẩm</TableCell>
-                <TableCell>Cơ sở du lịch</TableCell>
-                <TableCell>Ngày cấp</TableCell>
-                <TableCell>Ngày hết hạn</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Hành động</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredCertifications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((cert, index) => (
-                <TableRow hover key={cert.certificationId}>
-                  <TableCell>{page * rowsPerPage + index + 1}</TableCell>
-                  <TableCell>{cert.certificationName}</TableCell>
-                  <TableCell>{cert.issuingOrganization}</TableCell>
-                  <TableCell>{cert.product?.productName || '-'}</TableCell>
-                  <TableCell>{cert.touristFacility?.touristFacilityName || '-'}</TableCell>
-                  <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
-                  <TableCell>{new Date(cert.expiryDate).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Chip label={getStatusLabel(cert.statusApproval)} color={getStatusColor(cert.statusApproval)} size="small" />
-                  </TableCell>
-                  <TableCell>
-                    <Button sx={{ width: '120px' }} onClick={() => handleOnClick(cert.certificationId)} variant="contained" size="small">
-                      Xem chi tiết
-                    </Button>
-                  </TableCell>
+      {filteredCertifications.length > 0 ? (
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer sx={{ maxHeight: 440 }}>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>STT</TableCell>
+                  <TableCell>Tên chứng chỉ</TableCell>
+                  <TableCell>Tổ chức cấp</TableCell>
+                  <TableCell>Sản phẩm</TableCell>
+                  <TableCell>Cơ sở du lịch</TableCell>
+                  <TableCell>Ngày cấp</TableCell>
+                  <TableCell>Ngày hết hạn</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                  <TableCell>Hành động</TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {filteredCertifications.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((cert, index) => (
+                  <TableRow hover key={cert.certificationId}>
+                    <TableCell>{page * rowsPerPage + index + 1}</TableCell>
+                    <TableCell>{cert.certificationName}</TableCell>
+                    <TableCell>{cert.issuingOrganization}</TableCell>
+                    <TableCell>{cert.product?.productName || '-'}</TableCell>
+                    <TableCell>{cert.touristFacility?.touristFacilityName || '-'}</TableCell>
+                    <TableCell>{new Date(cert.issueDate).toLocaleDateString()}</TableCell>
+                    <TableCell>{new Date(cert.expiryDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Chip label={getStatusLabel(cert.statusApproval)} color={getStatusColor(cert.statusApproval)} size="small" />
+                    </TableCell>
+                    <TableCell>
+                      <Button sx={{ width: '120px' }} onClick={() => handleOnClick(cert.certificationId)} variant="contained" size="small">
+                        Xem chi tiết
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
 
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 100]}
-          component="div"
-          count={filteredCertifications.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-          labelRowsPerPage="Số hàng mỗi trang:"
-          labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
-        />
-      </Paper>
+          <TablePagination
+            rowsPerPageOptions={[10, 25, 100]}
+            component="div"
+            count={filteredCertifications.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
+            labelRowsPerPage="Số hàng mỗi trang:"
+            labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
+          />
+        </Paper>
+      ) : (
+        <Box mt={4}>Không tìm thấy chứng chỉ cần duyệt</Box>
+      )}
     </Stack>
   );
 };

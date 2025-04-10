@@ -23,6 +23,7 @@ import { StatusApproval } from '../../../types/content-moderator/certification.t
 import { ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 import AppSearchBar from '../../../components/table/SearchBar';
 import { CONTENT_MODERATOR_URLs } from '../../../constants/content-moderator-urls';
+import { MenuItem, Select } from '@mui/material';
 
 const ProductList = () => {
   const [products, setProducts] = useState<ProductDTO_CM[]>([]);
@@ -81,74 +82,97 @@ const ProductList = () => {
     }
   };
 
+  const [statusFilter, setStatusFilter] = useState<StatusApproval | 'all'>(StatusApproval.Processing);
+
+  // Update filteredProducts calculation
   const filteredProducts = products.filter(
     (product) =>
-      product.productName.toLowerCase().includes(searchText.toLowerCase()) ||
-      (product.touristFacility?.touristFacilityName.toLowerCase().includes(searchText.toLowerCase()) ?? false)
+      (product.productName.toLowerCase().includes(searchText.toLowerCase()) ||
+        (product.touristFacility?.touristFacilityName.toLowerCase().includes(searchText.toLowerCase()) ?? false)) &&
+      (statusFilter === 'all' || product.statusApproval === statusFilter)
   );
+
+  // Update the search bar section
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
 
   return (
     <Stack spacing={2}>
-      <Stack direction="row" justifyContent="space-between" alignItems="center" mb={2}>
-        <AppSearchBar value={searchText} onChange={(e) => setSearchText(e.target.value)} placeholder="Tìm kiếm sản phẩm..." />
-      </Stack>
-      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <TableCell>Tên sản phẩm</TableCell>
-                <TableCell>Danh mục</TableCell>
-                <TableCell>Cơ sở</TableCell>
-                <TableCell>Giá</TableCell>
-                <TableCell>Trạng thái</TableCell>
-                <TableCell>Ngày tạo</TableCell>
-                <TableCell>Thao tác</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
-                <TableRow key={product.productId}>
-                  <TableCell>{product.productName}</TableCell>
-                  <TableCell>{ProductCategoryLabels[product.productCategory]}</TableCell>
-                  <TableCell>{product.touristFacility?.touristFacilityName || '-'}</TableCell>
-                  <TableCell>{product.price ? `${product.price.toFixed(2)} VND` : '-'}</TableCell>
-                  <TableCell>
-                    <Chip label={getStatusLabel(product.statusApproval)} color={getStatusColor(product.statusApproval)} />
-                  </TableCell>
-                  <TableCell>{new Date(product.createDate).toLocaleDateString()}</TableCell>
-                  <TableCell>
-                    <Button
-                      variant="contained"
-                      size="small"
-                      sx={{ width: '120px' }}
-                      onClick={() => navigate(CONTENT_MODERATOR_URLs.PRODUCT.DETAILS + '?id=' + product.productId)}
-                    >
-                      Xem chi tiết
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-
-        <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
-          component="div"
-          count={filteredProducts.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={(_, newPage) => setPage(newPage)}
-          onRowsPerPageChange={(e) => {
-            setRowsPerPage(parseInt(e.target.value, 10));
-            setPage(0);
-          }}
+      <Stack direction="row" gap={4} alignItems="center" mb={2}>
+        <AppSearchBar
+          value={searchText}
+          onChange={(e) => setSearchText(e.target.value)}
+          placeholder="Tìm kiếm sản phẩm..."
+          sx={{ flex: 1, mr: 2 }}
         />
-      </Paper>
+        <Select value={statusFilter} onChange={(e) => setStatusFilter(e.target.value as StatusApproval | 'all')} sx={{ minWidth: 180 }}>
+          <MenuItem value="all">Tất cả trạng thái</MenuItem>
+          <MenuItem value={StatusApproval.Approved}>Đã duyệt</MenuItem>
+          <MenuItem value={StatusApproval.Processing}>Đang xử lý</MenuItem>
+          <MenuItem value={StatusApproval.Reject}>Từ chối</MenuItem>
+          <MenuItem value={StatusApproval.Update}>Cần cập nhật</MenuItem>
+        </Select>
+      </Stack>
+
+      {filteredProducts.length > 0 ? (
+        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Tên sản phẩm</TableCell>
+                  <TableCell>Danh mục</TableCell>
+                  <TableCell>Cơ sở</TableCell>
+                  <TableCell>Giá</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                  <TableCell>Ngày tạo</TableCell>
+                  <TableCell>Thao tác</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
+                  <TableRow key={product.productId}>
+                    <TableCell>{product.productName}</TableCell>
+                    <TableCell>{ProductCategoryLabels[product.productCategory]}</TableCell>
+                    <TableCell>{product.touristFacility?.touristFacilityName || '-'}</TableCell>
+                    <TableCell>{product.price ? `${product.price.toFixed(2)} VND` : '-'}</TableCell>
+                    <TableCell>
+                      <Chip label={getStatusLabel(product.statusApproval)} color={getStatusColor(product.statusApproval)} />
+                    </TableCell>
+                    <TableCell>{new Date(product.createDate).toLocaleDateString()}</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="contained"
+                        size="small"
+                        sx={{ width: '120px' }}
+                        onClick={() => navigate(CONTENT_MODERATOR_URLs.PRODUCT.DETAILS + '?id=' + product.productId)}
+                      >
+                        Xem chi tiết
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredProducts.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(_, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10));
+              setPage(0);
+            }}
+          />
+        </Paper>
+      ) : (
+        <Box mt={4}>Không tìm thấy sản phẩm cần duyệt</Box>
+      )}
     </Stack>
   );
 };

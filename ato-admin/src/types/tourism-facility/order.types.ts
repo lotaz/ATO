@@ -68,6 +68,7 @@ export enum TypePayment {
 
 export interface OrderResponse {
   orderId: string;
+  bookingId?: string;
   orderDate: Date;
   orderType: OrderType;
   statusOrder: StatusOrder;

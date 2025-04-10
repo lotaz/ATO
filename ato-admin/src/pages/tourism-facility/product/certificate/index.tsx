@@ -22,6 +22,7 @@ import { NoDataDisplay } from '../../../../components/no-data/NoDataDisplay';
 import AppSearchBar from '../../../../components/table/SearchBar';
 import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-urls';
 import { RootState } from '../../../../redux/store';
+import { StatusApproval } from '../../../../types/tourism-facility/certificate.types';
 
 const CertificateList = () => {
   const dispatch = useDispatch<any>();
@@ -61,7 +62,36 @@ const CertificateList = () => {
       // dispatch(fetchCertificates(productId));
     }
   }, [dispatch, productId]);
+  // Add this helper function
+  const getStatusLabel = (status: StatusApproval) => {
+    switch (status) {
+      case StatusApproval.Approved:
+        return 'Đã duyệt';
+      case StatusApproval.Processing:
+        return 'Đang xử lý';
+      case StatusApproval.Reject:
+        return 'Đã từ chối';
+      case StatusApproval.Update:
+        return 'Cần cập nhật';
+      default:
+        return 'Không xác định';
+    }
+  };
 
+  const getStatusColor = (status: StatusApproval) => {
+    switch (status) {
+      case StatusApproval.Approved:
+        return 'success';
+      case StatusApproval.Processing:
+        return 'warning';
+      case StatusApproval.Reject:
+        return 'error';
+      case StatusApproval.Update:
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
   return (
     <Stack spacing={2}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
@@ -96,12 +126,9 @@ const CertificateList = () => {
                     <TableCell>{cert.issuingOrganization}</TableCell>
                     <TableCell>{dayjs(cert.issueDate).format('DD/MM/YYYY')}</TableCell>
                     <TableCell>{cert.expiryDate ? dayjs(cert.expiryDate).format('DD/MM/YYYY') : 'Không có'}</TableCell>
+                    // Update the status display in the table
                     <TableCell>
-                      <Chip
-                        label={cert.statusApproval ? 'Đã duyệt' : 'Chờ duyệt'}
-                        color={cert.statusApproval ? 'success' : 'warning'}
-                        size="small"
-                      />
+                      <Chip label={getStatusLabel(cert.statusApproval)} color={getStatusColor(cert.statusApproval)} size="small" />
                     </TableCell>
                     <TableCell align="right">
                       <Stack direction="row" spacing={1} justifyContent="flex-end">

@@ -1,61 +1,18 @@
-import { Button, Chip, Stack } from '@mui/material';
+import { Button, Chip, Paper, Stack, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import AppTable from '../../../components/table/AppTable';
 import AppSearchBar from '../../../components/table/SearchBar';
-import { TColumn } from '../../../components/table/types';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
 import { tourGuideService } from '../../../services/tourism-company/tour-guide.service';
 import { TourGuideResponse } from '../../../types/tourism-company/tour-guide.types';
+import { TablePagination } from '@mui/material';
 
 const TourGuideList = () => {
   const navigate = useNavigate();
   const [tourGuides, setTourGuides] = useState<TourGuideResponse[]>([]);
   const [searchText, setSearchText] = useState('');
-
-  const columns: TColumn[] = [
-    {
-      id: 'fullName',
-      label: 'Họ tên',
-      minWidth: 150,
-      format: (row) => row.account?.fullName || '-'
-    },
-    {
-      id: 'email',
-      label: 'Email',
-      minWidth: 200,
-      format: (row) => row.account?.email || '-'
-    },
-    {
-      id: 'phone',
-      label: 'Số điện thoại',
-      minWidth: 150,
-      format: (row) => row.account?.phone || '-'
-    },
-    {
-      id: 'languages',
-      label: 'Ngôn ngữ',
-      minWidth: 200,
-      format: (row) => (
-        <Stack direction="row" spacing={1}>
-          {row.languages?.split(',').map((lang) => <Chip key={lang.trim()} label={lang.trim()} size="small" />)}
-        </Stack>
-      )
-    },
-    {
-      id: 'expertiseArea',
-      label: 'Chuyên môn',
-      minWidth: 150,
-      format: (row) => row.expertiseArea || '-'
-    },
-    {
-      id: 'rating',
-      label: 'Đánh giá',
-      minWidth: 100,
-      align: 'right',
-      format: (row) => row.rating?.toFixed(1) || '-'
-    }
-  ];
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     fetchTourGuides();
@@ -76,11 +33,11 @@ const TourGuideList = () => {
     setSearchText(value);
   };
 
-  const filteredData = tourGuides.filter((item) => {
+  const filteredData = tourGuides.filter((item: TourGuideResponse) => {
     const searchLower = searchText.toLowerCase();
     return (
-      item.account?.userName?.toLowerCase().includes(searchLower) ||
-      item.account?.email?.toLowerCase().includes(searchLower) ||
+      item?.account?.fullname?.toLowerCase().includes(searchLower) ||
+      item?.account?.email?.toLowerCase().includes(searchLower) ||
       item.expertiseArea?.toLowerCase().includes(searchLower) ||
       item.languages?.toLowerCase().includes(searchLower)
     );
@@ -95,13 +52,61 @@ const TourGuideList = () => {
         </Button>
       </Stack>
 
-      <AppTable
-        columns={columns}
-        rows={filteredData}
-        rowKey="guideId"
-        handleViewDetails={(id) => navigate(`${TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.DETAILS}/${id}`)}
-        handleUpdate={(id) => navigate(`${TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.UPDATE}/${id}`)}
-      />
+      <TableContainer component={Paper}>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <TableCell>Họ tên</TableCell>
+              <TableCell>Email</TableCell>
+              <TableCell>Số điện thoại</TableCell>
+              <TableCell>Ngôn ngữ</TableCell>
+              <TableCell>Chuyên môn</TableCell>
+              <TableCell align="right">Đánh giá</TableCell>
+              <TableCell>Thao tác</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {filteredData.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((guide) => (
+              <TableRow key={guide.guideId}>
+                <TableCell>{guide?.account?.fullname || '-'}</TableCell>
+                <TableCell>{guide?.account?.email || '-'}</TableCell>
+                <TableCell>{guide?.account?.phoneNumber || '-'}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={1}>
+                    {guide.languages?.split(',').map((lang) => <Chip key={lang.trim()} label={lang.trim()} size="small" />)}
+                  </Stack>
+                </TableCell>
+                <TableCell>{guide.expertiseArea || '-'}</TableCell>
+                <TableCell align="right">{guide.rating?.toFixed(1) || '-'}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={1}>
+                    <Button size="small" onClick={() => navigate(`${TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.DETAILS}?id=${guide.guideId}`)}>
+                      Chi tiết
+                    </Button>
+                    <Button size="small" onClick={() => navigate(`${TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.UPDATE}?id=${guide.guideId}`)}>
+                      Cập nhật
+                    </Button>
+                  </Stack>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          component="div"
+          count={filteredData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={(_, newPage) => setPage(newPage)}
+          onRowsPerPageChange={(e) => {
+            setRowsPerPage(parseInt(e.target.value, 10));
+            setPage(0);
+          }}
+          labelRowsPerPage="Số hàng mỗi trang:"
+          labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
+        />
+      </TableContainer>
     </Stack>
   );
 };

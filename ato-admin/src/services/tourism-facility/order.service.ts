@@ -17,7 +17,9 @@ export interface ShipAddressResponse {
   toName: string;
   toPhone: string;
   toWardCode: string;
-  toDistrictId: number;
+  toDistrictId: string;
+  toDistrictName: string;
+  toWardName: string;
 }
 
 // Add this method to orderService
@@ -31,10 +33,10 @@ export const orderService = {
     return response.data;
   },
   getShipAddressDetails: async (shipAddressId: string): Promise<ShipAddressResponse> => {
-    const response = await get(`tourist/shipp-address/ship-address-details/${shipAddressId}`);
+    const response = await get(`afto/order/ship-address-details/${shipAddressId}`);
     return response.data;
   },
-  shipOrder: async (request: ShipOrderRequest): Promise<void> => {
-    await post('afto/order/create-shipping', request);
+  shipOrder: async (data: any) => {
+    await post(`afto/order/create-shipping`, data);
   }
 };

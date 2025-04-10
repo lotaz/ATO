@@ -8,6 +8,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
 import { DurationType } from '../../../types/tourism-company/tour-package.types';
+import { AgriculturalTourPackageResponse } from '../../../types/tourism-company/agricultural-tour.types';
+import { useEffect, useState } from 'react';
+import { agriculturalTourService } from '../../../services/tourism-company/agricultural-tour.service';
 
 const UpdateTourPackage = () => {
   const navigate = useNavigate();
@@ -15,6 +18,25 @@ const UpdateTourPackage = () => {
   const location = useLocation();
   const params = new URLSearchParams(location.search);
   const id = params.get('id');
+  const [tourPackage, setTourPackage] = useState<AgriculturalTourPackageResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    if (id) {
+      fetchTourPackage();
+    }
+  }, [id]);
+
+  const fetchTourPackage = async () => {
+    try {
+      setLoading(true);
+      const response = await agriculturalTourService.getPackageById(id!);
+      setTourPackage(response.data);
+    } catch (error) {
+      console.error('Failed to fetch tour package:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const validationSchema = Yup.object().shape({
     packageName: Yup.string().required('Vui lòng nhập tên gói'),
@@ -31,12 +53,10 @@ const UpdateTourPackage = () => {
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
-      await dispatch(
-        updateTourPackage({
-          ...values,
-          tourId: Number(id)
-        })
-      ).unwrap();
+      await agriculturalTourService.updatePackage(id, {
+        ...values,
+        tourId: id
+      });
       navigate(TOURISM_COMPANY_URLs.TOUR_PACKAGE.INDEX);
     } finally {
       setSubmitting(false);
