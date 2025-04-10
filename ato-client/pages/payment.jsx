@@ -14,15 +14,6 @@ const Payment = () => {
   const { state } = useAppContext();
   const [shippingInfo, setShippingInfo] = useState(null);
 
-  useEffect(() => {
-    const storedInfo = sessionStorage.getItem("shippingInfo");
-    if (!storedInfo) {
-      router.push("/checkout");
-      return;
-    }
-    setShippingInfo(JSON.parse(storedInfo));
-  }, [router]);
-
   const handlePayment = async (paymentType) => {
     try {
       const orderDetails = state.cart.map((item) => ({

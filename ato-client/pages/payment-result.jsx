@@ -5,6 +5,7 @@ import { useAppContext } from "contexts/AppContext";
 import CheckoutNavLayout from "components/layouts/CheckoutNavLayout";
 import { Done, Error } from "@mui/icons-material";
 import { useSnackbar } from "notistack";
+import ShopLayout1 from "components/layouts/ShopLayout1"; // custom styled components
 
 const PaymentResult = () => {
   const router = useRouter();
@@ -67,7 +68,7 @@ const PaymentResult = () => {
   }
 
   return (
-    <CheckoutNavLayout>
+    <ShopLayout1>
       <Container maxWidth="sm">
         <Box sx={{ py: 8, textAlign: "center" }}>
           <Box
@@ -128,7 +129,7 @@ const PaymentResult = () => {
           )}
         </Box>
       </Container>
-    </CheckoutNavLayout>
+    </ShopLayout1>
   );
 };
 
