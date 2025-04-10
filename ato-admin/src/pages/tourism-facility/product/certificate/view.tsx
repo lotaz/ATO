@@ -8,6 +8,7 @@ import { RootState } from '../../../../redux/store';
 import { fetchCertificate } from '../../../../redux/tourism-facility/certificate.slice';
 import { ImageCarousel } from '../../../../components/carousel/ImageCarousel';
 import dayjs from 'dayjs';
+import { StatusApproval } from '../../../../types/tourism-facility/certificate.types';
 
 const ViewCertificate = () => {
   const navigate = useNavigate();
@@ -28,6 +29,35 @@ const ViewCertificate = () => {
   if (loading || !certificate) {
     return <div>Loading...</div>;
   }
+  const getCertificateStatusLabel = (status: StatusApproval) => {
+    switch (status) {
+      case StatusApproval.Approved:
+        return 'Đã duyệt';
+      case StatusApproval.Processing:
+        return 'Đang xử lý';
+      case StatusApproval.Reject:
+        return 'Đã từ chối';
+      case StatusApproval.Update:
+        return 'Cần cập nhật';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getCertificateStatusColor = (status: StatusApproval) => {
+    switch (status) {
+      case StatusApproval.Approved:
+        return 'success';
+      case StatusApproval.Processing:
+        return 'warning';
+      case StatusApproval.Reject:
+        return 'error';
+      case StatusApproval.Update:
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
 
   const DetailItem = ({ label, value }: { label: string; value: any }) => (
     <Box sx={{ py: 1 }}>
@@ -76,8 +106,8 @@ const ViewCertificate = () => {
                 label="Trạng thái"
                 value={
                   <Chip
-                    label={certificate.statusApproval ? 'Đã duyệt' : 'Chờ duyệt'}
-                    color={certificate.statusApproval ? 'success' : 'warning'}
+                    label={getCertificateStatusLabel(certificate.statusApproval)}
+                    color={getCertificateStatusColor(certificate.statusApproval)}
                     size="small"
                   />
                 }

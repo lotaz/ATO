@@ -12,6 +12,7 @@ import { fetchProduct } from '../../../redux/tourism-facility/product.slice';
 // import { fetchVariations } from '../../../redux/tourism-facility/variation.slice';
 import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 import { fetchOCOPSells } from '../../../redux/tourism-facility/ocop-sell.slice';
+import { StatusApproval } from '../../../types/tourism-facility/certificate.types';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -51,7 +52,36 @@ const ProductDetails = () => {
   }, [dispatch, id]);
 
   if (productLoading || !product) return <div>Loading...</div>;
+  // Add these helper functions in the component
+  const getCertificateStatusLabel = (status: StatusApproval) => {
+    switch (status) {
+      case StatusApproval.Approved:
+        return 'Đã duyệt';
+      case StatusApproval.Processing:
+        return 'Đang xử lý';
+      case StatusApproval.Reject:
+        return 'Đã từ chối';
+      case StatusApproval.Update:
+        return 'Cần cập nhật';
+      default:
+        return 'Không xác định';
+    }
+  };
 
+  const getCertificateStatusColor = (status: StatusApproval) => {
+    switch (status) {
+      case StatusApproval.Approved:
+        return 'success';
+      case StatusApproval.Processing:
+        return 'warning';
+      case StatusApproval.Reject:
+        return 'error';
+      case StatusApproval.Update:
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
   const DetailItem = ({ label, value }: { label: string; value: any }) => (
     <Box sx={{ py: 1 }}>
       <Typography variant="subtitle2" color="text.secondary">
@@ -166,8 +196,8 @@ const ProductDetails = () => {
                             {cert.certificationName}
                           </Typography>
                           <Chip
-                            label={cert.statusApproval ? 'Đã duyệt' : 'Chưa duyệt'}
-                            color={cert.statusApproval ? 'success' : 'warning'}
+                            label={getCertificateStatusLabel(cert.statusApproval)}
+                            color={getCertificateStatusColor(cert.statusApproval)}
                             size="small"
                           />
                         </Stack>

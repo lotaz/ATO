@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
 import { tourGuideService } from '../../../services/tour-guide';
-import { ITourGuide } from '../../../services/tour-guide/types';
+import { TourGuideResponse } from '../../../types/tourism-company/tour-guide.types';
 import CreateTourGuide from './create';
 
 const UpdateTourGuide = () => {
-  const { id } = useParams();
-  const [tourGuide, setTourGuide] = useState<ITourGuide | null>(null);
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const [tourGuide, setTourGuide] = useState<TourGuideResponse | null>(null);
 
   useEffect(() => {
     const fetchTourGuide = async () => {

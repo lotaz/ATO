@@ -2,6 +2,7 @@ import {
   Box,
   Button,
   Card,
+  CircularProgress,
   FormControlLabel,
   Radio,
   RadioGroup,
@@ -105,6 +106,7 @@ const CheckoutForm = () => {
       }
 
       if (response) {
+        sessionStorage.removeItem("cart");
         router.push(response);
       }
       // Redirect to order confirmation
@@ -141,36 +143,43 @@ const CheckoutForm = () => {
                 <Typography variant="subtitle1" gutterBottom>
                   Chọn địa chỉ giao hàng
                 </Typography>
-                <RadioGroup
-                  name="shipAddressId"
-                  value={values.shipAddressId || ""}
-                  onChange={(e) => {
-                    const selectedAddress = addresses.find(
-                      (a) => a.shipAddressId === e.target.value
-                    );
-                    handleAddressSelect(selectedAddress, setFieldValue);
-                  }}
-                >
-                  {addresses.map((address) => (
-                    <Card key={address.shipAddressId} sx={{ mb: 2, p: 2 }}>
-                      <FormControlLabel
-                        value={address.shipAddressId}
-                        control={<Radio />}
-                        label={
-                          <Box>
-                            <Typography fontWeight="600">
-                              {address.toName} - {address.toPhone}
-                              {address.defaultAddress && " (Mặc định)"}
-                            </Typography>
-                            <Typography variant="body2" color="text.secondary">
-                              {address.toWardCode}, {address.toDistrictId}
-                            </Typography>
-                          </Box>
-                        }
-                      />
-                    </Card>
-                  ))}
-                </RadioGroup>
+                {addresses.length > 0 ? (
+                  <RadioGroup
+                    name="shipAddressId"
+                    value={values.shipAddressId || ""}
+                    onChange={(e) => {
+                      const selectedAddress = addresses.find(
+                        (a) => a.shipAddressId === e.target.value
+                      );
+                      handleAddressSelect(selectedAddress, setFieldValue);
+                    }}
+                  >
+                    {addresses.map((address) => (
+                      <Card key={address.shipAddressId} sx={{ mb: 2, p: 2 }}>
+                        <FormControlLabel
+                          value={address.shipAddressId}
+                          control={<Radio />}
+                          label={
+                            <Box>
+                              <Typography fontWeight="600">
+                                {address.toName} - {address.toPhone}
+                                {address.defaultAddress && " (Mặc định)"}
+                              </Typography>
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {address.toWardName}, {address.toDistrictName}
+                              </Typography>
+                            </Box>
+                          }
+                        />
+                      </Card>
+                    ))}
+                  </RadioGroup>
+                ) : (
+                  <CircularProgress />
+                )}
               </Box>
 
               {shippingFee > 0 && (

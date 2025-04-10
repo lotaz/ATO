@@ -30,7 +30,15 @@ import { useSnackbar } from "notistack";
 import FeedbackSection from "components/feedback/FeedbackSection";
 
 const fetcher = (url) => get(url).then((res) => res.data);
-
+const PRODUCT_CATEGORIES = {
+  0: "Thực phẩm",
+  1: "Đồ uống",
+  2: "Thảo dược",
+  3: "Vải may mặc",
+  4: "Lưu niệm - Nội thất - Trang trí",
+  5: "Dịch vụ du lịch cộng đồng và điểm du lịch",
+  6: "Khác",
+};
 const ButtonBox = styled(FlexBox)(({ theme }) => ({
   gap: 10,
   marginTop: "15px",
@@ -136,7 +144,7 @@ const ProductDetails = () => {
             "& *": { maxWidth: "100%", lineHeight: 1.6 },
           }}
         >
-          <span dangerouslySetInnerHTML={{ __html: product.description }} />
+          <div dangerouslySetInnerHTML={{ __html: product.description }} />
         </Typography>
         <Button
           onClick={() => setShowFullDescription(!showFullDescription)}
@@ -157,7 +165,7 @@ const ProductDetails = () => {
         <ListItem>
           <ListItemText
             primary="Danh mục"
-            secondary={product.productCategory}
+            secondary={PRODUCT_CATEGORIES[product.productCategory]}
           />
         </ListItem>
         {product.volume && (

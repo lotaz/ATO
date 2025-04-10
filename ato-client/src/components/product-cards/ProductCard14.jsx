@@ -257,7 +257,7 @@ const ProductCard14 = (props) => {
 
             <FlexBox gap={1} alignItems="center" mt={0.5}>
               <Box fontWeight="600" color="primary.main">
-                đ{price.toLocaleString()}
+                đ{price?.toLocaleString()}
               </Box>
             </FlexBox>
           </Box>

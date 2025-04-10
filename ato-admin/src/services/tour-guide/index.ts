@@ -1,15 +1,16 @@
 import { API_URLs } from '../../constants/api';
 import { get, post, put } from '../../helpers/axios-helper';
-import { ITourGuide, ITourGuideRequest } from './types';
+import { TourGuideResponse } from '../../types/tourism-company/tour-guide.types';
+import { ITourGuideRequest } from './types';
 
 export const tourGuideService = {
   getTourGuides: async () => {
-    const response = await get<ITourGuide[]>(API_URLs.TOUR_GUIDE.LIST);
+    const response = await get<TourGuideResponse[]>(API_URLs.TOUR_GUIDE.LIST);
     return response.data;
   },
 
   getTourGuideById: async (id: string) => {
-    const response = await get<ITourGuide>(`${API_URLs.TOUR_GUIDE.DETAILS}/${id}`);
+    const response = await get<TourGuideResponse>(`${API_URLs.TOUR_GUIDE.DETAILS}/${id}`);
     return response.data;
   },
 

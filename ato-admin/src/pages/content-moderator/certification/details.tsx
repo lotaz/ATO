@@ -6,6 +6,7 @@ import { CertificationResponseCM, StatusApproval } from '../../../types/content-
 import dayjs from 'dayjs';
 import { ArrowLeftIcon } from '@mui/x-date-pickers';
 import { Dialog, DialogActions, DialogContent, DialogTitle, TextField } from '@mui/material';
+import { ImageCarousel } from '../../../components/carousel/ImageCarousel';
 
 const CertificationDetails = () => {
   const params = new URLSearchParams(location.search);
@@ -109,7 +110,12 @@ const CertificationDetails = () => {
             <Typography variant="h4">Chi tiết chứng chỉ</Typography>
             <Chip label={getStatusLabel(certification.statusApproval)} color={getStatusColor(certification.statusApproval)} />
           </Stack>
-
+          <Grid item xs={12}>
+            <Typography variant="h6" gutterBottom>
+              Hình ảnh chứng chỉ
+            </Typography>
+            <ImageCarousel images={certification.imgs || []} />
+          </Grid>
           <Grid container spacing={3}>
             <Grid item xs={12} md={6}>
               <DetailItem label="Tên chứng chỉ" value={certification.certificationName} />

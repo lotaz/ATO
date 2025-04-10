@@ -52,6 +52,7 @@ export interface CertificationResponseCM {
   touristFacility?: TouristFacilityDTO;
   productId?: string;
   product?: ProductDTO;
+  imgs?: string[];
 }
 
 export const UnitProductLabels = {

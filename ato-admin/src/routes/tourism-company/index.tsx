@@ -1,12 +1,11 @@
 import { TOURISM_COMPANY_BASE_URL } from '../../constants/tourism-company-urls';
 import Layout from '../../layout';
 import { TRoute } from '../types';
+import accommodationRoutes from './accommodation';
 import DriverRoutes from './driver';
 import tourDestinationRoutes from './tour-destination';
 import TourGuideTeamRoutes from './tour-guide-team';
 import tourismCompanyTourPackageRoutes from './tour-package';
-import accommodationRoutes from './accommodation';
-import { packageRoutes } from './package';
 
 const TourCompanyRoutes: TRoute = {
   path: TOURISM_COMPANY_BASE_URL,

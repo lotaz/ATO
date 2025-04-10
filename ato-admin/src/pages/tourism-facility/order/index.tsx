@@ -107,61 +107,65 @@ const OrderList = () => {
         placeholder="Tìm kiếm theo mã đơn hoặc ngày đặt..."
       />
 
-      <Card>
-        <CardContent>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Mã đơn</TableCell>
-                  <TableCell>Ngày đặt</TableCell>
-                  <TableCell>Loại đơn</TableCell>
-                  <TableCell>Trạng thái</TableCell>
-                  <TableCell>Thanh toán</TableCell>
-                  <TableCell>Tổng tiền</TableCell>
-                  <TableCell>Thao tác</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                  <TableRow key={order.orderId}>
-                    <TableCell>{order.orderId}</TableCell>
-                    <TableCell>{dayjs(order.orderDate).format('DD/MM/YYYY HH:mm')}</TableCell>
-                    <TableCell>{order.orderType === OrderType.Online ? 'Online' : 'Tại chỗ'}</TableCell>
-                    <TableCell>
-                      <Chip label={getStatusLabel(order.statusOrder)} color={getStatusColor(order.statusOrder)} />
-                    </TableCell>
-                    <TableCell>{getPaymentStatusLabel(order.paymentStatus)}</TableCell>
-                    <TableCell>{order.totalAmount.toLocaleString()} VND</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        onClick={() => navigate(`${TOURISM_FACILITY_URLs.ORDER.DETAILS}?id=${order.orderId}`)}
-                      >
-                        Chi tiết
-                      </Button>
-                    </TableCell>
+      {filteredOrders.length > 0 ? (
+        <Card>
+          <CardContent>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Mã đơn</TableCell>
+                    <TableCell>Ngày đặt</TableCell>
+                    <TableCell>Loại đơn</TableCell>
+                    <TableCell>Trạng thái</TableCell>
+                    <TableCell>Thanh toán</TableCell>
+                    <TableCell>Tổng tiền</TableCell>
+                    <TableCell>Thao tác</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                    <TableRow key={order.orderId}>
+                      <TableCell>{order.orderId}</TableCell>
+                      <TableCell>{dayjs(order.orderDate).format('DD/MM/YYYY HH:mm')}</TableCell>
+                      <TableCell>{order.orderType === OrderType.Online ? 'Online' : 'Tại chỗ'}</TableCell>
+                      <TableCell>
+                        <Chip label={getStatusLabel(order.statusOrder)} color={getStatusColor(order.statusOrder)} />
+                      </TableCell>
+                      <TableCell>{getPaymentStatusLabel(order.paymentStatus)}</TableCell>
+                      <TableCell>{order.totalAmount.toLocaleString()} VND</TableCell>
+                      <TableCell>
+                        <Button
+                          variant="outlined"
+                          size="small"
+                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.ORDER.DETAILS}?id=${order.orderId}`)}
+                        >
+                          Chi tiết
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={filteredOrders.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-          />
-        </CardContent>
-      </Card>
+            <TablePagination
+              rowsPerPageOptions={[5, 10, 25]}
+              component="div"
+              count={filteredOrders.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={(_, newPage) => setPage(newPage)}
+              onRowsPerPageChange={(e) => {
+                setRowsPerPage(parseInt(e.target.value, 10));
+                setPage(0);
+              }}
+            />
+          </CardContent>
+        </Card>
+      ) : (
+        <Box mt={4}>Không có hóa đơn nào</Box>
+      )}
     </Stack>
   );
 };

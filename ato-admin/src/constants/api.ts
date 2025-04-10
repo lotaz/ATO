@@ -48,10 +48,10 @@ export const API_URLs = {
     LIST: '/content-moderators/blog/get-blogs'
   },
   TOUR_GUIDE: {
-    LIST: '/tour-guide',
+    LIST: '/tour-company/guideteams/get-list-guide-teams',
     CREATE: '/tour-guide/create',
     UPDATE: '/tour-guide/update',
-    DETAILS: '/tour-guide/details',
+    DETAILS: '/tour-company/guideteams/get-guide-team',
     REQUEST: '/tour-guide/request'
   },
   FACILITY_OWNER: {

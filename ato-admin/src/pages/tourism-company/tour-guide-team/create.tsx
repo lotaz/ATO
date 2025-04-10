@@ -3,15 +3,14 @@ import { Formik } from 'formik';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import AppCard from '../../../components/cards/AppCard';
-import { ExpertiseAreaSelect } from '../../../components/select/ExpertiseAreaSelect';
-import { LanguageSelect } from '../../../components/select/LanguageSelect';
 import { UserSelect } from '../../../components/select/UserSelect';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
 import { tourGuideService } from '../../../services/tour-guide';
-import { ITourGuide } from '../../../services/tour-guide/types';
+import { TourGuideResponse } from '../../../types/tourism-company/tour-guide.types';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 
 interface CreateTourGuideProps {
-  initialValues?: ITourGuide;
+  initialValues?: TourGuideResponse;
   isUpdate?: boolean;
   isRequest?: boolean;
 }
@@ -21,14 +20,20 @@ const CreateTourGuide = ({ initialValues, isUpdate, isRequest }: CreateTourGuide
 
   return (
     <AppCard>
-      <Typography variant="h3" textAlign="center" sx={{ mb: 3 }}>
-        {isRequest ? 'Đăng Ký Làm Hướng Dẫn Viên' : isUpdate ? 'Cập Nhật Hướng Dẫn Viên' : 'Thêm Hướng Dẫn Viên'}
-      </Typography>
+      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 3 }}>
+        <Button startIcon={<ArrowLeftOutlined />} onClick={() => navigate(TOURISM_COMPANY_URLs.TOUR_GUIDE_TEAM.INDEX)}>
+          Quay lại
+        </Button>
+        <Typography variant="h3">
+          {isRequest ? 'Đăng Ký Làm Hướng Dẫn Viên' : isUpdate ? 'Cập Nhật Hướng Dẫn Viên' : 'Thêm Hướng Dẫn Viên'}
+        </Typography>
+        <div style={{ width: 100 }} /> {/* Spacer to balance the layout */}
+      </Stack>
 
       <Formik
         initialValues={{
           userId: initialValues?.userId || 0,
-          companyId: initialValues?.companyId || 0,
+          companyId: initialValues?.tourCompanyId || 0,
           bio: initialValues?.bio || '',
           languages: initialValues?.languages || [],
           expertiseArea: initialValues?.expertiseArea || [],
@@ -42,8 +47,8 @@ const CreateTourGuide = ({ initialValues, isUpdate, isRequest }: CreateTourGuide
         })}
         onSubmit={async (values, { setSubmitting }) => {
           try {
-            if (isUpdate && initialValues?.id) {
-              await tourGuideService.updateTourGuide(initialValues.id, values);
+            if (isUpdate && initialValues?.guideId) {
+              await tourGuideService.updateTourGuide(initialValues.guideId, values);
             } else {
               await tourGuideService.createTourGuide(values);
             }
@@ -90,10 +95,16 @@ const CreateTourGuide = ({ initialValues, isUpdate, isRequest }: CreateTourGuide
               <Grid item xs={12} md={6}>
                 <Stack spacing={1}>
                   <InputLabel>Ngôn ngữ</InputLabel>
-                  <LanguageSelect
-                    value={values.languages}
-                    onChange={(value) => setFieldValue('languages', value)}
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
                     error={Boolean(touched.languages && errors.languages)}
+                    value={values.languages}
+                    name="bio"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    placeholder="Nhập ngôn ngữ"
                   />
                   {touched.languages && errors.languages && <FormHelperText error>{errors.languages}</FormHelperText>}
                 </Stack>
@@ -102,10 +113,16 @@ const CreateTourGuide = ({ initialValues, isUpdate, isRequest }: CreateTourGuide
               <Grid item xs={12} md={6}>
                 <Stack spacing={1}>
                   <InputLabel>Lĩnh vực chuyên môn</InputLabel>
-                  <ExpertiseAreaSelect
-                    value={values.expertiseArea}
-                    onChange={(value) => setFieldValue('expertiseArea', value)}
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
                     error={Boolean(touched.expertiseArea && errors.expertiseArea)}
+                    value={values.expertiseArea}
+                    name="bio"
+                    onBlur={handleBlur}
+                    onChange={handleChange}
+                    placeholder="Nhập chuyên môn"
                   />
                   {touched.expertiseArea && errors.expertiseArea && <FormHelperText error>{errors.expertiseArea}</FormHelperText>}
                 </Stack>

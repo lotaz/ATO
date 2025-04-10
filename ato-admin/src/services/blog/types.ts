@@ -1,6 +1,6 @@
 export enum BlogType {
-  News = 0,
-  Even = 1
+  News = 1,
+  Even = 2
 }
 
 export enum BlogStatus {
