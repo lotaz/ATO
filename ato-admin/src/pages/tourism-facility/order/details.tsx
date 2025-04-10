@@ -1,82 +1,105 @@
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { Box, Button, Card, CardContent, Divider, Grid, MenuItem, Stack, TextField, Typography } from '@mui/material';
+import { Box, Button, Card, CardContent, Chip, Divider, Grid, Stack, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
-import { RootState } from '../../../redux/store';
-import { fetchOrder, updateOrderStatus, updatePaymentStatus } from '../../../redux/tourism-facility/order.slice';
-import { OrderDetail, OrderStatus, PaymentStatus } from '../../../types/tourism-facility/order.types';
-
-const getStatusLabel = (status: OrderStatus) => {
-  switch (status) {
-    case OrderStatus.Completed:
-      return 'Hoàn thành';
-    case OrderStatus.Cancelled:
-      return 'Đã hủy';
-    case OrderStatus.Shipped:
-      return 'Đang giao';
-    case OrderStatus.Processing:
-      return 'Đang xử lý';
-    default:
-      return status;
-  }
-};
-
-const getPaymentStatusLabel = (status: PaymentStatus) => {
-  switch (status) {
-    case PaymentStatus.Paid:
-      return 'Đã thanh toán';
-    case PaymentStatus.UnPaid:
-      return 'Chưa thanh toán';
-    case PaymentStatus.Failed:
-      return 'Thất bại';
-    case PaymentStatus.Refunded:
-      return 'Đã hoàn tiền';
-    default:
-      return status;
-  }
-};
+import { orderService, ShipAddressResponse } from '../../../services/tourism-facility/order.service';
+import { OrderResponse, PaymentStatus, StatusOrder } from '../../../types/tourism-facility/order.types';
+import { LoadingButton } from '@mui/lab';
 
 const OrderDetails = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<any>();
+  const location = useLocation();
   const params = new URLSearchParams(location.search);
-  const id = params.get('id');
-  const [updating, setUpdating] = useState(false);
-  const { specific: order, loading } = useSelector((state: RootState) => state.orderSlice);
+  const orderId = params.get('id');
+  const [order, setOrder] = useState<OrderResponse | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [shipping, setShipping] = useState(false);
+  const [shipAddress, setShipAddress] = useState<ShipAddressResponse | null>(null);
 
   useEffect(() => {
-    if (id) {
-      dispatch(fetchOrder(Number(id)));
-    }
-  }, [dispatch, id]);
+    const fetchOrderDetails = async () => {
+      if (!orderId) return;
 
-  const handleStatusUpdate = async (newStatus: string) => {
-    try {
-      setUpdating(true);
-      await dispatch(updateOrderStatus({ id: Number(id), status: newStatus })).unwrap();
-    } catch (error) {
-      console.error('Failed to update order status:', error);
-    } finally {
-      setUpdating(false);
+      try {
+        setLoading(true);
+        const data = await orderService.getOrderDetails(orderId);
+        setOrder(data);
+      } catch (error) {
+        console.error('Failed to fetch order details:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchOrderDetails();
+  }, [orderId]);
+
+  useEffect(() => {
+    const fetchShipAddress = async () => {
+      if (!order?.shipAddressId) return;
+
+      try {
+        const data = await orderService.getShipAddressDetails(order.shipAddressId);
+        setShipAddress(data);
+      } catch (error) {
+        console.error('Failed to fetch shipping address:', error);
+      }
+    };
+
+    if (order?.shipAddressId) {
+      fetchShipAddress();
+    }
+  }, [order?.shipAddressId]);
+
+  const getStatusColor = (status: StatusOrder) => {
+    switch (status) {
+      case StatusOrder.Completed:
+        return 'success';
+      case StatusOrder.Processing:
+        return 'warning';
+      case StatusOrder.Canceled:
+        return 'error';
+      case StatusOrder.Shipped:
+        return 'info';
+      default:
+        return 'default';
     }
   };
 
-  const handlePaymentStatusUpdate = async (newStatus: string) => {
-    try {
-      setUpdating(true);
-      await dispatch(updatePaymentStatus({ id: Number(id), paymentStatus: newStatus })).unwrap();
-    } catch (error) {
-      console.error('Failed to update payment status:', error);
-    } finally {
-      setUpdating(false);
+  const getStatusLabel = (status: StatusOrder) => {
+    switch (status) {
+      case StatusOrder.Completed:
+        return 'Hoàn thành';
+      case StatusOrder.Processing:
+        return 'Đang xử lý';
+      case StatusOrder.Canceled:
+        return 'Đã hủy';
+      case StatusOrder.Shipped:
+        return 'Đang giao';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getPaymentStatusLabel = (status: PaymentStatus) => {
+    switch (status) {
+      case PaymentStatus.Paid:
+        return 'Đã thanh toán';
+      case PaymentStatus.UnPaid:
+        return 'Chưa thanh toán';
+      case PaymentStatus.Failed:
+        return 'Thanh toán thất bại';
+      case PaymentStatus.Refunded:
+        return 'Đã hoàn tiền';
+      default:
+        return 'Không xác định';
     }
   };
 
   if (loading || !order) {
-    return <div>Đang tải...</div>;
+    return <div>Loading...</div>;
   }
 
   const DetailItem = ({ label, value }: { label: string; value: any }) => (
@@ -88,13 +111,40 @@ const OrderDetails = () => {
     </Box>
   );
 
+  const handleShipOrder = async () => {
+    try {
+      setShipping(true);
+      await orderService.shipOrder({
+        client_order_code: order.orderId,
+        content: `Shipping order ${order.orderId}`,
+        shipAddressId: order.shipAddressId,
+        insurance_value: 0, // Set appropriate value
+        cod_amount: order.totalAmount, // Or set appropriate COD amount,
+        weight: 100
+      });
+      // Refresh order details after shipping
+      const data = await orderService.getOrderDetails(orderId!);
+      setOrder(data);
+    } catch (error) {
+      console.error('Failed to ship order:', error);
+    } finally {
+      setShipping(false);
+    }
+  };
+
+  // In the return section, add the ship button:
   return (
     <Stack spacing={3}>
       <Stack direction="row" alignItems="center" spacing={2}>
         <Button startIcon={<ArrowLeftOutlined />} onClick={() => navigate(TOURISM_FACILITY_URLs.ORDER.INDEX)}>
-          Quay lại danh sách
+          Quay lại
         </Button>
-        <Typography variant="h5">Chi tiết đơn hàng</Typography>
+        <Typography variant="h5">Chi tiết đơn hàng #{order.orderId}</Typography>
+        {order.statusOrder === StatusOrder.Processing && (
+          <LoadingButton variant="contained" color="primary" loading={shipping} onClick={handleShipOrder} sx={{ ml: 'auto' }}>
+            Giao hàng
+          </LoadingButton>
+        )}
       </Stack>
 
       <Card>
@@ -106,94 +156,88 @@ const OrderDetails = () => {
               </Typography>
               <DetailItem label="Mã đơn hàng" value={order.orderId} />
               <DetailItem label="Ngày đặt" value={dayjs(order.orderDate).format('DD/MM/YYYY HH:mm')} />
-              <DetailItem label="Loại đơn hàng" value={order.orderType === 'Online' ? 'Trực tuyến' : 'Tại chỗ'} />
-              <DetailItem label="Tổng tiền" value={`${order.totalAmount.toLocaleString()} VND`} />
+              <DetailItem label="Loại đơn" value={order.orderType === 0 ? 'Online' : 'Tại chỗ'} />
+              <DetailItem
+                label="Trạng thái"
+                value={<Chip label={getStatusLabel(order.statusOrder)} color={getStatusColor(order.statusOrder)} />}
+              />
+              <DetailItem label="Tình trạng thanh toán" value={getPaymentStatusLabel(order.paymentStatus)} />
+              <DetailItem label="Tổng tiền" value={order.totalAmount.toLocaleString() + ' VND'} />
             </Grid>
 
             <Grid item xs={12} md={6}>
               <Typography variant="h6" gutterBottom>
-                Thông tin khách hàng
+                Thông tin vận chuyển
               </Typography>
-              <DetailItem label="Mã khách hàng" value={order.customerId} />
-              <DetailItem label="Tên khách hàng" value={order.customer?.name} />
-              <DetailItem label="Số điện thoại" value={order.customer?.phone} />
+              <DetailItem
+                label="Địa chỉ giao hàng"
+                value={
+                  shipAddress ? (
+                    <Box>
+                      <Typography>{shipAddress.toName}</Typography>
+                      <Typography>{shipAddress.toPhone}</Typography>
+                      <Typography>
+                        {shipAddress.toWardCode}, District ID: {shipAddress.toDistrictId}
+                      </Typography>
+                      {shipAddress.defaultAddress && <Chip label="Default Address" color="primary" size="small" sx={{ mt: 1 }} />}
+                    </Box>
+                  ) : (
+                    'Đang tải...'
+                  )
+                }
+              />
+              {order.cancelDate && <DetailItem label="Ngày hủy" value={dayjs(order.cancelDate).format('DD/MM/YYYY HH:mm')} />}
             </Grid>
 
             <Grid item xs={12}>
               <Divider />
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid item xs={12}>
               <Typography variant="h6" gutterBottom>
-                Quản lý trạng thái
+                Sản phẩm
               </Typography>
-              <Stack spacing={2}>
-                <TextField
-                  select
-                  fullWidth
-                  label="Trạng thái đơn hàng"
-                  value={order.status}
-                  onChange={(e) => handleStatusUpdate(e.target.value)}
-                  disabled={updating}
-                >
-                  {Object.values(OrderStatus).map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {getStatusLabel(status)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-
-                <TextField
-                  select
-                  fullWidth
-                  label="Trạng thái thanh toán"
-                  value={order.paymentStatus}
-                  onChange={(e) => handlePaymentStatusUpdate(e.target.value)}
-                  disabled={updating}
-                >
-                  {Object.values(PaymentStatus).map((status) => (
-                    <MenuItem key={status} value={status}>
-                      {getPaymentStatusLabel(status)}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              </Stack>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      <Card>
-        <CardContent>
-          <Typography variant="h6" gutterBottom>
-            Chi tiết sản phẩm
-          </Typography>
-          <Box sx={{ mt: 2 }}>
-            <Grid container spacing={2}>
-              {order.orderDetails.map((detail: OrderDetail) => (
-                <Grid item xs={12} key={`${detail.orderId}-${detail.productId}`}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Grid container spacing={2} alignItems="center">
-                        <Grid item xs={12} md={4}>
-                          <Typography variant="subtitle1">{detail.product?.productName}</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={2}>
-                          <Typography color="text.secondary">Số lượng: {detail.quantity}</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={3}>
-                          <Typography color="text.secondary">Đơn giá: {detail.unitPrice.toLocaleString()} VND</Typography>
-                        </Grid>
-                        <Grid item xs={12} md={3}>
-                          <Typography variant="subtitle2">Thành tiền: {detail.totalPrice.toLocaleString()} VND</Typography>
-                        </Grid>
+              {order.orderDetails.map((item) => (
+                <Card key={item.orderId} sx={{ mb: 2 }}>
+                  <CardContent>
+                    <Grid container spacing={2}>
+                      <Grid item xs={8}>
+                        <Typography variant="subtitle1">{item.product?.productName}</Typography>
                       </Grid>
-                    </CardContent>
-                  </Card>
-                </Grid>
+                      <Grid item xs={2}>
+                        <Typography variant="body1">Số lượng: {item.quantity}</Typography>
+                      </Grid>
+                      <Grid item xs={2}>
+                        <Typography variant="body1">{item.unitPrice.toLocaleString()} VND</Typography>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
               ))}
             </Grid>
-          </Box>
+
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+
+            {order.vnPayPaymentResponses?.length > 0 && (
+              <Grid item xs={12}>
+                <Typography variant="h6" gutterBottom>
+                  Thông tin thanh toán
+                </Typography>
+                <>
+                  {order.vnPayPaymentResponses?.map((payment) => (
+                    <Box key={payment.transactionNo} sx={{ mb: 2 }}>
+                      <DetailItem label="Mã giao dịch" value={payment.transactionNo} />
+                      <DetailItem label="Ngân hàng" value={payment.bankCode} />
+                      <DetailItem label="Số tiền" value={payment.amount.toLocaleString() + ' VND'} />
+                      <DetailItem label="Thời gian" value={dayjs(payment.payDate).format('DD/MM/YYYY HH:mm')} />
+                    </Box>
+                  ))}
+                </>
+              </Grid>
+            )}
+          </Grid>
         </CardContent>
       </Card>
     </Stack>

@@ -1,5 +1,12 @@
 // assets
-import { ExclamationCircleOutlined, NotificationOutlined, ProfileOutlined } from '@ant-design/icons';
+import {
+  CheckCircleOutlined,
+  CheckCircleTwoTone,
+  CheckSquareOutlined,
+  ExclamationCircleOutlined,
+  NotificationOutlined,
+  ProfileOutlined
+} from '@ant-design/icons';
 import { CONTENT_MODERATOR_URLs } from '../constants/content-moderator-urls';
 import { TMenu } from './types';
 
@@ -49,6 +56,38 @@ const contentModeratorMenu: TMenu = {
           title: 'Chi tiết đánh giá',
           type: 'item',
           url: CONTENT_MODERATOR_URLs.REVIEW.DETAILS,
+          icon: ProfileOutlined
+        }
+      ]
+    },
+    {
+      id: 'certificate',
+      title: 'Phê duyệt chứng chỉ',
+      type: 'item',
+      url: CONTENT_MODERATOR_URLs.CER.INDEX,
+      icon: CheckSquareOutlined,
+      subItems: [
+        {
+          id: 'view-review',
+          title: 'Chi tiết chứng chỉ',
+          type: 'item',
+          url: CONTENT_MODERATOR_URLs.CER.DETAILS,
+          icon: ProfileOutlined
+        }
+      ]
+    },
+    {
+      id: 'product',
+      title: 'Phê duyệt sản phẩm',
+      type: 'item',
+      url: CONTENT_MODERATOR_URLs.PRODUCT.INDEX,
+      icon: CheckCircleOutlined,
+      subItems: [
+        {
+          id: 'view-review',
+          title: 'Chi tiết sản phẩm',
+          type: 'item',
+          url: CONTENT_MODERATOR_URLs.PRODUCT.DETAILS,
           icon: ProfileOutlined
         }
       ]

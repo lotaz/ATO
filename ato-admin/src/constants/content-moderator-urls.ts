@@ -10,5 +10,13 @@ export const CONTENT_MODERATOR_URLs = {
   REVIEW: {
     INDEX: `${CONTENT_MODERATOR_BASE_URL}/review`,
     DETAILS: `${CONTENT_MODERATOR_BASE_URL}/details`
+  },
+  CER: {
+    INDEX: `${CONTENT_MODERATOR_BASE_URL}/cer`,
+    DETAILS: `${CONTENT_MODERATOR_BASE_URL}/cer/details`
+  },
+  PRODUCT: {
+    INDEX: `${CONTENT_MODERATOR_BASE_URL}/product`,
+    DETAILS: `${CONTENT_MODERATOR_BASE_URL}/product/details`
   }
 };

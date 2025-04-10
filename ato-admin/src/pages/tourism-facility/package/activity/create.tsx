@@ -9,7 +9,9 @@ import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-ur
 import { activityService } from '../../../../services/tourism-facility/activity.service';
 import { TimeType } from '../../../../types/tourism-facility/package.types';
 import { MultipleFileUploader } from '../../../../components/upload/MultipleFileUploader';
-import { CreateActivityRequest } from '../../../../types/tourism-facility/activity.types';
+// Update the imports
+import { ActivityRequest } from '../../../../types/tourism-facility/activity.types';
+import dayjs from 'dayjs';
 
 const validationSchema = Yup.object().shape({
   activityName: Yup.string().required('Tên hoạt động là bắt buộc'),
@@ -30,7 +32,7 @@ const CreateActivity = () => {
   const params = new URLSearchParams(location.search);
   const packageId = params.get('packageId');
 
-  const initialValues = {
+  const initialValues: ActivityRequest = {
     activityName: '',
     description: '',
     durationInHours: 0,
@@ -39,15 +41,23 @@ const CreateActivity = () => {
     imgs: [],
     breakTimeInMinutes: 0,
     breakTimeInMinutesType: TimeType.MINUTE,
-    startTime: null,
-    endTime: null,
-    packageId
+    startTime: new Date(),
+    endTime: new Date(),
+    packageId: packageId || '',
+    products: []
   };
 
-  const handleSubmit = async (values: CreateActivityRequest, { setSubmitting }: any) => {
+  const handleSubmit = async (values: ActivityRequest, { setSubmitting }: any) => {
     try {
-      await activityService.create(values);
-      navigate(TOURISM_FACILITY_URLs.PACKAGE.DETAILS.replace(':id', packageId));
+      // Format dates to ISO string before sending
+      const requestData = {
+        ...values,
+        startTime: values.startTime?.toISOString(),
+        endTime: values.endTime?.toISOString()
+      };
+
+      await activityService.createActivity(requestData);
+      navigate(TOURISM_FACILITY_URLs.PACKAGE.DETAILS.replace(':id', packageId || ''));
     } catch (error) {
       console.error('Failed to create activity:', error);
     } finally {
@@ -146,8 +156,8 @@ const CreateActivity = () => {
                 <Grid item xs={12} md={6}>
                   <DateTimePicker
                     label="Thời gian bắt đầu"
-                    value={values.startTime}
-                    onChange={(value) => setFieldValue('startTime', value)}
+                    value={dayjs(values.startTime)}
+                    onChange={(value) => setFieldValue('startTime', value?.toDate())}
                     slotProps={{
                       textField: {
                         fullWidth: true,
@@ -161,8 +171,8 @@ const CreateActivity = () => {
                 <Grid item xs={12} md={6}>
                   <DateTimePicker
                     label="Thời gian kết thúc"
-                    value={values.endTime}
-                    onChange={(value) => setFieldValue('endTime', value)}
+                    value={dayjs(values.endTime)}
+                    onChange={(value) => setFieldValue('endTime', value?.toDate())}
                     slotProps={{
                       textField: {
                         fullWidth: true,

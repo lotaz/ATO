@@ -7,6 +7,9 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-urls';
 import { RootState } from '../../../../redux/store';
 import { fetchActivity } from '../../../../redux/tourism-facility/activity.slice';
+import { ImageCarousel } from '../../../../components/carousel/ImageCarousel';
+
+// Add this import at the top
 
 const ActivityDetails = () => {
   const navigate = useNavigate();
@@ -20,7 +23,7 @@ const ActivityDetails = () => {
 
   useEffect(() => {
     if (activityId) {
-      dispatch(fetchActivity(Number(activityId)));
+      dispatch(fetchActivity(activityId));
     }
   }, [dispatch, activityId]);
 
@@ -40,7 +43,10 @@ const ActivityDetails = () => {
   return (
     <Stack spacing={3}>
       <Stack direction="row" alignItems="center" spacing={2}>
-        <Button startIcon={<ArrowLeftOutlined />} onClick={() => navigate(`${TOURISM_FACILITY_URLs.PACKAGE.DETAILS}?id=${packageId}`)}>
+        <Button
+          startIcon={<ArrowLeftOutlined />}
+          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PACKAGE.DETAILS.replace(':id', packageId)}`)}
+        >
           Quay lại
         </Button>
         <Typography variant="h5">Chi tiết hoạt động</Typography>
@@ -53,10 +59,32 @@ const ActivityDetails = () => {
               <Typography variant="h6" gutterBottom>
                 Thông tin cơ bản
               </Typography>
-              <DetailItem label="Tên hoạt động" value={activityData.name} />
+              <DetailItem label="Tên hoạt động" value={activityData.activityName} />
               <DetailItem label="Địa điểm" value={activityData.location} />
               <DetailItem label="Thời gian (giờ)" value={activityData.durationInHours} />
               <DetailItem label="Thời gian nghỉ (phút)" value={activityData.breakTimeInMinutes} />
+            </Grid>
+
+            <Grid item xs={12}>
+              <Divider />
+            </Grid>
+
+            {/* Add this new section for products */}
+            <Grid item xs={12}>
+              <Typography variant="h6" gutterBottom>
+                Sản phẩm
+              </Typography>
+              {activityData.products && activityData.products.length > 0 ? (
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  {activityData.products.map((product: any) => (
+                    <Chip key={product.productId} label={product.productName} variant="outlined" sx={{ mb: 1 }} />
+                  ))}
+                </Stack>
+              ) : (
+                <Typography variant="body1" color="text.secondary">
+                  Không có sản phẩm nào
+                </Typography>
+              )}
             </Grid>
 
             <Grid item xs={12}>
@@ -80,10 +108,9 @@ const ActivityDetails = () => {
               </Typography>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Chip
-                  label={activityData.approvalStatus ? 'Đã duyệt' : 'Chưa duyệt'}
-                  color={activityData.approvalStatus ? 'success' : 'warning'}
+                  label={activityData.statusApproval ? 'Đã duyệt' : 'Chưa duyệt'}
+                  color={activityData.statusApproval ? 'success' : 'warning'}
                 />
-                {activityData.approvalContent && <DetailItem label="Nội dung phê duyệt" value={activityData.approvalContent} />}
               </Stack>
             </Grid>
 
@@ -95,16 +122,7 @@ const ActivityDetails = () => {
               <Typography variant="h6" gutterBottom>
                 Hình ảnh
               </Typography>
-              <Box
-                component="img"
-                src={activityData.imgs}
-                alt={activityData.name}
-                sx={{
-                  maxWidth: '100%',
-                  height: 'auto',
-                  borderRadius: 1
-                }}
-              />
+              <ImageCarousel images={activityData.imgs} />
             </Grid>
 
             <Grid item xs={12}>
@@ -115,9 +133,9 @@ const ActivityDetails = () => {
               <Typography variant="h6" gutterBottom>
                 Thông tin thời gian
               </Typography>
-              <DetailItem label="Ngày tạo" value={dayjs(activityData.createdDate).format('DD/MM/YYYY HH:mm')} />
-              {activityData.updatedDate && (
-                <DetailItem label="Cập nhật lần cuối" value={dayjs(activityData.updatedDate).format('DD/MM/YYYY HH:mm')} />
+              <DetailItem label="Ngày tạo" value={dayjs(activityData.createDate).format('DD/MM/YYYY HH:mm')} />
+              {activityData.updateDate && (
+                <DetailItem label="Cập nhật lần cuối" value={dayjs(activityData.updateDate).format('DD/MM/YYYY HH:mm')} />
               )}
             </Grid>
           </Grid>

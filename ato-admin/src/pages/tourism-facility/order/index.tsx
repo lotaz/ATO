@@ -1,9 +1,9 @@
 import {
+  Box,
+  Button,
   Card,
   CardContent,
   Chip,
-  IconButton,
-  InputAdornment,
   Stack,
   Table,
   TableBody,
@@ -12,157 +12,154 @@ import {
   TableHead,
   TablePagination,
   TableRow,
-  TextField,
   Typography
 } from '@mui/material';
-import { EyeOutlined, SearchOutlined } from '@ant-design/icons';
-import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
-import { RootState } from '../../../redux/store';
-import { fetchOrders } from '../../../redux/tourism-facility/order.slice';
-import { OrderStatus, PaymentStatus } from '../../../types/tourism-facility/order.types';
+import { orderService } from '../../../services/tourism-facility/order.service';
+import { OrderResponse, OrderType, PaymentStatus, StatusOrder } from '../../../types/tourism-facility/order.types';
+import dayjs from 'dayjs';
 import AppSearchBar from '../../../components/table/SearchBar';
+import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
 
 const OrderList = () => {
   const navigate = useNavigate();
-  const dispatch = useDispatch<any>();
-  const { list: orders, loading } = useSelector((state: RootState) => state.orderSlice);
+  const [orders, setOrders] = useState<OrderResponse[]>([]);
+  const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    dispatch(fetchOrders());
-  }, [dispatch]);
+    const fetchOrders = async () => {
+      try {
+        setLoading(true);
+        const data = await orderService.getOrders();
+        console.log('data', data);
+        setOrders(data);
+      } catch (error) {
+        console.error('Failed to fetch orders:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
-    setPage(0);
-  };
+    fetchOrders();
+  }, []);
 
   const filteredOrders = orders.filter(
-    (order) => order.orderId.toString().includes(searchTerm) || order.customerId.toString().includes(searchTerm)
+    (order) =>
+      order.orderId.toLowerCase().includes(searchText.toLowerCase()) || dayjs(order.orderDate).format('DD/MM/YYYY').includes(searchText)
   );
+
+  const getStatusColor = (status: StatusOrder) => {
+    switch (status) {
+      case StatusOrder.Completed:
+        return 'success';
+      case StatusOrder.Processing:
+        return 'warning';
+      case StatusOrder.Canceled:
+        return 'error';
+      case StatusOrder.Shipped:
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
+
+  const getStatusLabel = (status: StatusOrder) => {
+    switch (status) {
+      case StatusOrder.Completed:
+        return 'Hoàn thành';
+      case StatusOrder.Processing:
+        return 'Đang xử lý';
+      case StatusOrder.Canceled:
+        return 'Đã hủy';
+      case StatusOrder.Shipped:
+        return 'Đang giao';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  const getPaymentStatusLabel = (status: PaymentStatus) => {
+    switch (status) {
+      case PaymentStatus.Paid:
+        return 'Đã thanh toán';
+      case PaymentStatus.UnPaid:
+        return 'Chưa thanh toán';
+      case PaymentStatus.Failed:
+        return 'Thanh toán thất bại';
+      case PaymentStatus.Refunded:
+        return 'Đã hoàn tiền';
+      default:
+        return 'Không xác định';
+    }
+  };
+
+  if (loading) return <div>Đang tải...</div>;
 
   return (
     <Stack spacing={3}>
       <AppSearchBar
-        placeholder="Tìm kiếm theo mã đơn hàng hoặc mã khách hàng"
-        value={searchTerm}
-        onChange={(e) => setSearchTerm(e.target.value)}
+        value={searchText}
+        onChange={(e) => setSearchText(e.target.value)}
+        placeholder="Tìm kiếm theo mã đơn hoặc ngày đặt..."
       />
+
       <Card>
         <CardContent>
-          <Stack spacing={2}>
-            <TableContainer>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Mã đơn</TableCell>
-                    <TableCell>Khách hàng</TableCell>
-                    <TableCell>Ngày đặt</TableCell>
-                    <TableCell>Trạng thái</TableCell>
-                    <TableCell>Thanh toán</TableCell>
-                    <TableCell align="right">Tổng tiền</TableCell>
-                    <TableCell align="center">Thao tác</TableCell>
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <TableCell>Mã đơn</TableCell>
+                  <TableCell>Ngày đặt</TableCell>
+                  <TableCell>Loại đơn</TableCell>
+                  <TableCell>Trạng thái</TableCell>
+                  <TableCell>Thanh toán</TableCell>
+                  <TableCell>Tổng tiền</TableCell>
+                  <TableCell>Thao tác</TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
+                  <TableRow key={order.orderId}>
+                    <TableCell>{order.orderId}</TableCell>
+                    <TableCell>{dayjs(order.orderDate).format('DD/MM/YYYY HH:mm')}</TableCell>
+                    <TableCell>{order.orderType === OrderType.Online ? 'Online' : 'Tại chỗ'}</TableCell>
+                    <TableCell>
+                      <Chip label={getStatusLabel(order.statusOrder)} color={getStatusColor(order.statusOrder)} />
+                    </TableCell>
+                    <TableCell>{getPaymentStatusLabel(order.paymentStatus)}</TableCell>
+                    <TableCell>{order.totalAmount.toLocaleString()} VND</TableCell>
+                    <TableCell>
+                      <Button
+                        variant="outlined"
+                        size="small"
+                        onClick={() => navigate(`${TOURISM_FACILITY_URLs.ORDER.DETAILS}?id=${order.orderId}`)}
+                      >
+                        Chi tiết
+                      </Button>
+                    </TableCell>
                   </TableRow>
-                </TableHead>
-                <TableBody>
-                  {filteredOrders.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((order) => (
-                    <TableRow key={order.orderId} hover>
-                      <TableCell>{order.orderId}</TableCell>
-                      <TableCell>{order.customerId}</TableCell>
-                      <TableCell>{dayjs(order.orderDate).format('DD/MM/YYYY HH:mm')}</TableCell>
-                      <TableCell>
-                        <Chip
-                          label={
-                            order.status === OrderStatus.Completed
-                              ? 'Hoàn thành'
-                              : order.status === OrderStatus.Cancelled
-                                ? 'Đã hủy'
-                                : order.status === OrderStatus.Shipped
-                                  ? 'Đang giao'
-                                  : 'Đang xử lý'
-                          }
-                          color={
-                            order.status === OrderStatus.Completed
-                              ? 'success'
-                              : order.status === OrderStatus.Cancelled
-                                ? 'error'
-                                : order.status === OrderStatus.Shipped
-                                  ? 'info'
-                                  : 'warning'
-                          }
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell>
-                        <Chip
-                          label={
-                            order.paymentStatus === PaymentStatus.Paid
-                              ? 'Đã thanh toán'
-                              : order.paymentStatus === PaymentStatus.Failed
-                                ? 'Thất bại'
-                                : order.paymentStatus === PaymentStatus.Refunded
-                                  ? 'Đã hoàn tiền'
-                                  : 'Chưa thanh toán'
-                          }
-                          color={
-                            order.paymentStatus === PaymentStatus.Paid
-                              ? 'success'
-                              : order.paymentStatus === PaymentStatus.Failed
-                                ? 'error'
-                                : order.paymentStatus === PaymentStatus.Refunded
-                                  ? 'info'
-                                  : 'warning'
-                          }
-                          size="small"
-                        />
-                      </TableCell>
-                      <TableCell align="right">{order.totalAmount.toLocaleString()} VND</TableCell>
-                      <TableCell align="center">
-                        <IconButton color="primary" onClick={() => navigate(`${TOURISM_FACILITY_URLs.ORDER.DETAILS}?id=${order.orderId}`)}>
-                          <EyeOutlined />
-                        </IconButton>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {loading && (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center">
-                        Đang tải...
-                      </TableCell>
-                    </TableRow>
-                  )}
-                  {!loading && filteredOrders.length === 0 && (
-                    <TableRow>
-                      <TableCell colSpan={7} align="center">
-                        Không tìm thấy đơn hàng nào
-                      </TableCell>
-                    </TableRow>
-                  )}
-                </TableBody>
-              </Table>
-            </TableContainer>
-            <TablePagination
-              component="div"
-              count={filteredOrders.length}
-              page={page}
-              onPageChange={handleChangePage}
-              rowsPerPage={rowsPerPage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              rowsPerPageOptions={[10, 25, 50]}
-              labelRowsPerPage="Số hàng mỗi trang:"
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} của ${count}`}
-            />
-          </Stack>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+
+          <TablePagination
+            rowsPerPageOptions={[5, 10, 25]}
+            component="div"
+            count={filteredOrders.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={(_, newPage) => setPage(newPage)}
+            onRowsPerPageChange={(e) => {
+              setRowsPerPage(parseInt(e.target.value, 10));
+              setPage(0);
+            }}
+          />
         </CardContent>
       </Card>
     </Stack>
