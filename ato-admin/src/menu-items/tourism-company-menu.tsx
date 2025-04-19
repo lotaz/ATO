@@ -1,5 +1,5 @@
 // assets
-import { BoxPlotOutlined, TeamOutlined, CarOutlined, EnvironmentOutlined, HomeOutlined } from '@ant-design/icons';
+import { BoxPlotOutlined, CarOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
 import { TOURISM_COMPANY_URLs } from '../constants/tourism-company-urls';
 import { TMenu } from './types';
 
@@ -149,6 +149,44 @@ const tourCompanuMenu: TMenu = {
           icon: HomeOutlined
         }
       ]
+    },
+    {
+      id: 'booking',
+      title: 'Quản lý đặt gói du lịch',
+      type: 'item',
+      url: TOURISM_COMPANY_URLs.BOOKING.INDEX,
+      icon: HomeOutlined,
+      subItems: [
+        // {
+        //   id: 'create-accommodation',
+        //   title: 'Thêm nhà nghỉ',
+        //   type: 'item',
+        //   url: TOURISM_COMPANY_URLs.ACCOMMODATION.CREATE,
+        //   icon: HomeOutlined
+        // },
+        // {
+        //   id: 'view-accommodation',
+        //   title: 'Chi tiết nhà nghỉ',
+        //   type: 'item',
+        //   url: TOURISM_COMPANY_URLs.ACCOMMODATION.DETAILS,
+        //   icon: HomeOutlined
+        // },
+        // {
+        //   id: 'update-accommodation',
+        //   title: 'Cập nhật nhà nghỉ',
+        //   type: 'item',
+        //   url: TOURISM_COMPANY_URLs.ACCOMMODATION.UPDATE,
+        //   icon: HomeOutlined
+        // }
+      ]
+    },
+    {
+      id: 'history-payment',
+      title: 'Quản lý lịch sử thanh toán',
+      type: 'item',
+      url: TOURISM_COMPANY_URLs.HISTORY_PAYMENT.INDEX,
+      icon: HomeOutlined,
+      subItems: []
     }
   ]
 };

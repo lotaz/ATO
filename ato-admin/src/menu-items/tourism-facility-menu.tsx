@@ -1,5 +1,5 @@
 // assets
-import { BoxPlotOutlined, PaperClipOutlined, ProductOutlined, ShopOutlined } from '@ant-design/icons';
+import { BoxPlotOutlined, ProductOutlined, ShopOutlined } from '@ant-design/icons';
 import { TOURISM_FACILITY_URLs } from '../constants/tourism-facility-urls';
 import { TMenu } from './types';
 
@@ -49,6 +49,13 @@ const tourismFacilityMenu: TMenu = {
       title: 'Quản lý hóa đơn',
       type: 'item',
       url: TOURISM_FACILITY_URLs.ORDER.INDEX,
+      icon: ShopOutlined
+    },
+    {
+      id: 'history_payment_orders',
+      title: 'Lịch sử thanh toán',
+      type: 'item',
+      url: TOURISM_FACILITY_URLs.HISTORY_PAYMENT_ORDER.INDEX,
       icon: ShopOutlined
     }
   ]
