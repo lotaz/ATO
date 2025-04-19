@@ -1,19 +1,17 @@
-import Link from "next/link";
-import { useCallback, useState } from "react";
 import { Add, Favorite, FavoriteBorder, Remove } from "@mui/icons-material";
-import PreviewIcon from "@mui/icons-material/RemoveRedEye";
-import FavoriteIcon from "@mui/icons-material/FavoriteBorder";
 import ShoppingCartIcon from "@mui/icons-material/AddShoppingCart";
+import PreviewIcon from "@mui/icons-material/RemoveRedEye";
 import { Box, Button, Chip, Divider, styled, useTheme } from "@mui/material";
-import { useSnackbar } from "notistack";
-import LazyImage from "components/LazyImage";
 import BazaarCard from "components/BazaarCard";
-import { H3, Span } from "components/Typography";
 import BazaarRating from "components/BazaarRating";
 import { FlexBetween, FlexBox } from "components/flex-box";
+import LazyImage from "components/LazyImage";
 import ProductViewDialog from "components/products/ProductViewDialog";
+import { H3, Span } from "components/Typography";
 import { useAppContext } from "contexts/AppContext";
-import { calculateDiscount, currency } from "lib"; // styled components
+import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
+import { useCallback, useState } from "react";
 
 const StyledBazaarCard = styled(BazaarCard)(({ theme }) => ({
   margin: "auto",
@@ -117,7 +115,6 @@ const ButtonBox = styled(FlexBox)(({ theme }) => ({
     },
   },
 })); // =============================================================
-import { useRouter } from "next/router";
 
 // =============================================================
 const ProductCard14 = (props) => {
@@ -131,7 +128,11 @@ const ProductCard14 = (props) => {
     hideRating,
     hoverEffect,
     slug,
+    product,
   } = props;
+
+  console.log(product);
+
   const router = useRouter();
 
   const handleClick = () => {
@@ -159,6 +160,7 @@ const ProductCard14 = (props) => {
         name: title,
         qty: amount,
         slug,
+        product,
       },
     }); // SHOW ALERT PRODUCT ADDED OR REMOVE
 
@@ -256,51 +258,75 @@ const ProductCard14 = (props) => {
             )}
 
             <FlexBox gap={1} alignItems="center" mt={0.5}>
-              <Box fontWeight="600" color="primary.main">
+              <Box fontWeight="600" color="error.main">
                 đ{price?.toLocaleString()}
               </Box>
             </FlexBox>
           </Box>
 
-          <ButtonBox>
+          <ButtonBox
+            sx={{
+              display: "flex",
+              gap: 1,
+              mt: 2,
+            }}
+          >
             {cartItem?.qty ? (
               <Button
                 variant="contained"
+                color="error"
                 sx={{
-                  py: "3px",
+                  py: 1.5,
                   width: "100%",
-                  fontSize: "13px",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  boxShadow: 2,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: 4,
+                    bgcolor: "error.dark",
+                  },
                 }}
                 onClick={handleCartAmountChange(cartItem.qty - 1, "remove")}
               >
-                <Remove /> Xóa khỏi giỏ hàng
+                <Remove sx={{ fontSize: 20 }} />
+                Xóa khỏi giỏ hàng
               </Button>
             ) : (
               <Button
                 variant="contained"
+                color="primary"
                 sx={{
-                  py: "3px",
+                  py: 1.5,
                   width: "100%",
-                  fontSize: "13px",
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  borderRadius: 2,
+                  textTransform: "none",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 1,
+                  background: "linear-gradient(45deg, #1976d2, #42a5f5)",
+                  boxShadow: 2,
+                  transition: "all 0.3s ease",
+                  "&:hover": {
+                    transform: "translateY(-2px)",
+                    boxShadow: 4,
+                    background: "linear-gradient(45deg, #1565c0, #1976d2)",
+                  },
                 }}
                 onClick={handleCartAmountChange(1)}
               >
-                <Add /> Thêm vào giỏ hàng
+                <Add sx={{ fontSize: 20 }} />
+                Thêm vào giỏ hàng
               </Button>
             )}
-
-            <Button
-              variant="contained"
-              sx={{
-                p: "3px 8px",
-              }}
-            >
-              <FavoriteIcon
-                sx={{
-                  fontSize: "16px",
-                }}
-              />
-            </Button>
           </ButtonBox>
         </ContentWrapper>
       </StyledBazaarCard>

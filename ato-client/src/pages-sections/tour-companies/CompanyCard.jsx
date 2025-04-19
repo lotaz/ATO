@@ -14,10 +14,10 @@ const CompanyCard = ({ company }) => {
     <Card sx={{ height: "100%", display: "flex", flexDirection: "column" }}>
       <CardMedia
         component="img"
-        height="200"
+       // height="200"
         image={company.logoURL}
         alt={company.companynName}
-        sx={{ objectFit: "contain", p: 2, bgcolor: "grey.50" }}
+        sx={{ objectFit: "contain", bgcolor: "grey.50" }}
       />
 
       <CardContent sx={{ flexGrow: 1 }}>
