@@ -25,7 +25,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { createFacility } from '../../../redux/facilitySlice';
 import { RootState } from '../../../redux/store';
 import { CreateFacilityRequest } from '../../../services/facility/types';
-import { getUnAssigedAccounts } from '../../../redux/companySlice';
+import { getUnAssigedAccounts } from '../../../redux/facilitySlice';
 import { User } from '../../../types';
 
 const CreateFacility = () => {
@@ -182,10 +182,10 @@ const CreateFacility = () => {
                   <Grid container spacing={2}>
                     <Grid item xs={12}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="facilityName">Tên cơ sở*</InputLabel>
+                        <InputLabel htmlFor="touristFacilityName">Tên cơ sở*</InputLabel>
                         <OutlinedInput
-                          id="facilityName"
-                          name="facilityName"
+                          id="touristFacilityName"
+                          name="touristFacilityName"
                           value={values.touristFacilityName}
                           onBlur={handleBlur}
                           onChange={handleChange}
@@ -218,10 +218,10 @@ const CreateFacility = () => {
 
                     <Grid item xs={12} sm={6}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="emailFacility">Email cơ sở*</InputLabel>
+                        <InputLabel htmlFor="emailTouristFacility">Email cơ sở*</InputLabel>
                         <OutlinedInput
-                          id="emailFacility"
-                          name="emailFacility"
+                          id="emailTouristFacility"
+                          name="emailTouristFacility"
                           value={values.emailTouristFacility}
                           onBlur={handleBlur}
                           onChange={handleChange}
@@ -237,10 +237,10 @@ const CreateFacility = () => {
 
                     <Grid item xs={12}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="addressFacility">Địa chỉ*</InputLabel>
+                        <InputLabel htmlFor="address">Địa chỉ*</InputLabel>
                         <OutlinedInput
-                          id="addressFacility"
-                          name="addressFacility"
+                          id="address"
+                          name="address"
                           value={values.address}
                           onBlur={handleBlur}
                           onChange={handleChange}
@@ -256,10 +256,10 @@ const CreateFacility = () => {
 
                     <Grid item xs={12}>
                       <Stack spacing={1}>
-                        <InputLabel htmlFor="facilityDescription">Mô tả</InputLabel>
+                        <InputLabel htmlFor="description">Mô tả</InputLabel>
                         <OutlinedInput
-                          id="facilityDescription"
-                          name="facilityDescription"
+                          id="description"
+                          name="description"
                           value={values.description}
                           onBlur={handleBlur}
                           onChange={handleChange}

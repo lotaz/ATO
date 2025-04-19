@@ -44,7 +44,7 @@ const rootReducers = combineReducers({
   driverSlice: driverSlice.reducer,
   accommodationSlice: accommodationSlice.reducer,
   ocopSellSlice: ocopSellSlice.reducer,
-  supportSlice: supportSlice.reducer
+  supportSlice: supportSlice.reducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducers);

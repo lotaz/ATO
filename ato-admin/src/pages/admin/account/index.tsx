@@ -8,16 +8,22 @@ import { RootState } from '../../../redux/store';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
 import { getAccounts } from '../../../redux/accountSlice';
+import { useState } from 'react';
 
 const Index = () => {
   const navigate = useNavigate();
-
   const accounts: any = useSelector((state: RootState) => state.account.data);
   const dispatch = useDispatch<any>();
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     dispatch(getAccounts());
   }, []);
+
+  // Add search filter function
+  const filteredAccounts = accounts?.filter((account: any) =>
+    Object.values(account).some((value: any) => String(value).toLowerCase().includes(searchTerm.toLowerCase()))
+  );
 
   const columns: TColumn[] = [
     { id: 'id', hidden: true },
@@ -51,17 +57,25 @@ const Index = () => {
     <>
       <Stack direction={'column'} spacing={2}>
         <Stack direction={'row'} display={'flex'} alignItems={'start'} justifyContent={'space-between'}>
-          <AppSearchBar placeholder="Nhập tên, vai trò, đơn vị, email, số điện thoại" />
+          <AppSearchBar
+            placeholder="Nhập tên, vai trò, đơn vị, email, số điện thoại"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
 
           <Button onClick={() => navigate(ADMIN_URLs.ACCOUNT.CREATE)} type="button" variant="contained" color="primary">
             Thêm mới
           </Button>
         </Stack>
-        {accounts && (
-          <AppTable columns={columns} rows={accounts} handleViewDetails={handleViewDetails} handleUpdate={handleUpdate} rowKey="id" />
+        {filteredAccounts && (
+          <AppTable
+            columns={columns}
+            rows={filteredAccounts}
+            handleViewDetails={handleViewDetails}
+            handleUpdate={handleUpdate}
+            rowKey="id"
+          />
         )}
-
-        {!accounts && <Typography>Không tìm thấy dữ liệu tài khoản.</Typography>}
       </Stack>
     </>
   );
