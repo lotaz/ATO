@@ -1,22 +1,21 @@
-import { useState } from "react";
+import { SentimentDissatisfied } from "@mui/icons-material";
+import Search from "@mui/icons-material/Search";
 import {
   Box,
   Container,
   Grid,
-  TextField,
   InputAdornment,
+  styled,
+  TextField,
   Typography,
 } from "@mui/material";
-import { SentimentDissatisfied } from "@mui/icons-material";
-import Search from "@mui/icons-material/Search";
+import CategorySectionCreator from "components/CategorySectionCreator";
 import SEO from "components/SEO";
-import { H2 } from "components/Typography";
+import { H2, Paragraph } from "components/Typography";
+import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import ProductCard14 from "components/product-cards/ProductCard14";
-import CategorySectionCreator from "components/CategorySectionCreator";
-import { Paragraph } from "components/Typography";
-import Footer from "components/footer/Footer";
-import { styled } from "@mui/material";
+import { useState } from "react";
 import api from "utils/__api__/healthbeauty-shop";
 
 // styled component
@@ -101,7 +100,7 @@ const ProductList = ({ products }) => {
           {filteredProducts.length > 0 ? (
             <Grid container spacing={3}>
               {filteredProducts.map((item) => (
-                <Grid item lg={4} sm={6} xs={12} key={item.productId}>
+                <Grid item lg={3} sm={6} xs={12} key={item.productId}>
                   <ProductCard14
                     id={item.productId}
                     slug={item.productId}
@@ -113,6 +112,7 @@ const ProductList = ({ products }) => {
                     description={item.description}
                     manufacturer={item.manufacturer}
                     origin={item.origin}
+                    product={item}
                   />
                 </Grid>
               ))}

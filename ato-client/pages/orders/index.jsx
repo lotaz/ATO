@@ -1,13 +1,13 @@
-import { Pagination } from "@mui/material";
 import { ShoppingBag } from "@mui/icons-material";
-import { useState, useEffect } from "react";
+import { Pagination } from "@mui/material";
 import TableRow from "components/TableRow";
 import { H5 } from "components/Typography";
 import { FlexBox } from "components/flex-box";
-import OrderRow from "pages-sections/orders/OrderRow";
 import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
+import OrderRow from "pages-sections/orders/OrderRow";
+import { useEffect, useState } from "react";
 import api from "utils/__api__/orders";
 
 const Orders = () => {

@@ -1,30 +1,30 @@
-import { Fragment } from "react";
-import { useRouter } from "next/router";
-import { format } from "date-fns";
 import { Done, ShoppingBag } from "@mui/icons-material";
 import {
   Avatar,
   Box,
-  Button,
   Card,
-  Divider,
+  Chip,
   Grid,
   Typography,
   styled,
 } from "@mui/material";
 import TableRow from "components/TableRow";
+import { H5, H6 } from "components/Typography";
+import { FlexBetween, FlexBox } from "components/flex-box";
+import UserDashboardHeader from "components/header/UserDashboardHeader";
 import Delivery from "components/icons/Delivery";
 import PackageBox from "components/icons/PackageBox";
 import TruckFilled from "components/icons/TruckFilled";
-import { H5, H6, Paragraph } from "components/Typography";
-import { FlexBetween, FlexBox } from "components/flex-box";
-import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
+import { format } from "date-fns";
 import useWindowSize from "hooks/useWindowSize";
 import { currency } from "lib";
+import { useRouter } from "next/router";
+import { Fragment } from "react";
 import api from "utils/__api__/orders"; // styled components
 import { StatusOrder } from "constants/order-enums";
+import { PaymentStatus, StatusBooking } from "constants/order-enums";
 
 const StyledFlexbox = styled(FlexBetween)(({ theme }) => ({
   flexWrap: "wrap",
@@ -45,16 +45,41 @@ const StyledFlexbox = styled(FlexBetween)(({ theme }) => ({
   },
 }));
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 // =============================================================
+// Add these imports at the top
+import { LoadingButton } from "@mui/lab";
+import { post } from "helpers/axios-helper";
+
+// Update the OrderDetails component
 const OrderDetails = () => {
   const router = useRouter();
   const { id } = router.query;
   const [order, setOrder] = useState(null);
+  const [isRefunding, setIsRefunding] = useState(false);
   const width = useWindowSize();
   const breakpoint = 350;
   const stepIconList = [PackageBox, TruckFilled, Delivery];
+
+  // Add refund handler
+  const handleRefundOrder = async () => {
+    if (!window.confirm("Bạn có chắc chắn muốn hủy đơn hàng này?")) return;
+
+    setIsRefunding(true);
+    try {
+      await post(`tourist/order/refund-order/${id}`);
+      const response = await api.getOrder(id);
+      const formattedOrder = api.formatOrderData(response);
+      setOrder(formattedOrder);
+      alert("Hủy đơn hàng thành công");
+    } catch (error) {
+      console.error("Failed to refund order:", error);
+      alert("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
+    } finally {
+      setIsRefunding(false);
+    }
+  };
 
   useEffect(() => {
     if (id) {
@@ -71,16 +96,21 @@ const OrderDetails = () => {
     }
   }, [id]);
 
-  if (!order) return <p>Đang tải...</p>;
-
+  // Add getStatusIndex function here
   const getStatusIndex = (status) => {
-    const statusList = [
-      StatusOrder.Processing,
-      StatusOrder.Shipped,
-      StatusOrder.Completed,
-    ];
-    return statusList.indexOf(status);
+    switch (status) {
+      case StatusOrder.Processing:
+        return 0;
+      case StatusOrder.Shipped:
+        return 1;
+      case StatusOrder.RejecOrder:
+        return 2;
+      default:
+        return -1;
+    }
   };
+
+  if (!order) return <p>Đang tải...</p>;
 
   return (
     <CustomerDashboardLayout>
@@ -167,6 +197,34 @@ const OrderDetails = () => {
               {format(new Date(order.orderDate), "dd/MM/yyyy")}
             </Typography>
           </FlexBox>
+
+          {/* Add Order Status */}
+          <FlexBox className="pre" m={0.75} alignItems="center">
+            <Typography fontSize={14} color="grey.600" mr={0.5}>
+              Trạng thái:
+            </Typography>
+            <Chip
+              size="small"
+              label={
+                order.status === StatusOrder.Processing
+                  ? "Đang xử lý"
+                  : order.status === StatusOrder.Shipped
+                  ? "Đang giao hàng"
+                  : order.status === StatusOrder.Completed
+                  ? "Đã hủy"
+                  : "Hoàn thành"
+              }
+              color={
+                order.status === StatusOrder.Processing
+                  ? "warning"
+                  : order.status === StatusOrder.Shipped
+                  ? "info"
+                  : order.status === StatusOrder.Completed
+                  ? "success"
+                  : "error"
+              }
+            />
+          </FlexBox>
         </TableRow>
 
         <Box py={1}>
@@ -206,6 +264,8 @@ const OrderDetails = () => {
               <H6 my="0px">
                 {order.paymentType === 0
                   ? "Thanh toán khi nhận hàng"
+                  : order.paymentType === 2
+                  ? "Hoàn tiền"
                   : "Chuyển khoản"}
               </H6>
             </FlexBetween>
@@ -214,11 +274,27 @@ const OrderDetails = () => {
                 Trạng thái:
               </Typography>
               <H6 my="0px">
-                {order.paymentStatus === 0
+                {order.paymentStatus === PaymentStatus.Paid
                   ? "Đã thanh toán"
+                  : order.paymentStatus === 3
+                  ? "Hủy đơn hàng thành công"
                   : "Chưa thanh toán"}
               </H6>
             </FlexBetween>
+
+            {/* Add Cancel Button */}
+            {order.status === StatusOrder.Processing && (
+              <LoadingButton
+                fullWidth
+                color="error"
+                variant="contained"
+                loading={isRefunding}
+                onClick={handleRefundOrder}
+                sx={{ mt: 2 }}
+              >
+                Hủy đơn hàng
+              </LoadingButton>
+            )}
           </Card>
         </Grid>
 

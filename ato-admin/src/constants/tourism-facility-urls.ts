@@ -42,5 +42,8 @@ export const TOURISM_FACILITY_URLs = {
     CREATE: `${TOURISM_FACILITY_BASE_URL}/contracts/create`,
     UPDATE: `${TOURISM_FACILITY_BASE_URL}/contracts/update`,
     DETAILS: `${TOURISM_FACILITY_BASE_URL}/contracts/details`
+  },
+  HISTORY_PAYMENT_ORDER: {
+    INDEX: `${TOURISM_FACILITY_BASE_URL}/history-payment-order`,
   }
 };
