@@ -1,20 +1,20 @@
-import { useState } from "react";
+import { BusinessCenter, Groups, Security, Support } from "@mui/icons-material";
+import Search from "@mui/icons-material/Search";
 import {
   Box,
   Container,
   Grid,
+  InputAdornment,
   TextField,
   Typography,
-  InputAdornment,
 } from "@mui/material";
-import Search from "@mui/icons-material/Search";
-import { BusinessCenter, Security, Support, Groups } from "@mui/icons-material";
+import Footer from "components/footer/Footer";
+import ShopLayout2 from "components/layouts/ShopLayout2";
 import SEO from "components/SEO";
 import { H2 } from "components/Typography";
-import { getCompanyList } from "utils/__api__/company";
 import CompanyCard from "pages-sections/tour-companies/CompanyCard";
-import ShopLayout2 from "components/layouts/ShopLayout2";
-import Footer from "components/footer/Footer";
+import { useState } from "react";
+import { getCompanyList } from "utils/__api__/company";
 // Add import for no data icon
 import { SentimentDissatisfied } from "@mui/icons-material";
 
@@ -154,7 +154,7 @@ const CompanyList = ({ companies }) => {
           {filteredCompanies.length > 0 ? (
             <Grid container spacing={3}>
               {filteredCompanies.map((company) => (
-                <Grid item xs={12} sm={6} md={4} key={company.tourCompanyId}>
+                <Grid item xs={12} sm={6} md={3} key={company.tourCompanyId}>
                   <CompanyCard company={company} />
                 </Grid>
               ))}
