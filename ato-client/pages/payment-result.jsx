@@ -99,34 +99,6 @@ const PaymentResult = () => {
           <Typography color="text.secondary" mb={4}>
             {paymentStatus.message}
           </Typography>
-
-          {paymentStatus.success ? (
-            <>
-              <Button
-                variant="contained"
-                onClick={() => router.push("/orders")}
-                sx={{ mr: 2 }}
-              >
-                Xem đơn hàng
-              </Button>
-              <Button variant="outlined" onClick={() => router.push("/")}>
-                Tiếp tục mua sắm
-              </Button>
-            </>
-          ) : (
-            <>
-              <Button
-                variant="contained"
-                onClick={() => router.push("/payment")}
-                sx={{ mr: 2 }}
-              >
-                Thử lại
-              </Button>
-              <Button variant="outlined" onClick={() => router.push("/cart")}>
-                Quay lại giỏ hàng
-              </Button>
-            </>
-          )}
         </Box>
       </Container>
     </ShopLayout1>

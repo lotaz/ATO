@@ -58,6 +58,7 @@ const TopProducts = ({ products }) => {
               description={item.description}
               manufacturer={item.manufacturer}
               origin={item.origin}
+              product={item}
             />
           </Box>
         ))}
