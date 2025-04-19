@@ -2,6 +2,7 @@ import { Search, SentimentDissatisfied } from "@mui/icons-material";
 import {
   Box,
   Card,
+  CircularProgress,
   Container,
   Grid,
   InputAdornment,
@@ -13,29 +14,24 @@ import {
 import { H2 } from "components/Typography";
 import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
+import { get } from "helpers/axios-helper";
 import { useRouter } from "next/router";
 import { useState } from "react";
-import { TimeType } from "types/tour.ts";
-// Add these imports at the top
-import { get } from "helpers/axios-helper";
 import useSWR from "swr";
+import { TimeType } from "types/tour.ts";
 
-// Add this fetcher function
 const fetcher = (url) => get(url).then((res) => res.data);
 
 const TourPackages = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [priceRange, setPriceRange] = useState([0, 10000000]);
-  const [selectedLocation, setSelectedLocation] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("");
-  const [startDate, setStartDate] = useState(null);
-  const [endDate, setEndDate] = useState(null);
+  const [startDate, setStartDate] = useState("");
+  const [endDate, setEndDate] = useState("");
   const [page, setPage] = useState(1);
   const itemsPerPage = 6;
 
   const router = useRouter();
 
-  // Replace mock data with API call
   const {
     data: tourPackages = [],
     error,
@@ -44,29 +40,19 @@ const TourPackages = () => {
     "/agricultural-tour-package/get-list-agricultural-tour-packages",
     fetcher
   );
-  console.log("----", tourPackages);
 
   const filteredPackages = tourPackages.filter((pack) => {
     const matchesSearch = pack.packageName
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
     const matchesPrice =
-      pack.price >= priceRange[0] && pack.price <= priceRange[1];
-    // Update location filter if needed (currently not in API response)
-    const matchesLocation = !selectedLocation || true;
-    // Update category filter if needed (currently not in API response)
-    const matchesCategory = !selectedCategory || true;
+      pack.priceOfAdults >= priceRange[0] &&
+      pack.priceOfAdults <= priceRange[1];
     const matchesDate =
-      (!startDate || new Date(pack.startTime) >= startDate) &&
-      (!endDate || new Date(pack.endTime) <= endDate);
+      (!startDate || new Date(pack.startTime) >= new Date(startDate)) &&
+      (!endDate || new Date(pack.endTime) <= new Date(endDate));
 
-    return (
-      matchesSearch &&
-      matchesPrice &&
-      matchesLocation &&
-      matchesCategory &&
-      matchesDate
-    );
+    return matchesSearch && matchesPrice && matchesDate;
   });
 
   const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
@@ -75,56 +61,13 @@ const TourPackages = () => {
     page * itemsPerPage
   );
 
-  // Add pagination handler
   const handlePageChange = (_, value) => {
     setPage(value);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  // Then in your JSX, update the mapping to use paginatedPackages instead of filteredPackages
-  <Grid container spacing={3}>
-    {paginatedPackages.map((pack) => (
-      <Grid item xs={12} sm={6} md={4} key={pack.id}>
-        <Card sx={{ height: "100%" }}>
-          <Box
-            sx={{
-              height: 200,
-              overflow: "hidden",
-              position: "relative",
-            }}
-          >
-            <img
-              src={pack.imageUrl}
-              alt={pack.name}
-              style={{
-                width: "100%",
-                height: "100%",
-                objectFit: "cover",
-              }}
-            />
-          </Box>
-          <Box sx={{ p: 2 }}>
-            <Typography variant="h6" gutterBottom noWrap>
-              {pack.name}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={1}>
-              {pack.location}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" mb={1}>
-              {pack.duration}
-            </Typography>
-            <Typography variant="h6" color="primary.main">
-              {pack.price.toLocaleString("vi-VN")} VNĐ
-            </Typography>
-          </Box>
-        </Card>
-      </Grid>
-    ))}
-  </Grid>;
-
   return (
     <ShopLayout2>
-      {/* Hero Section */}
       <Box sx={{ mb: 4 }}>
         <Box
           sx={{
@@ -144,7 +87,6 @@ const TourPackages = () => {
         </Box>
 
         <Container maxWidth="lg">
-          {/* Add search bar here, before the Grid container */}
           <Box sx={{ mb: 3 }}>
             <TextField
               fullWidth
@@ -166,19 +108,17 @@ const TourPackages = () => {
           </Box>
 
           <Grid container spacing={3}>
-            {/* Search Filters */}
             <Grid item xs={12} md={3}>
               <Card sx={{ p: 3 }}>
                 <Typography variant="h6" mb={2}>
                   Bộ lọc tìm kiếm
                 </Typography>
-                {/* Remove the original search TextField from here */}
                 <Typography gutterBottom>Khoảng giá (VNĐ)</Typography>
                 <Slider
                   value={priceRange}
                   onChange={(_, newValue) => {
                     setPriceRange(newValue);
-                    setPage(1); // Reset page
+                    setPage(1);
                   }}
                   valueLabelDisplay="auto"
                   min={0}
@@ -190,14 +130,14 @@ const TourPackages = () => {
                 <TextField
                   type="date"
                   label="Ngày bắt đầu"
-                  value={startDate ? startDate.split("T")[0] : ""}
+                  value={startDate}
                   onChange={(e) => {
                     setStartDate(e.target.value);
                     setPage(1);
                   }}
                   fullWidth
                   InputProps={{
-                    sx: { height: 56 }, // Add this
+                    sx: { height: 56 },
                   }}
                   InputLabelProps={{
                     shrink: true,
@@ -207,14 +147,14 @@ const TourPackages = () => {
                 <TextField
                   type="date"
                   label="Ngày kết thúc"
-                  value={endDate ? endDate.split("T")[0] : ""}
+                  value={endDate}
                   onChange={(e) => {
                     setEndDate(e.target.value);
                     setPage(1);
                   }}
                   fullWidth
                   InputProps={{
-                    sx: { height: 56 }, // Add this
+                    sx: { height: 56 },
                   }}
                   InputLabelProps={{
                     shrink: true,
@@ -223,58 +163,220 @@ const TourPackages = () => {
               </Card>
             </Grid>
 
-            {/* Tour Packages Grid */}
             <Grid item xs={12} md={9}>
-              {filteredPackages.length > 0 ? (
+              {isLoading ? (
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    minHeight: 400,
+                  }}
+                >
+                  <CircularProgress />
+                </Box>
+              ) : error ? (
+                <Box
+                  sx={{
+                    textAlign: "center",
+                    py: 8,
+                    px: 2,
+                  }}
+                >
+                  <Typography color="error">
+                    Đã xảy ra lỗi khi tải dữ liệu
+                  </Typography>
+                </Box>
+              ) : filteredPackages.length > 0 ? (
                 <>
                   <Grid container spacing={3}>
                     {paginatedPackages.map((pack) => (
                       <Grid item xs={12} sm={6} md={4} key={pack.tourId}>
                         <Card
-                          sx={{ height: "100%", cursor: "pointer" }}
+                          sx={{
+                            height: "100%",
+                            cursor: "pointer",
+                            transition: "all 0.3s ease",
+                            "&:hover": {
+                              transform: "translateY(-8px)",
+                              boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                              "& img": {
+                                transform: "scale(1.1)",
+                              },
+                            },
+                            borderRadius: 2,
+                            overflow: "hidden",
+                          }}
                           onClick={() =>
                             router.push(`/tour-packages/${pack.tourId}`)
                           }
                         >
-                          <Box
-                            sx={{
-                              height: 200,
-                              overflow: "hidden",
-                              position: "relative",
-                            }}
-                          >
-                            <img
-                              src={pack.imgs?.[0] || "/placeholder.jpg"}
-                              alt={pack.packageName}
-                              style={{
-                                width: "100%",
-                                height: "100%",
-                                objectFit: "cover",
+                          <Box sx={{ position: "relative" }}>
+                            <Box sx={{ height: 220, overflow: "hidden" }}>
+                              <img
+                                src={pack.imgs?.[0] || "/placeholder.jpg"}
+                                alt={pack.packageName}
+                                style={{
+                                  width: "100%",
+                                  height: "100%",
+                                  objectFit: "cover",
+                                  transition: "transform 0.3s ease",
+                                }}
+                              />
+                            </Box>
+                            <Box
+                              sx={{
+                                position: "absolute",
+                                top: 12,
+                                right: 12,
+                                bgcolor: "error.main",
+                                color: "white",
+                                px: 2,
+                                py: 0.5,
+                                borderRadius: 1,
+                                fontSize: "0.875rem",
+                                fontWeight: "bold",
                               }}
-                            />
+                            >
+                              Còn {pack.slot} chỗ
+                            </Box>
                           </Box>
-                          <Box sx={{ p: 2 }}>
-                            <Typography variant="h6" gutterBottom noWrap>
+
+                          <Box sx={{ p: 2.5 }}>
+                            <Typography
+                              sx={{
+                                fontSize: "1.1rem",
+                                fontWeight: "bold",
+                                mb: 1.5,
+                                height: 52,
+                                overflow: "hidden",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 2,
+                                WebkitBoxOrient: "vertical",
+                              }}
+                            >
                               {pack.packageName}
                             </Typography>
+
                             <Typography
                               variant="body2"
                               color="text.secondary"
-                              mb={1}
+                              sx={{
+                                mb: 2,
+                                height: 60,
+                                overflow: "hidden",
+                                display: "-webkit-box",
+                                WebkitLineClamp: 3,
+                                WebkitBoxOrient: "vertical",
+                              }}
                             >
-                              {new Date(pack.startTime).toLocaleDateString()} -{" "}
-                              {new Date(pack.endTime).toLocaleDateString()}
+                              {pack.description}
                             </Typography>
-                            <Typography
-                              variant="body2"
-                              color="text.secondary"
-                              mb={1}
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                mb: 1.5,
+                              }}
                             >
-                              {pack.durations} {TimeType[pack.durationsType]}
-                            </Typography>
-                            <Typography variant="h6" color="primary.main">
-                              {pack.price.toLocaleString("vi-VN")} VNĐ
-                            </Typography>
+                              <Box
+                                component="span"
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  bgcolor: "primary.main",
+                                  mr: 1.5,
+                                }}
+                              />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {new Date(pack.startTime).toLocaleDateString(
+                                  "vi-VN",
+                                  {
+                                    weekday: "long",
+                                    year: "numeric",
+                                    month: "long",
+                                    day: "numeric",
+                                  }
+                                )}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "center",
+                                mb: 2,
+                              }}
+                            >
+                              <Box
+                                component="span"
+                                sx={{
+                                  width: 8,
+                                  height: 8,
+                                  borderRadius: "50%",
+                                  bgcolor: "primary.main",
+                                  mr: 1.5,
+                                }}
+                              />
+                              <Typography
+                                variant="body2"
+                                color="text.secondary"
+                              >
+                                {pack.durations} {TimeType[pack.durationsType]}
+                              </Typography>
+                            </Box>
+
+                            <Box
+                              sx={{
+                                display: "flex",
+                                alignItems: "flex-end",
+                                justifyContent: "space-between",
+                              }}
+                            >
+                              <Box>
+                                <Typography
+                                  variant="caption"
+                                  color="text.secondary"
+                                >
+                                  Giá từ
+                                </Typography>
+                                <Typography
+                                  variant="h6"
+                                  color="primary.main"
+                                  sx={{ fontWeight: "bold" }}
+                                >
+                                  {pack.priceOfAdults.toLocaleString("vi-VN")}{" "}
+                                  VNĐ
+                                </Typography>
+                              </Box>
+                              <Typography
+                                variant="button"
+                                sx={{
+                                  bgcolor: "primary.main",
+                                  color: "white",
+                                  px: 1.5,
+                                  py: 1,
+                                  borderRadius: 2,
+                                  fontWeight: "bold",
+                                  transition: "all 0.2s ease",
+                                  "&:hover": {
+                                    bgcolor: "primary.dark",
+                                    transform: "translateY(-2px)",
+                                    boxShadow: "0 4px 12px rgba(0,0,0,0.15)",
+                                  },
+                                  "&:active": {
+                                    transform: "translateY(0)",
+                                  },
+                                }}
+                              >
+                                Đặt ngay
+                              </Typography>
+                            </Box>
                           </Box>
                         </Card>
                       </Grid>
@@ -282,19 +384,48 @@ const TourPackages = () => {
                   </Grid>
 
                   {totalPages > 1 && (
-                    <Box display="flex" justifyContent="center" mt={4}>
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        mt: 6,
+                        mb: 4,
+                        gap: 2,
+                      }}
+                    >
                       <Pagination
                         count={totalPages}
                         page={page}
                         onChange={handlePageChange}
                         color="primary"
                         size="large"
+                        showFirstButton
+                        showLastButton
                         sx={{
                           "& .MuiPaginationItem-root": {
                             fontSize: 16,
+                            fontWeight: 500,
+                            mx: 0.5,
+                          },
+                          "& .MuiPaginationItem-page.Mui-selected": {
+                            bgcolor: "primary.main",
+                            color: "white",
+                            "&:hover": {
+                              bgcolor: "primary.dark",
+                            },
+                          },
+                          "& .MuiPaginationItem-page:hover": {
+                            bgcolor: "primary.light",
+                          },
+                          "& .MuiPaginationItem-firstLast": {
+                            bgcolor: "grey.100",
                           },
                         }}
                       />
+                      <Typography variant="body2" color="text.secondary">
+                        Trang {page} / {totalPages}
+                      </Typography>
                     </Box>
                   )}
                 </>
