@@ -7,10 +7,10 @@ import MinimalLayout from '../layout/MinimalLayout';
 import AuthenRoutes from './AuthenRoutes';
 import AdminRoutes from './admin';
 import ContentModeratorRoutes from './content-moderator';
-import { TRoute } from './types';
 import TourGuideRoutes from './tour-guide';
 import TourCompanyRoutes from './tourism-company';
 import TourFacilityoutes from './tourism-facility';
+import { TRoute } from './types';
 
 // ==============================|| ROUTING RENDER ||============================== //
 const Index = Loadable(lazy(() => import('../pages/index')));

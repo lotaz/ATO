@@ -10,7 +10,9 @@ export interface AgriculturalTourPackageResponse {
   description?: string;
   imgs?: string[];
   slot: number;
-  price: number;
+  priceOfAdults: number;
+  priceOfChildren: number;
+  childTicketAge: string;
   startTime: Date;
   endTime: Date;
   durations: number;
@@ -66,10 +68,10 @@ export interface AgriculturalTourPackageDestinationActivityResponse {
 
 export interface TourGuideAccountResponse {
   userId: string;
-  fullName: string;
+  fullname: string;
   email: string;
-  phone: string;
-  avatar?: string;
+  phoneNumber: string;
+  avatarURL?: string;
 }
 
 export interface DriverResponse {

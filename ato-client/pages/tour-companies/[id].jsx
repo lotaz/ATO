@@ -1,20 +1,16 @@
-import { useState } from "react";
+import { Email, Language, LocationOn } from "@mui/icons-material";
 import {
   Box,
+  Card,
   Container,
   Grid,
-  Typography,
-  Card,
-  Divider,
   Tab,
   Tabs,
+  Typography,
 } from "@mui/material";
 import { H2 } from "components/Typography";
 import ShopLayout2 from "components/layouts/ShopLayout2";
-import { Email, Language, LocationOn, Phone } from "@mui/icons-material";
-import axios from "axios";
-import { API_URLs } from "constants/api-url";
-import Image from "next/image";
+import { useState } from "react";
 import api from "utils/__api__/company";
 
 const CompanyDetails = ({ company }) => {
@@ -41,12 +37,14 @@ const CompanyDetails = ({ company }) => {
                     borderRadius: 1,
                   }}
                 >
-                  <Image
+                  <img
+                    style={{
+                      width: "100%",
+                      height: "100%",
+                      objectFit: "cover",
+                    }}
                     src={company.logoURL}
                     alt={company.companynName}
-                    layout="fill"
-                    objectFit="contain"
-                    priority
                   />
                 </Box>
               </Grid>

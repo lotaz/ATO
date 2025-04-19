@@ -1,22 +1,21 @@
+import { CardTravelOutlined } from "@mui/icons-material";
 import {
   Box,
   Button,
   Card,
   CardContent,
   Chip,
-  Container,
   Grid,
-  Typography,
+  Typography
 } from "@mui/material";
 import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
+import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
 import { PaymentStatus, StatusBooking } from "constants/order-enums";
 import { get } from "helpers/axios-helper";
 import { useRouter } from "next/router";
 import useSWR from "swr";
 const fetcher = (url) => get(url).then((res) => res.data);
-import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
-import { CardTravelOutlined } from "@mui/icons-material";
 
 const BookedToursPage = () => {
   const router = useRouter();
@@ -89,7 +88,7 @@ const BookedToursPage = () => {
               <CardContent>
                 <Box display="flex" justifyContent="space-between" mb={2}>
                   <Typography variant="h6">
-                    {booking.agriculturalTourPackage?.packageName}
+                    <strong>{booking.agriculturalTourPackage?.packageName}</strong>
                   </Typography>
                   <Box>
                     {statusBookingTranslations[booking.statusBooking] && (
@@ -108,15 +107,20 @@ const BookedToursPage = () => {
                 </Box>
 
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                  Ngày đặt: {new Date(booking.bookingDate).toLocaleDateString()}
+                <strong>Ngày đặt: </strong>
+                  {new Date(booking.bookingDate).toLocaleDateString()}
                 </Typography>
 
                 <Typography variant="body1" mb={2}>
-                  Số người: {booking.numberOfPeople}
+                <strong>Số vé người lớn: </strong>
+                  {booking.numberOfAdults} vé
                 </Typography>
-
-                <Typography variant="h6" mb={2}>
-                  Tổng tiền: {booking.totalAmmount} VNĐ
+                <Typography variant="body1" mb={2}>
+                <strong>Số vé trẻ em: </strong>
+                  {booking.numberOfAdults} vé
+                </Typography>
+                <Typography variant="h6" mb={2} color="error.main">
+                  <strong>Tổng tiền: {Number(booking.totalAmmount).toLocaleString()} VNĐ</strong>
                 </Typography>
 
                 {booking.orders?.map((order) => (
