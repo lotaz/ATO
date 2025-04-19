@@ -8,7 +8,7 @@ export const agriculturalTourService = {
 
   getPackageById: (id: string) => get<AgriculturalTourPackageResponse>(`${API_URL}/get-agricultural-tour-package/${id}`),
 
-  createPackage: (data: FormData) => post<AgriculturalTourPackageResponse>(`${API_URL}/create-agricultural-tour-package`, data),
+  createPackage: (data: FormData) => post<AgriculturalTourPackageResponse>(`${API_URL}/add-agricultural-tour-package`, data),
 
   updatePackage: (id: string, data: FormData) =>
     put<AgriculturalTourPackageResponse>(`${API_URL}/update-agricultural-tour-package/${id}`, data),
@@ -19,5 +19,8 @@ export const agriculturalTourService = {
       formData.append('files', file);
     });
     return post<string[]>(`${API_URL}/upload-images`, formData);
-  }
+  },
+
+  addTourDestination: (data: any) => 
+    post(`${API_URL}/add-tour-destination/${data.tourismPackageId}`, data)
 };
