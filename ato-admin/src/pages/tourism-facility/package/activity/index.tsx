@@ -20,7 +20,7 @@ import { useNavigate } from 'react-router-dom';
 import { NoDataDisplay } from '../../../../components/no-data/NoDataDisplay';
 import AppSearchBar from '../../../../components/table/SearchBar';
 import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-urls';
-import { ActivityResponse } from '../../../../types/tourism-facility/package.types';
+import { ActivityResponse, StatusApproval, TimeType } from '../../../../types/tourism-facility/package.types';
 
 const ActivityList = ({ activities, packageId }: { activities: ActivityResponse[]; packageId: string | undefined }) => {
   const navigate = useNavigate();
@@ -81,8 +81,8 @@ const ActivityList = ({ activities, packageId }: { activities: ActivityResponse[
                     <TableCell>{activity.location || '-'}</TableCell>
                     <TableCell>
                       <Chip
-                        label={activity.statusApproval ? 'Đã duyệt' : 'Chưa duyệt'}
-                        color={activity.statusApproval ? 'success' : 'warning'}
+                        label={getStatusApprovalLabel(activity.statusApproval)}
+                        color={getStatusColor(activity.statusApproval)}
                         size="small"
                       />
                     </TableCell>
@@ -128,3 +128,34 @@ const ActivityList = ({ activities, packageId }: { activities: ActivityResponse[
 };
 
 export default ActivityList;
+
+const getDurationType = (type: TimeType) => {
+  const types = {
+    [TimeType.SECOND]: 'Giây',
+    [TimeType.MINUTE]: 'Phút',
+    [TimeType.HOUR]: 'Giờ',
+    [TimeType.DAY]: 'Ngày',
+    [TimeType.MONTH]: 'Tháng',
+    [TimeType.YEAR]: 'Năm'
+  };
+  return types[type] || 'Không xác định';
+};
+
+const getStatusApprovalLabel = (status: StatusApproval) => {
+  const labels = {
+    [StatusApproval.APPROVED]: 'Đã duyệt',
+    [StatusApproval.PROCESSING]: 'Đang xử lý',
+    [StatusApproval.REJECT]: 'Từ chối',
+    [StatusApproval.UPDATE]: 'Cập nhật'
+  };
+  return labels[status] || 'Không xác định';
+};
+const getStatusColor = (status: StatusApproval) => {
+  const colors = {
+    [StatusApproval.APPROVED]: 'success',
+    [StatusApproval.PROCESSING]: 'warning',
+    [StatusApproval.REJECT]: 'error',
+    [StatusApproval.UPDATE]: 'info'
+  };
+  return colors[status] || 'default';
+};

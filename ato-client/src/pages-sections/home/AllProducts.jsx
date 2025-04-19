@@ -30,6 +30,7 @@ const AllProducts = ({ products }) => {
               off={item.discount}
               rating={item.rating}
               imgUrl={item.thumbnail}
+              product={item}
             />
           </Grid>
         ))}

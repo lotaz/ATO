@@ -37,5 +37,11 @@ export const TOURISM_COMPANY_URLs = {
     CREATE: `${TOURISM_COMPANY_BASE_URL}/accommodation/create`,
     UPDATE: `${TOURISM_COMPANY_BASE_URL}/accommodation/update/:id`,
     DETAILS: `${TOURISM_COMPANY_BASE_URL}/accommodation/details/:id`
+  },
+  BOOKING: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/book-tour`,
+  },
+  HISTORY_PAYMENT: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/history-payment`,
   }
 };

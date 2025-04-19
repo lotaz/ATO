@@ -68,86 +68,96 @@ const ProductList = () => {
       </Stack>
 
       <Card>
-        {currentProducts?.length > 0 && (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell width={500}>Tên sản phẩm</TableCell>
-                  <TableCell>Nhà sản xuất</TableCell>
-                  <TableCell>Nguồn gốc</TableCell>
-                  <TableCell>Số lượng</TableCell>
-                  <TableCell>Danh mục</TableCell>
-                  <TableCell align="right">Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentProducts?.map((product) => (
-                  <TableRow key={product.productId}>
-                    <TableCell>
-                      <Typography
-                        sx={{
-                          maxWidth: 500,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {product.productName}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>
-                      <Typography
-                        sx={{
-                          maxWidth: 150,
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap'
-                        }}
-                      >
-                        {product.manufacturer}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{product.origin}</TableCell>
-                    <TableCell>{product.unitProduct}</TableCell>
-                    <TableCell>
-                      <Chip label={ProductCategoryLabels[product.productCategory as ProductCategory]} color="primary" size="small" />
-                    </TableCell>
-                    <TableCell align="right">
-                      <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${product.productId}`)}
-                        >
-                          <EyeOutlined />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?productId=${product.productId}`)}
-                        >
-                          <EditOutlined />
-                        </IconButton>
-                      </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={filteredProducts.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Số hàng mỗi trang:"
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
-            />
-          </TableContainer>
+        {products && products.length > 0 ? (
+          <>
+            {currentProducts.length > 0 ? (
+              <TableContainer component={Paper}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell width={500}>Tên sản phẩm</TableCell>
+                      <TableCell>Nhà sản xuất</TableCell>
+                      <TableCell>Nguồn gốc</TableCell>
+                      <TableCell>Số lượng</TableCell>
+                      <TableCell>Danh mục</TableCell>
+                      <TableCell align="right">Hành động</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {currentProducts?.map((product) => (
+                      <TableRow key={product.productId}>
+                        <TableCell>
+                          <Typography
+                            sx={{
+                              maxWidth: 500,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {product.productName}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>
+                          <Typography
+                            sx={{
+                              maxWidth: 150,
+                              overflow: 'hidden',
+                              textOverflow: 'ellipsis',
+                              whiteSpace: 'nowrap'
+                            }}
+                          >
+                            {product.manufacturer}
+                          </Typography>
+                        </TableCell>
+                        <TableCell>{product.origin}</TableCell>
+                        <TableCell>{product.unitProduct}</TableCell>
+                        <TableCell>
+                          <Chip label={ProductCategoryLabels[product.productCategory as ProductCategory]} color="primary" size="small" />
+                        </TableCell>
+                        <TableCell align="right">
+                          <Stack direction="row" spacing={1} justifyContent="flex-end">
+                            <IconButton
+                              size="small"
+                              onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${product.productId}`)}
+                            >
+                              <EyeOutlined />
+                            </IconButton>
+                            <IconButton
+                              size="small"
+                              onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?productId=${product.productId}`)}
+                            >
+                              <EditOutlined />
+                            </IconButton>
+                          </Stack>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+                <TablePagination
+                  rowsPerPageOptions={[10, 25, 100]}
+                  component="div"
+                  count={filteredProducts.length}
+                  rowsPerPage={rowsPerPage}
+                  page={page}
+                  onPageChange={handleChangePage}
+                  onRowsPerPageChange={handleChangeRowsPerPage}
+                  labelRowsPerPage="Số hàng mỗi trang:"
+                  labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
+                />
+              </TableContainer>
+            ) : (
+              <Stack alignItems="center" justifyContent="center" py={3}>
+                <Typography variant="body1" color="text.secondary">
+                  Không tìm thấy sản phẩm phù hợp với từ khóa tìm kiếm
+                </Typography>
+              </Stack>
+            )}
+          </>
+        ) : (
+          <NoDataDisplay />
         )}
-
-        {!currentProducts && <NoDataDisplay />}
       </Card>
     </Stack>
   );

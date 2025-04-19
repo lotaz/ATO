@@ -24,6 +24,7 @@ const PackageDetails = () => {
     try {
       setIsLoading(true);
       const response = await packageService.getPackage(packageId);
+      console.log('response', response.data);
       setPackageData(response.data);
     } catch (error) {
       console.error('Failed to fetch package:', error);

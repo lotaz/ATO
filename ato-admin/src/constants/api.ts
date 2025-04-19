@@ -32,6 +32,10 @@ export const API_URLs = {
       GET: '/tour-company/driver/get-driver/:id',
       CREATE: '/tour-company/driver/add-driver',
       UPDATE: '/tour-company/driver/update-driver/:id'
+    },
+    PAYMENT: {
+      LIST: '/tour-company/book-tour/get-list-history-payment',
+      GET: '/tour-company/book-tour/payment/:id'
     }
   },
   FACILITY: {
@@ -39,7 +43,7 @@ export const API_URLs = {
     GET: '/admin/tourist-facility/get-tourist-facility/:id',
     CREATE: '/admin/tourist-facility/create-tourist-facility',
     UPDATE: '/admin/tourist-facility/update-tourist-facility',
-    UNASSIGED: '/admin/tourist-facility/unassigned-tourist-facility'
+    UNASSIGED: '/admin/tourist-facility/unassigned-tour-facility'
   },
   BLOG: {
     CREATE: '/content-moderators/blog/create',

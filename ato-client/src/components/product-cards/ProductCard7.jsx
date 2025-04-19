@@ -1,6 +1,13 @@
 import Link from "next/link";
 import { Add, Close, Remove } from "@mui/icons-material";
-import { Button, Card, IconButton, styled } from "@mui/material";
+import {
+  Box,
+  Button,
+  Card,
+  IconButton,
+  styled,
+  Typography,
+} from "@mui/material";
 import Image from "components/BazaarImage";
 import { Span } from "components/Typography";
 import { FlexBox } from "components/flex-box";
@@ -47,10 +54,11 @@ const ProductCard7 = ({ id, name, qty, price, imgUrl, slug }) => {
     <Wrapper>
       <Image
         alt={name}
+        style={{ objectFit: "cover" }}
         width={140}
-        height={140}
+        height={180}
         display="block"
-        src={imgUrl || "/assets/images/products/iphone-xi.png"}
+        src={imgUrl}
       />
 
       <IconButton
@@ -65,12 +73,18 @@ const ProductCard7 = ({ id, name, qty, price, imgUrl, slug }) => {
         <Close fontSize="small" />
       </IconButton>
 
-      <FlexBox p={2} rowGap={2} width="100%" flexDirection="column">
+      <FlexBox
+        p={2}
+        alignItems={"top"}
+        rowGap={2}
+        width="100%"
+        flexDirection="column"
+      >
         <Link href={`/product/${slug}`}>
           <a>
-            <Span ellipsis fontWeight="600" fontSize={18}>
+            <Typography sx={{ width: "80%" }} fontWeight="600" fontSize={18}>
               {name}
-            </Span>
+            </Typography>
           </a>
         </Link>
 
