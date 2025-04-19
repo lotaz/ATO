@@ -80,6 +80,8 @@ const PackageList = () => {
     try {
       setIsLoading(true);
       const response = await packageService.getPackages();
+      console.log(response.data);
+
       setPackages(response.data);
     } catch (error) {
       console.error('Failed to fetch packages:', error);
