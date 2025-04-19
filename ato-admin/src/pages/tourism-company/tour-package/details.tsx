@@ -1,5 +1,15 @@
-import { ArrowLeftOutlined, ArrowRightOutlined } from '@ant-design/icons';
-import { Box, Button, Card, CardContent, Divider, Grid, Stack, Typography } from '@mui/material';
+import {
+  ArrowLeftOutlined,
+  CalendarOutlined,
+  CarOutlined,
+  GlobalOutlined,
+  HomeOutlined,
+  MailOutlined,
+  PhoneOutlined,
+  TrophyOutlined
+} from '@ant-design/icons';
+import { Timeline, TimelineConnector, TimelineContent, TimelineDot, TimelineItem, TimelineSeparator } from '@mui/lab';
+import { Avatar, Box, Button, Card, CardContent, Chip, Grid, Stack, Tab, Tabs, Typography } from '@mui/material';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -8,6 +18,30 @@ import { agriculturalTourService } from '../../../services/tourism-company/agric
 import { AgriculturalTourPackageResponse } from '../../../types/tourism-company/agricultural-tour.types';
 import { TimeType } from '../../../types/tourism-facility/package.types';
 
+interface TabPanelProps {
+  children?: React.ReactNode;
+  index: number;
+  value: number;
+}
+
+const TabPanel = (props: TabPanelProps) => {
+  const { children, value, index, ...other } = props;
+  return (
+    <div role="tabpanel" hidden={value !== index} {...other}>
+      {value === index && <Box sx={{ py: 3 }}>{children}</Box>}
+    </div>
+  );
+};
+
+const DetailItem = ({ label, value }: { label: string; value: any }) => (
+  <Box sx={{ py: 1 }}>
+    <Typography variant="subtitle2" color="text.secondary">
+      {label}
+    </Typography>
+    <Typography variant="body1">{value || '-'}</Typography>
+  </Box>
+);
+
 const TourPackageDetails = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -15,12 +49,17 @@ const TourPackageDetails = () => {
   const id = params.get('id');
   const [tourPackage, setTourPackage] = useState<AgriculturalTourPackageResponse | null>(null);
   const [loading, setLoading] = useState(false);
+  const [tabValue, setTabValue] = useState(0);
 
   useEffect(() => {
     if (id) {
       fetchTourPackage();
     }
   }, [id]);
+
+  const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
+    setTabValue(newValue);
+  };
 
   const fetchTourPackage = async () => {
     try {
@@ -43,11 +82,11 @@ const TourPackageDetails = () => {
       [TimeType.MONTH]: 'Tháng',
       [TimeType.YEAR]: 'Năm'
     };
-    return types[type] || 'Không xác định';
+    return types[type] || 'Undefined';
   };
 
-  if (loading) return <Typography>Đang tải...</Typography>;
-  if (!tourPackage) return <Typography>Không tìm thấy gói du lịch</Typography>;
+  if (loading) return <Typography>Loading...</Typography>;
+  if (!tourPackage) return <Typography>Tour package not found</Typography>;
 
   return (
     <Stack spacing={3}>
@@ -55,164 +94,194 @@ const TourPackageDetails = () => {
         <Button startIcon={<ArrowLeftOutlined />} onClick={() => navigate(TOURISM_COMPANY_URLs.TOUR_PACKAGE.INDEX)}>
           Quay lại danh sách
         </Button>
-        <Typography variant="h5">Chi tiết gói du lịch</Typography>
+        <Typography variant="h5">Chi tiết chuyến đi </Typography>
       </Stack>
 
       <Card>
-        <CardContent>
-          <Grid container spacing={3}>
-            <Grid item xs={12}>
-              <Typography variant="h6" gutterBottom>
-                {tourPackage.packageName}
-              </Typography>
-              <Divider sx={{ my: 2 }} />
-            </Grid>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+          <Tabs value={tabValue} onChange={handleTabChange}>
+            <Tab label="Thông tin cơ bản" />
+            <Tab label="Điểm đến" />
+            <Tab label="Hướng dẫn viên" />
+          </Tabs>
+        </Box>
 
-            {tourPackage.imgs && tourPackage.imgs.length > 0 && (
-              <Grid item xs={12}>
-                <Box sx={{ display: 'flex', gap: 2, overflowX: 'auto', pb: 2 }}>
-                  {tourPackage.imgs.map((img, index) => (
-                    <Box
-                      key={index}
-                      component="img"
-                      src={img}
-                      alt={`Tour ${index + 1}`}
-                      sx={{ height: 200, objectFit: 'cover', borderRadius: 1 }}
-                    />
-                  ))}
-                </Box>
+        <TabPanel value={tabValue} index={0}>
+          <CardContent>
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <DetailItem label="Tên gói" value={tourPackage.packageName} />
+                <DetailItem label="Mô tả" value={tourPackage.description} />
+                <DetailItem label="Thời gian" value={`${tourPackage.durations} ${getDurationType(tourPackage.durationsType)}`} />
+                <DetailItem label="Giá người lớn" value={`${tourPackage.priceOfAdults.toLocaleString()} VND`} />
+                <DetailItem label="Giá trẻ em" value={`${tourPackage.priceOfChildren.toLocaleString()} VND`} />
               </Grid>
-            )}
-
-            <Grid item xs={12} md={6}>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Số chỗ
+              {tourPackage.imgs && tourPackage.imgs.length > 0 && (
+                <Grid item xs={12}>
+                  <Typography variant="subtitle2" color="text.secondary" gutterBottom>
+                    Hình ảnh
                   </Typography>
-                  <Typography>{tourPackage.slot}</Typography>
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Giá
-                  </Typography>
-                  <Typography>{tourPackage.price.toLocaleString('vi-VN')} đ</Typography>
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Thời lượng
-                  </Typography>
-                  <Typography>
-                    {tourPackage.durations} {getDurationType(tourPackage.durationsType)}
-                  </Typography>
-                </Box>
-              </Stack>
-            </Grid>
-
-            <Grid item xs={12} md={6}>
-              <Stack spacing={2}>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Thời gian bắt đầu
-                  </Typography>
-                  <Typography>{dayjs(tourPackage.startTime).format('DD/MM/YYYY HH:mm')}</Typography>
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Thời gian kết thúc
-                  </Typography>
-                  <Typography>{dayjs(tourPackage.endTime).format('DD/MM/YYYY HH:mm')}</Typography>
-                </Box>
-                <Box>
-                  <Typography variant="subtitle2" color="text.secondary">
-                    Ngày tạo
-                  </Typography>
-                  <Typography>{dayjs(tourPackage.createDate).format('DD/MM/YYYY HH:mm')}</Typography>
-                </Box>
-              </Stack>
-            </Grid>
-
-            <Grid item xs={12}>
-              <Divider sx={{ my: 2 }} />
-              <Typography variant="subtitle2" color="text.secondary" gutterBottom>
-                Mô tả
-              </Typography>
-              <Typography sx={{ whiteSpace: 'pre-wrap' }}>{tourPackage.description}</Typography>
-            </Grid>
-          </Grid>
-        </CardContent>
-      </Card>
-
-      {tourPackage.tourDestinations && tourPackage.tourDestinations.length > 0 && (
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Lộ trình du lịch
-            </Typography>
-            <Stack spacing={2}>
-              {tourPackage.tourDestinations.map((destination, index) => (
-                <Box key={destination.tourDestinationId}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} md={4}>
-                          <Typography variant="h6">{destination.title}</Typography>
-                          <Typography variant="body2" color="text.secondary">
-                            {dayjs(destination.startTime).format('DD/MM/YYYY HH:mm')} -
-                            {dayjs(destination.endTime).format('DD/MM/YYYY HH:mm')}
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12} md={8}>
-                          <Typography>{destination.description}</Typography>
-                          {destination.activity && (
-                            <Box mt={2}>
-                              <Typography variant="subtitle2">Hoạt động: {destination.activity.activityName}</Typography>
-                              <Typography variant="body2">{destination.activity.description}</Typography>
-                            </Box>
-                          )}
-                        </Grid>
+                  <Grid container spacing={2}>
+                    {tourPackage.imgs.map((img, index) => (
+                      <Grid item key={index} xs={12} sm={6} md={4}>
+                        <img src={img} alt={`Tour ${index + 1}`} style={{ width: '100%', borderRadius: 8 }} />
                       </Grid>
-                    </CardContent>
-                  </Card>
-                  {index < tourPackage.tourDestinations.length - 1 && (
-                    <Stack alignItems="center" sx={{ my: 2 }}>
-                      <ArrowRightOutlined />
-                    </Stack>
-                  )}
-                </Box>
-              ))}
-            </Stack>
-          </CardContent>
-        </Card>
-      )}
-
-      {tourPackage.tourGuides && tourPackage.tourGuides.length > 0 && (
-        <Card>
-          <CardContent>
-            <Typography variant="h6" gutterBottom>
-              Hướng dẫn viên
-            </Typography>
-            <Grid container spacing={2}>
-              {tourPackage.tourGuides.map((guide) => (
-                <Grid item xs={12} md={4} key={guide.guideId}>
-                  <Card variant="outlined">
-                    <CardContent>
-                      <Stack spacing={1}>
-                        <Typography variant="h6">{guide.account?.fullName}</Typography>
-                        <Typography variant="body2">Email: {guide.account?.email}</Typography>
-                        <Typography variant="body2">SĐT: {guide.account?.phone}</Typography>
-                        <Typography variant="body2">Chuyên môn: {guide.expertiseArea}</Typography>
-                        <Typography variant="body2">Ngôn ngữ: {guide.languages}</Typography>
-                        <Typography variant="body2">Đánh giá: {guide.rating}/5</Typography>
-                      </Stack>
-                    </CardContent>
-                  </Card>
+                    ))}
+                  </Grid>
                 </Grid>
-              ))}
+              )}
             </Grid>
           </CardContent>
-        </Card>
-      )}
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={1}>
+          <CardContent>
+            {tourPackage.tourDestinations && tourPackage.tourDestinations.length > 0 ? (
+              <Timeline position="alternate">
+                {tourPackage.tourDestinations.map((destination, index) => (
+                  <TimelineItem key={index}>
+                    <TimelineSeparator>
+                      <TimelineDot sx={{ bgcolor: 'primary.main' }}>
+                        {destination.typeActivity === 0 ? (
+                          <CalendarOutlined />
+                        ) : destination.typeActivity === 1 ? (
+                          <CarOutlined />
+                        ) : (
+                          <HomeOutlined />
+                        )}
+                      </TimelineDot>
+                      {index !== tourPackage?.tourDestinations?.length - 1 && <TimelineConnector />}
+                    </TimelineSeparator>
+                    <TimelineContent>
+                      <Card variant="outlined" sx={{ mb: 2 }}>
+                        <CardContent>
+                          <Typography variant="h6" color="primary" gutterBottom>
+                            {destination.title}
+                          </Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
+                            <Typography variant="caption" color="text.secondary">
+                              Thứ tự: {destination.visitOrder}
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              •
+                            </Typography>
+                            <Typography variant="caption" color="text.secondary">
+                              {destination.typeActivity === 0 ? 'Hoạt động' : destination.typeActivity === 1 ? 'Di chuyển' : 'Lưu trú'}
+                            </Typography>
+                          </Box>
+
+                          <Typography variant="body2" color="text.secondary" sx={{ mb: 2 }}>
+                            {destination.description}
+                          </Typography>
+
+                          <Box
+                            sx={{
+                              bgcolor: 'background.default',
+                              p: 2,
+                              borderRadius: 1,
+                              display: 'flex',
+                              justifyContent: 'space-between'
+                            }}
+                          >
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Bắt đầu
+                              </Typography>
+                              <Typography variant="body2">{dayjs(destination.startTime).format('DD/MM/YYYY HH:mm')}</Typography>
+                            </Box>
+                            <Box>
+                              <Typography variant="caption" color="text.secondary">
+                                Kết thúc
+                              </Typography>
+                              <Typography variant="body2">{dayjs(destination.endTime).format('DD/MM/YYYY HH:mm')}</Typography>
+                            </Box>
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </TimelineContent>
+                  </TimelineItem>
+                ))}
+              </Timeline>
+            ) : (
+              <Typography>Không có điểm đến nào</Typography>
+            )}
+          </CardContent>
+        </TabPanel>
+
+        <TabPanel value={tabValue} index={2}>
+          <CardContent>
+            {tourPackage.tourGuides && tourPackage.tourGuides.length > 0 ? (
+              <Grid container spacing={3}>
+                {tourPackage.tourGuides.map((guide, index) => (
+                  <Grid item xs={12} md={6} key={index}>
+                    <Card
+                      variant="outlined"
+                      sx={{
+                        '&:hover': {
+                          boxShadow: 3,
+                          transition: 'box-shadow 0.3s ease-in-out'
+                        }
+                      }}
+                    >
+                      <CardContent>
+                        <Stack spacing={2}>
+                          <Stack direction="row" spacing={2} alignItems="center">
+                            <Avatar
+                              sx={{
+                                width: 64,
+                                height: 64,
+                                bgcolor: 'primary.main'
+                              }}
+                              src={guide.account?.avatarURL}
+                            >
+                              {guide.account?.fullname?.charAt(0)}
+                            </Avatar>
+                            <Box>
+                              <Typography variant="h6" gutterBottom>
+                                {guide.account?.fullname}
+                              </Typography>
+                              <Chip
+                                icon={<TrophyOutlined />}
+                                label={`${guide.expertiseArea} `}
+                                size="small"
+                                color="primary"
+                                variant="outlined"
+                              />
+                            </Box>
+                          </Stack>
+
+                          <Stack spacing={1}>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <MailOutlined style={{ color: 'text.secondary' }} />
+                              <Typography>{guide.account?.email}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <PhoneOutlined style={{ color: 'text.secondary' }} />
+                              <Typography>{guide.account?.phoneNumber}</Typography>
+                            </Box>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                              <GlobalOutlined style={{ color: 'text.secondary' }} />
+                              <Stack direction="row" spacing={1} flexWrap="wrap">
+                                {guide.languages
+                                  ?.split(',')
+                                  .map((language, idx) => (
+                                    <Chip key={idx} label={language.trim()} size="small" variant="outlined" sx={{ margin: '2px' }} />
+                                  ))}
+                              </Stack>
+                            </Box>
+                          </Stack>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography>Không có hướng dẫn viên nào</Typography>
+            )}
+          </CardContent>
+        </TabPanel>
+      </Card>
     </Stack>
   );
 };

@@ -16,10 +16,10 @@ import {
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import AppSearchBar from '../../../components/table/SearchBar';
 import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
 import { agriculturalTourService } from '../../../services/tourism-company/agricultural-tour.service';
 import { AgriculturalTourPackageResponse } from '../../../types/tourism-company/agricultural-tour.types';
-import AppSearchBar from '../../../components/table/SearchBar';
 import { TimeType } from '../../../types/tourism-facility/package.types';
 
 const TourPackageList = () => {
@@ -38,7 +38,6 @@ const TourPackageList = () => {
     try {
       setLoading(true);
       const response = await agriculturalTourService.getPackages();
-      console.log('res', response);
       setPackages(response.data);
     } catch (error) {
       console.error('Failed to fetch packages:', error);
@@ -59,9 +58,15 @@ const TourPackageList = () => {
       [TimeType.HOUR]: 'Giờ',
       [TimeType.DAY]: 'Ngày',
       [TimeType.MONTH]: 'Tháng',
-      [TimeType.YEAR]: 'Năm'
+      [TimeType.YEAR]: 'Nằm'
     };
-    return types[type] || 'Không xác định';
+    return types[type] || 'Undefined';
+  };
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND'
+    }).format(amount);
   };
 
   return (
@@ -69,12 +74,12 @@ const TourPackageList = () => {
       <Stack direction="row" alignItems="center" justifyContent="space-between">
         <AppSearchBar
           fullWidth
-          placeholder="Tìm kiếm theo tên gói hoặc mô tả..."
+          placeholder="Search by package name or description..."
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
         <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => navigate(TOURISM_COMPANY_URLs.TOUR_PACKAGE.CREATE)}>
-          Thêm gói du lịch
+          Tạo mới
         </Button>
       </Stack>
 
@@ -85,15 +90,17 @@ const TourPackageList = () => {
               <Table>
                 <TableHead>
                   <TableRow>
-                    <TableCell>Tên gói</TableCell>
-                    <TableCell>Số chỗ</TableCell>
+                    <TableCell>Tên chuyến</TableCell>
+                    <TableCell>Số lượng</TableCell>
                     <TableCell>Thời gian bắt đầu</TableCell>
                     <TableCell>Thời gian kết thúc</TableCell>
                     <TableCell>Thời lượng</TableCell>
-                    <TableCell>Giá</TableCell>
-                    <TableCell>Điểm đến</TableCell>
-                    <TableCell>Hướng dẫn viên</TableCell>
-                    <TableCell align="center">Thao tác</TableCell>
+                    <TableCell>Giá vé người lớn</TableCell>
+                    <TableCell>Giá vé trẻ em</TableCell>
+                    <TableCell>Tuổi áp dụng vé trẻ em</TableCell>
+                    <TableCell>Số điểm đến</TableCell>
+                    <TableCell>Số hướng dẫn viên</TableCell>
+                    <TableCell align="center">Hành động</TableCell>
                   </TableRow>
                 </TableHead>
                 <TableBody>
@@ -104,7 +111,9 @@ const TourPackageList = () => {
                       <TableCell>{dayjs(pkg.startTime).format('DD/MM/YYYY HH:mm')}</TableCell>
                       <TableCell>{dayjs(pkg.endTime).format('DD/MM/YYYY HH:mm')}</TableCell>
                       <TableCell>{`${pkg.durations} ${getDurationType(pkg.durationsType)}`}</TableCell>
-                      <TableCell>{pkg.price.toLocaleString('vi-VN')} đ</TableCell>
+                      <TableCell>{formatCurrency(pkg.priceOfAdults)}</TableCell>
+                      <TableCell>{formatCurrency(pkg.priceOfChildren)}</TableCell>
+                      <TableCell>{pkg.childTicketAge}</TableCell>
                       <TableCell>{pkg.tourDestinations?.length || 0}</TableCell>
                       <TableCell>{pkg.tourGuides?.length || 0}</TableCell>
                       <TableCell align="center">
@@ -140,8 +149,8 @@ const TourPackageList = () => {
                 setPage(0);
               }}
               rowsPerPageOptions={[10, 25, 50]}
-              labelRowsPerPage="Số hàng mỗi trang:"
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} của ${count}`}
+              labelRowsPerPage="Rows per page:"
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} of ${count}`}
             />
           </Stack>
         </CardContent>
