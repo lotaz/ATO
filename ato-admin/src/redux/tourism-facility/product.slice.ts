@@ -63,8 +63,9 @@ const productSlice = createSlice({
       })
       .addCase(fetchProducts.rejected, (state, action) => {
         state.loading = false;
+        state.products = [];
         state.error = action.error.message || 'Failed to fetch products';
-        enqueueSnackbar(state.error, { variant: 'error' });
+        // enqueueSnackbar(state.error, { variant: 'error' });
       })
       // Fetch Single Product
       .addCase(fetchProduct.pending, (state) => {
