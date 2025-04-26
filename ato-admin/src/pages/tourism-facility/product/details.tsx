@@ -13,6 +13,10 @@ import { fetchProduct } from '../../../redux/tourism-facility/product.slice';
 import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 import { fetchOCOPSells } from '../../../redux/tourism-facility/ocop-sell.slice';
 import { StatusApproval } from '../../../types/tourism-facility/certificate.types';
+import { LoadingButton } from '@mui/lab';
+import { get, put } from '../../../helpers/axios-helper';
+import { StatusActive } from '../../tourism-company/history_payment';
+import { enqueueSnackbar } from 'notistack';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -38,9 +42,13 @@ const ProductDetails = () => {
 
   const { product, loading: productLoading } = useSelector((state: RootState) => state.productSlice);
   const { certificates, loading: certificateLoading } = useSelector((state: RootState) => state.certificateSlice);
+  const [updatingStatus, setUpdatingStatus] = useState<string | null>(null);
 
   // Add to component state
   const { list: ocopSells, loading: ocopSellLoading } = useSelector((state: RootState) => state.ocopSellSlice);
+  const getStatusLabel = (status: boolean) => {
+    return status ? 'Đang hoạt động' : 'Ngừng hoạt động';
+  };
 
   // Add to useEffect
   useEffect(() => {
@@ -65,6 +73,30 @@ const ProductDetails = () => {
         return 'Cần cập nhật';
       default:
         return 'Không xác định';
+    }
+  };
+
+  const handleStatusChange = async (ocopSellId: string, currentStatus: boolean) => {
+    try {
+      setUpdatingStatus(ocopSellId);
+      console.log('currentStatus', currentStatus);
+      const newStatus = currentStatus === true ? StatusActive.Active : StatusActive.Inactive;
+      const response = await put(`/afto/product/ocop-sell/${ocopSellId}/${newStatus}`, {});
+
+      const data = response.data;
+
+      if (data.status) {
+        enqueueSnackbar(data.message, { variant: 'success' });
+      } else {
+        enqueueSnackbar(data.message, { variant: 'error' });
+      }
+
+      // Refresh OCOP sells data
+      dispatch(fetchOCOPSells(id!));
+    } catch (error) {
+      console.error('Failed to update status:', error);
+    } finally {
+      setUpdatingStatus(null);
     }
   };
 
@@ -265,11 +297,18 @@ const ProductDetails = () => {
                                 <Typography variant="subtitle1" fontWeight="bold">
                                   Đợt bán {dayjs(sale.createDate).format('DD/MM/YYYY')}
                                 </Typography>
-                                <Chip
-                                  label={dayjs(sale.expiryDate).isAfter(dayjs()) ? 'Còn hạn' : 'Hết hạn'}
-                                  color={dayjs(sale.expiryDate).isAfter(dayjs()) ? 'success' : 'error'}
-                                  size="small"
-                                />
+                                <Stack direction="row" spacing={1}>
+                                  <Chip
+                                    label={getStatusLabel(sale.activeStatus)}
+                                    color={sale.activeStatus ? 'success' : 'error'}
+                                    size="small"
+                                  />
+                                  <Chip
+                                    label={dayjs(sale.expiryDate).isAfter(dayjs()) ? 'Còn hạn' : 'Hết hạn'}
+                                    color={dayjs(sale.expiryDate).isAfter(dayjs()) ? 'success' : 'error'}
+                                    size="small"
+                                  />
+                                </Stack>
                               </Stack>
                               <DetailItem label="Số lượng bán" value={`${sale.sellVolume} sản phẩm`} />
                               <DetailItem label="Giá bán" value={`${sale.salePrice?.toLocaleString('vi-VN')} đ`} />
@@ -282,6 +321,14 @@ const ProductDetails = () => {
                                 >
                                   Cập nhật
                                 </Button>
+                                <LoadingButton
+                                  size="small"
+                                  loading={updatingStatus === sale.ocopSellId}
+                                  color={sale.activeStatus === true ? 'error' : 'success'}
+                                  onClick={() => handleStatusChange(sale.ocopSellId, sale.activeStatus)}
+                                >
+                                  {sale.activeStatus === true ? 'Vô hiệu hóa' : 'Kích hoạt'}
+                                </LoadingButton>
                               </Stack>
                             </Stack>
                           </CardContent>
