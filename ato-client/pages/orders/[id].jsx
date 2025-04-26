@@ -24,7 +24,7 @@ import { format } from "date-fns";
 import useWindowSize from "hooks/useWindowSize";
 import { currency } from "lib";
 import { useRouter } from "next/router";
-import { enqueueSnackbar } from "notistack";
+import { useSnackbar } from "notistack";
 import { Fragment } from "react";
 import api from "utils/__api__/orders"; // styled components
 
@@ -65,6 +65,7 @@ const OrderDetails = () => {
   const width = useWindowSize();
   const breakpoint = 350;
   const stepIconList = [PackageBox, TruckFilled, Delivery];
+  const { enqueueSnackbar } = useSnackbar();
 
   // Add refund handler
   const handleRefundOrder = async () => {
@@ -108,9 +109,9 @@ const OrderDetails = () => {
       case StatusOrder.AcceptOrder:
         return 1;
       case StatusOrder.RejecOrder:
-        return 2;
+        return -1;
       case StatusOrder.Completed:
-        return 3;
+        return 2;
       default:
         return -1;
     }
@@ -300,8 +301,6 @@ const OrderDetails = () => {
               <H6 my="0px">
                 {order.paymentStatus === PaymentStatus.Paid
                   ? "Đã thanh toán"
-                  : order.paymentStatus === 3
-                  ? "Hủy đơn hàng thành công"
                   : "Chưa thanh toán"}
               </H6>
             </FlexBetween>

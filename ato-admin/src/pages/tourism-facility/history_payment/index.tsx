@@ -15,6 +15,7 @@ import {
   TableCell,
   TableContainer,
   TableHead,
+  TablePagination,
   TableRow,
   Typography
 } from '@mui/material';
@@ -28,6 +29,8 @@ const OrderPaymentHistory = () => {
   const [payments, setPayments] = useState<VNPayPaymentResponse[]>([]);
   const [selectedPayment, setSelectedPayment] = useState<VNPayPaymentResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [page, setPage] = useState(0);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
 
   useEffect(() => {
     const fetchPayments = async () => {
@@ -69,7 +72,7 @@ const OrderPaymentHistory = () => {
         return 'Đã xác nhận';
       case 2:
         return 'Hoàn thành';
-      case 3:
+      case -1:
         return 'Đã hủy';
       default:
         return 'Không xác định';
@@ -84,7 +87,7 @@ const OrderPaymentHistory = () => {
         return 'info';
       case 2:
         return 'success';
-      case 3:
+      case -1:
         return 'error';
       default:
         return 'default';
@@ -110,6 +113,18 @@ const OrderPaymentHistory = () => {
       payment.bankCode?.toLowerCase().includes(searchText.toLowerCase())
   );
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setRowsPerPage(parseInt(event.target.value, 10));
+    setPage(0);
+  };
+
+  // Add pagination logic
+  const paginatedPayments = filteredPayments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+
   return (
     <Stack spacing={3}>
       <AppSearchBar placeholder="Tìm kiếm theo mã giao dịch, mã đơn hàng, ngân hàng" onChange={(e) => setSearchText(e.target.value)} />
@@ -119,36 +134,49 @@ const OrderPaymentHistory = () => {
             <Typography>Đang tải...</Typography>
           </Stack>
         ) : filteredPayments.length > 0 ? (
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Mã giao dịch</TableCell>
-                  <TableCell>Mã đơn hàng</TableCell>
-                  <TableCell>Thời gian</TableCell>
-                  <TableCell>Số tiền</TableCell>
-                  <TableCell>Trạng thái</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredPayments.map((payment) => (
-                  <TableRow key={payment.responseId} hover onClick={() => handlePaymentClick(payment)} sx={{ cursor: 'pointer' }}>
-                    <TableCell>{payment.txnRef}</TableCell>
-                    <TableCell>{payment.order?.orderId}</TableCell>
-                    <TableCell>{formatDateTime(payment.payDate)}</TableCell>
-                    <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                    <TableCell>
-                      <Chip
-                        label={getPaymentStatusText(payment.responseCode)}
-                        color={payment.responseCode === '00' ? 'success' : 'error'}
-                        size="small"
-                      />
-                    </TableCell>
+          <>
+            <TableContainer>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Mã giao dịch</TableCell>
+                    <TableCell>Mã đơn hàng</TableCell>
+                    <TableCell>Thời gian</TableCell>
+                    <TableCell>Số tiền</TableCell>
+                    <TableCell>Trạng thái</TableCell>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                </TableHead>
+                <TableBody>
+                  {paginatedPayments.map((payment) => (
+                    <TableRow key={payment.responseId} hover onClick={() => handlePaymentClick(payment)} sx={{ cursor: 'pointer' }}>
+                      <TableCell>{payment.txnRef}</TableCell>
+                      <TableCell>{payment.order?.orderId}</TableCell>
+                      <TableCell>{formatDateTime(payment.payDate)}</TableCell>
+                      <TableCell>{formatCurrency(payment.amount)}</TableCell>
+                      <TableCell>
+                        <Chip
+                          label={getPaymentStatusText(payment.responseCode)}
+                          color={payment.responseCode === '00' ? 'success' : 'error'}
+                          size="small"
+                        />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+            <TablePagination
+              rowsPerPageOptions={[10, 25, 50]}
+              component="div"
+              count={filteredPayments.length}
+              rowsPerPage={rowsPerPage}
+              page={page}
+              onPageChange={handleChangePage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              labelRowsPerPage="Số dòng mỗi trang:"
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} trong ${count}`}
+            />
+          </>
         ) : (
           <NoDataDisplay />
         )}
