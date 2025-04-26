@@ -9,6 +9,12 @@ export const ADMIN_URLs = {
     UPDATE: `${ADMIN_BASE_URL}/account/update`,
     DETAILS: `${ADMIN_BASE_URL}/account/details`
   },
+  CONTRACT: {
+    INDEX: `${ADMIN_BASE_URL}/contract`,
+    CREATE: `${ADMIN_BASE_URL}/contract/create`,
+    UPDATE: `${ADMIN_BASE_URL}/contract/update`,
+    DETAILS: `${ADMIN_BASE_URL}/contract/details`
+  },
   CONFIG: {
     EMAIL: `${ADMIN_BASE_URL}/config/email`,
     VNPAY: `${ADMIN_BASE_URL}/config/vnpay`
@@ -31,5 +37,9 @@ export const ADMIN_URLs = {
   },
   NEWS: {
     INDEX: `${ADMIN_BASE_URL}/account/news`
+  },
+  PAYMENTHISTORY: {
+    INDEX: `${ADMIN_BASE_URL}/payment-history`,
+    DETAILS: `${ADMIN_BASE_URL}/payment-history/details`
   }
 };

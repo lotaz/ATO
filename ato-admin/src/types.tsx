@@ -9,6 +9,7 @@ export type Role = 'Admin' | 'ContentModerators' | 'TourGuides' | 'TourismCompan
 
 // Define the type for the 'touristFacility' object
 export type TouristFacility = {
+  touristFacilityId: string;
   touristFacilityName: string;
   address: string;
   description: string;
