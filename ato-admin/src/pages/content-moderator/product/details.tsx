@@ -151,7 +151,7 @@ const ProductDetails = () => {
             )}
           </Grid>
 
-          <Stack direction="row" spacing={2} justifyContent="flex-end">
+          <Stack direction="row" spacing={2} mt={3} justifyContent="flex-end">
             <Button variant="contained" color="success" onClick={() => handleApproveReject(StatusApproval.Approved)}>
               Phê duyệt
             </Button>
@@ -184,23 +184,27 @@ const ProductDetails = () => {
   );
 };
 
-const DetailItem = ({ label, value }: { label: string; value: any }) => (
-  <Box sx={{ py: 1 }}>
-    <Typography variant="subtitle2" color="text.secondary">
-      {label}
-    </Typography>
+const DetailItem = ({ label, value, icon }: { label: string; value: any; icon?: React.ReactNode }) => (
+  <Box sx={{ py: 1.5 }}>
+    <Stack direction="row" spacing={1} alignItems="center" mb={0.5}>
+      {icon && <Box sx={{ color: 'primary.main' }}>{icon}</Box>}
+      <Typography variant="subtitle2" color="text.secondary">
+        {label}
+      </Typography>
+    </Stack>
     <Typography
       sx={{
         maxHeight: 200,
         overflow: 'auto',
         whiteSpace: 'pre-wrap',
-        wordBreak: 'break-word'
+        wordBreak: 'break-word',
+        pl: icon ? 3 : 0
       }}
       variant="body1"
     >
       {value || '-'}
     </Typography>
-    <Divider sx={{ mt: 1 }} />
+    <Divider sx={{ mt: 1.5 }} />
   </Box>
 );
 

@@ -52,65 +52,63 @@ const BlogList = () => {
           Thêm mới
         </Button>
       </Stack>
-      <AppCard>
-        <Stack spacing={3}>
-          <Box>
-            <Grid container spacing={3}>
-              {filteredBlogs?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((blog) => (
-                <Grid item xs={12} sm={6} md={4} key={blog.blogId}>
-                  <Card>
-                    <CardMedia component="img" height="200" image={blog.linkImg} alt={blog.title} />
-                    <CardContent>
-                      <Stack spacing={2}>
-                        <Typography variant="h6" noWrap>
-                          {blog.title}
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary" noWrap>
-                          {blog.description}
-                        </Typography>
-                        <Stack direction="row" justifyContent="space-between" alignItems="center">
-                          <Stack direction="row" spacing={1}>
-                            <Chip
-                              label={getBlogStatusText(blog.blogStatus)}
-                              color={blog.blogStatus === BlogStatus.Approval ? 'success' : 'default'}
-                              size="small"
-                            />
-                            <Chip label={getBlogTypeText(blog.blogType)} variant="outlined" size="small" />
-                          </Stack>
-                          <Stack direction="row" spacing={1}>
-                            <IconButton size="small" onClick={() => navigate(`${CONTENT_MODERATOR_URLs.BLOG.DETAILS}?id=${blog.blogId}`)}>
-                              <EyeFilled />
-                            </IconButton>
-                            <IconButton size="small" onClick={() => navigate(`${CONTENT_MODERATOR_URLs.BLOG.UPDATE}?id=${blog.blogId}`)}>
-                              <EditOutlined />
-                            </IconButton>
-                          </Stack>
+      <Stack spacing={3}>
+        <Box>
+          <Grid container spacing={3}>
+            {filteredBlogs?.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((blog) => (
+              <Grid item xs={12} sm={6} md={4} key={blog.blogId}>
+                <Card>
+                  <CardMedia component="img" height="200" image={blog.linkImg} alt={blog.title} />
+                  <CardContent>
+                    <Stack spacing={2}>
+                      <Typography variant="h6" noWrap>
+                        {blog.title}
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary" noWrap>
+                        {blog.description}
+                      </Typography>
+                      <Stack direction="row" justifyContent="space-between" alignItems="center">
+                        <Stack direction="row" spacing={1}>
+                          <Chip
+                            label={getBlogStatusText(blog.blogStatus)}
+                            color={blog.blogStatus === BlogStatus.Approval ? 'success' : 'default'}
+                            size="small"
+                          />
+                          <Chip label={getBlogTypeText(blog.blogType)} variant="outlined" size="small" />
+                        </Stack>
+                        <Stack direction="row" spacing={1}>
+                          <IconButton size="small" onClick={() => navigate(`${CONTENT_MODERATOR_URLs.BLOG.DETAILS}?id=${blog.blogId}`)}>
+                            <EyeFilled />
+                          </IconButton>
+                          <IconButton size="small" onClick={() => navigate(`${CONTENT_MODERATOR_URLs.BLOG.UPDATE}?id=${blog.blogId}`)}>
+                            <EditOutlined />
+                          </IconButton>
                         </Stack>
                       </Stack>
-                    </CardContent>
-                  </Card>
-                </Grid>
-              ))}
-            </Grid>
-            {filteredBlogs?.length === 0 && <Typography mt={2}>Không tìm thấy tin tức</Typography>}
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+          {filteredBlogs?.length === 0 && <Typography mt={2}>Không tìm thấy tin tức</Typography>}
 
-            {filteredBlogs?.length > 0 && (
-              <TablePagination
-                component="div"
-                count={filteredBlogs.length}
-                page={page}
-                onPageChange={handleChangePage}
-                rowsPerPage={rowsPerPage}
-                onRowsPerPageChange={handleChangeRowsPerPage}
-                rowsPerPageOptions={[6, 12, 24]}
-                labelRowsPerPage="Số tin tức mỗi trang:"
-                labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
-                sx={{ mt: 3 }}
-              />
-            )}
-          </Box>
-        </Stack>
-      </AppCard>
+          {filteredBlogs?.length > 0 && (
+            <TablePagination
+              component="div"
+              count={filteredBlogs.length}
+              page={page}
+              onPageChange={handleChangePage}
+              rowsPerPage={rowsPerPage}
+              onRowsPerPageChange={handleChangeRowsPerPage}
+              rowsPerPageOptions={[6, 12, 24]}
+              labelRowsPerPage="Số tin tức mỗi trang:"
+              labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
+              sx={{ mt: 3 }}
+            />
+          )}
+        </Box>
+      </Stack>
     </Stack>
   );
 };
