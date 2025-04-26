@@ -12,7 +12,7 @@ const SubTitle = styled(Paragraph)(({ theme }) => ({
 
 const BlogSection = ({ blogs = [] }) => {
   return (
-    <CategorySectionCreator title="Tin tức" seeMoreLink="#" mb={0}>
+    <CategorySectionCreator title="Tin tức" seeMoreLink="/blogs" mb={0}>
       <SubTitle>Cập nhật tin tức mới nhất</SubTitle>
       <Grid container spacing={3}>
         {blogs.map((item) => (

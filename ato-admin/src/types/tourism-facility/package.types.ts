@@ -75,4 +75,10 @@ export interface TourismPackageResponse {
   replyRequest?: string;
   statusOperating: StatusOperating;
   activities?: ActivityResponse[];
+  touristFacility?: TouristFacilityModel;
+}
+
+export interface TouristFacilityModel {
+  touristFacilityId: number;
+  touristFacilityName: string;
 }

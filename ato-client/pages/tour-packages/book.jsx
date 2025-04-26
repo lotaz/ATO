@@ -43,6 +43,7 @@ const BookTourPage = () => {
     fetcher
   );
 
+  console.log("tour", tour);
   if (isLoading)
     return (
       <Box
@@ -647,6 +648,8 @@ const BookTourPage = () => {
               tourId={id}
               priceOfAdults={tour.priceOfAdults}
               priceOfChildren={tour.priceOfChildren}
+              slot={tour.slot}
+              people={tour.people}
             />
           </Grid>
         </Grid>

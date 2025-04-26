@@ -23,9 +23,7 @@ const PaymentMethodEditor = () => {
     cvc: yup.string().required("required"),
   });
 
-  const handleFormSubmit = async (values) => {
-    console.log(values);
-  }; // SECTION TITLE HEADER LINK
+  const handleFormSubmit = async (values) => {}; // SECTION TITLE HEADER LINK
 
   const HEADER_LINK = (
     <Link href="/payment-methods" passHref>

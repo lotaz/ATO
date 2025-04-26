@@ -60,8 +60,6 @@ const CategoryMenuCard = (props) => {
 
   const companies = data || [];
 
-  console.log("data", data);
-
   const companyNavigations =
     companies?.map((company) => ({
       title: company.companynName,

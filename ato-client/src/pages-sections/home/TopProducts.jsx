@@ -37,7 +37,11 @@ const TopProducts = ({ products }) => {
   };
 
   return (
-    <CategorySectionCreator title="Sản phẩm OCOP" seeMoreLink="#" mb={0}>
+    <CategorySectionCreator
+      title="Sản phẩm OCOP"
+      seeMoreLink="/products"
+      mb={0}
+    >
       <SubTitle>Danh sách sản phẩm OCOP nổi bật</SubTitle>
       <Carousel
         infinite={true}

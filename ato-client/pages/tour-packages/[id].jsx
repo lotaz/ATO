@@ -12,6 +12,7 @@ import TimelineDot from "@mui/lab/TimelineDot";
 import TimelineItem from "@mui/lab/TimelineItem";
 import TimelineSeparator from "@mui/lab/TimelineSeparator";
 import {
+  Avatar,
   Box,
   Button,
   Card,
@@ -61,6 +62,7 @@ const TourPackageDetails = () => {
 
   const sortedDestinations =
     tour?.tourDestinations?.sort((a, b) => a.visitOrder - b.visitOrder) || [];
+  console.log("des", tour?.tourDestinations);
 
   return (
     <ShopLayout2>
@@ -89,7 +91,7 @@ const TourPackageDetails = () => {
             />
             <Chip
               icon={<Group />}
-              label={`${tour.slot} chỗ trống`}
+              label={` ${tour.slot - tour.people} / ${tour.slot} chỗ trống`}
               color="primary"
               variant="outlined"
             />
@@ -279,7 +281,7 @@ const TourPackageDetails = () => {
                       </Typography>
                     </Box>
                     <Typography variant="body1" color="text.secondary">
-                      Còn {tour.slot} chỗ trống
+                      Còn {tour.slot - tour.people} / {tour.slot} chỗ trống
                     </Typography>
                   </Box>
                 </Grid>
@@ -623,7 +625,7 @@ const TourPackageDetails = () => {
                 {tour.tourGuides.map((guide, index) => (
                   <Box key={index} sx={{ mb: 3 }}>
                     <Box display="flex" alignItems="center" gap={2}>
-                      <img
+                      <Avatar
                         src={guide.account?.avatarURL || "/placeholder.jpg"}
                         alt={guide.account?.fullname}
                         style={{ width: 60, height: 60, borderRadius: "50%" }}
@@ -816,7 +818,7 @@ const TourPackageDetails = () => {
                             color: tour.slot < 5 ? "#e74c3c" : "#27ae60",
                           }}
                         >
-                          {`${tour.slot} chỗ`}
+                          {`${tour.slot - tour.people}/${tour.slot} chỗ`}
                         </Typography>
                       }
                     />

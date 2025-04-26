@@ -6,6 +6,7 @@ import {
   CreditCard,
   FavoriteBorder,
   KeyOutlined,
+  LocationCity,
   PasswordOutlined,
   Person,
   Place,
@@ -70,8 +71,6 @@ const Navigations = () => {
                 />
                 <span>{item.title}</span>
               </FlexBox>
-
-              <span>{item.count}</span>
             </StyledNavLink>
           ))}
         </Fragment>
@@ -107,7 +106,12 @@ const linkList = [
         icon: Person,
       },
       {
-        href: "#",
+        href: "/address",
+        title: "Cài đặt địa chỉ",
+        icon: LocationCity,
+      },
+      {
+        href: "/change-password",
         title: "Đổi mật khẩu",
         icon: KeyOutlined,
       },

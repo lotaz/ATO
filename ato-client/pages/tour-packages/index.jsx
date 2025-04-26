@@ -238,7 +238,7 @@ const TourPackages = () => {
                                 fontWeight: "bold",
                               }}
                             >
-                              Còn {pack.slot} chỗ
+                              Còn {pack.slot - pack.people}/ {pack.slot} chỗ
                             </Box>
                           </Box>
 

@@ -1,3 +1,4 @@
+import { BookingTourDestination } from '../../pages/tour-guide/types';
 import { TouristFacility } from '../../types';
 import { Activity } from '../tourism-facility/activity.types';
 import { StatusOperating, TimeType } from '../tourism-facility/package.types';
@@ -21,6 +22,7 @@ export interface AgriculturalTourPackageResponse {
   updateDate?: Date;
   tourDestinations?: AgriculturalTourPackageDestinationResponse[];
   tourGuides?: AgriculturalTourPackageGuideResponse[];
+  trackings?: BookingTourDestination[];
 }
 
 export interface AgriculturalTourPackageDestinationResponse {

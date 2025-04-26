@@ -32,7 +32,6 @@ const ContactPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission
-    console.log(formData);
   };
 
   return (

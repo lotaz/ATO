@@ -16,7 +16,6 @@ const SupportTicketDetails = ({ ticket }) => {
 
   const handleFormSubmit = (event) => {
     event.preventDefault();
-    console.log(event);
   }; // SECTION TITLE HEADER LINK
 
   const HEADER_LINK = (

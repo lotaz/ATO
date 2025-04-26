@@ -18,37 +18,63 @@ import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
 import { currency } from "lib";
 import api from "utils/__api__/users";
+import { useEffect, useState } from "react";
+import { get } from "helpers/axios-helper";
 
 // ============================================================
-const Profile = ({ user }) => {
-  const downMd = useMediaQuery((theme) => theme.breakpoints.down("md")); // SECTION TITLE HEADER LINK
+// Add these imports
+import { CalendarMonth, Email, Phone, Place } from "@mui/icons-material";
+
+const Profile = () => {
+  const [user, setUser] = useState(null);
+  const downMd = useMediaQuery((theme) => theme.breakpoints.down("md"));
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        const response = await get("/profile");
+        console.log("user", response.data);
+        setUser(response.data);
+      } catch (error) {
+        console.error("Failed to fetch profile:", error);
+      }
+    };
+    fetchProfile();
+  }, []);
+
+  if (!user) return <p>Đang tải...</p>;
 
   const HEADER_LINK = (
     <Link href={`/profile/${user.id}`} passHref>
-      <Button
-        color="primary"
-        sx={{
-          px: 4,
-          bgcolor: "primary.light",
-        }}
-      >
+      <Button color="primary" sx={{ px: 4, bgcolor: "primary.light" }}>
         Chỉnh sửa thông tin
       </Button>
     </Link>
   );
-  const infoList = [
+
+  const profileInfo = [
     {
-      title: "16",
-      subtitle: "Đơn hàng",
+      icon: Email,
+      title: "Email",
+      value: user?.email || "Chưa cập nhật",
     },
     {
-      title: "02",
-      subtitle: "Tour đã đặt",
+      icon: Phone,
+      title: "Số điện thoại",
+      value: user?.phoneNumber || "Chưa cập nhật",
+    },
+
+    {
+      icon: CalendarMonth,
+      title: "Ngày sinh",
+      value: user?.dob
+        ? format(new Date(user.dob), "dd/MM/yyyy")
+        : "Chưa cập nhật",
     },
   ];
+
   return (
     <CustomerDashboardLayout>
-      {/* TITLE HEADER AREA */}
       <UserDashboardHeader
         icon={Person}
         title="Thông tin tài khoản"
@@ -56,83 +82,81 @@ const Profile = ({ user }) => {
         navigation={<CustomerDashboardNavigation />}
       />
 
-      {/* USER PROFILE INFO */}
-      <Box mb={4}>
+      {/* Profile Card */}
+      <Card sx={{ p: 3, mb: 3 }}>
         <Grid container spacing={3}>
-          <Grid item md={6} xs={12}>
-            <Card
-              sx={{
-                display: "flex",
-                p: "14px 32px",
-                height: "100%",
-                alignItems: "center",
-              }}
-            >
+          <Grid item md={4} xs={12}>
+            <Box textAlign="center">
               <Avatar
-                src={"#"}
+                src={user?.avatarURL || "/assets/images/avatars/default.png"}
                 sx={{
-                  height: 64,
-                  width: 64,
+                  width: 120,
+                  height: 120,
+                  margin: "auto",
+                  border: 2,
+                  borderColor: "primary.main",
                 }}
               />
-
-              <Box ml={1.5} flex="1 1 0">
-                <FlexBetween flexWrap="wrap">
-                  <div>
-                    <H5 my="0px">{`${user.name.firstName} ${user.name.lastName}`}</H5>
-                  </div>
-                </FlexBetween>
-              </Box>
-            </Card>
+              <H5 mt={2} mb={1}>
+                {user?.fullName}
+              </H5>
+              <Small color="grey.600">{user?.role}</Small>
+            </Box>
           </Grid>
 
-          <Grid item md={6} xs={12}>
-            <Grid container spacing={4}>
-              {infoList.map((item) => (
-                <Grid item lg={6} sm={6} xs={6} key={item.subtitle}>
+          <Grid item md={8} xs={12}>
+            <Grid container spacing={2}>
+              {profileInfo.map((item) => (
+                <Grid item xs={12} sm={6} key={item.title}>
                   <Card
                     sx={{
+                      p: 2,
                       height: "100%",
                       display: "flex",
-                      p: "1rem 1.25rem",
                       alignItems: "center",
-                      flexDirection: "column",
+                      bgcolor: "grey.50",
                     }}
                   >
-                    <H3 color="primary.main" my={0} fontWeight={600}>
-                      {item.title}
-                    </H3>
-
-                    <Small color="grey.600" textAlign="center">
-                      {item.subtitle}
-                    </Small>
+                    <item.icon
+                      sx={{ fontSize: 24, color: "primary.main", mr: 1 }}
+                    />
+                    <Box>
+                      <Small color="grey.600">{item.title}</Small>
+                      <Typography fontSize={14}>{item.value}</Typography>
+                    </Box>
                   </Card>
                 </Grid>
               ))}
             </Grid>
           </Grid>
         </Grid>
-      </Box>
+      </Card>
 
-      <TableRow
-        sx={{
-          cursor: "auto",
-          p: "0.75rem 1.5rem",
-          ...(downMd && {
-            alignItems: "start",
-            flexDirection: "column",
-            justifyContent: "flex-start",
-          }),
-        }}
-      >
-        <TableRowItem title="Họ và tên" value={user.name.firstName} />
-        <TableRowItem title="Email" value={user.email} />
-        <TableRowItem title="Số điện thoại" value={user.phone} />
-        <TableRowItem
-          title="Ngày sinh"
-          value={format(new Date(user.dateOfBirth), "dd MMM, yyyy")}
-        />
-      </TableRow>
+      {/* Account Details */}
+      <Card sx={{ p: 3 }}>
+        <H5 mb={2}>Chi tiết tài khoản</H5>
+        <Grid container spacing={2}>
+          <Grid item xs={12}>
+            <FlexBox alignItems="center">
+              <Small color="grey.600" minWidth={120}>
+                Trạng thái:
+              </Small>
+              <Typography
+                fontSize={14}
+                sx={{
+                  backgroundColor: "success.light",
+                  color: "success.main",
+                  px: 2,
+                  py: 0.5,
+                  borderRadius: 1,
+                }}
+              >
+                Đang hoạt động
+              </Typography>
+            </FlexBox>
+          </Grid>
+        </Grid>
+      </Card>
     </CustomerDashboardLayout>
   );
 };
@@ -156,4 +180,5 @@ export const getStaticProps = async () => {
     },
   };
 };
+// Remove getStaticProps as we're now using client-side fetching
 export default Profile;

@@ -28,6 +28,7 @@ const AppContext = createContext({
 
 const reducer = (state, action) => {
   let newState;
+
   switch (action.type) {
     case "CHANGE_CART_AMOUNT":
       let cartList = state.cart;
@@ -51,7 +52,20 @@ const reducer = (state, action) => {
         sessionStorage.setItem("cart", JSON.stringify(newState.cart));
       }
       return newState;
-
+    case "RESET_CART":
+      let list = state.cart;
+      const ids = JSON.parse(sessionStorage.getItem("ids"));
+      if (ids) {
+        const newCart = list.filter((item) => ids.indexOf(item.id) === -1);
+        newState = { ...state, cart: newCart };
+        if (typeof window !== "undefined") {
+          sessionStorage.setItem("cart", JSON.stringify(newState.cart));
+          sessionStorage.removeItem("ids");
+        }
+        return newState;
+      } else {
+        return state;
+      }
     default: {
       return state;
     }

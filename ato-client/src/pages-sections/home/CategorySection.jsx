@@ -131,7 +131,11 @@ const CompanySection = () => {
   };
 
   return (
-    <CategorySectionCreator title="Công ty du lịch" seeMoreLink="#" mb={0}>
+    <CategorySectionCreator
+      title="Công ty du lịch"
+      seeMoreLink="/tour-companies"
+      mb={0}
+    >
       <SubTitle>Xem tất cả các công ty du lịch</SubTitle>
       <Carousel
         infinite={true}

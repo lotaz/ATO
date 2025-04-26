@@ -37,7 +37,6 @@ const Payment = () => {
       // // Clear cart and shipping info after successful order
       // sessionStorage.removeItem("shippingInfo");
       // sessionStorage.removeItem("cart");
-      console.log("h", response);
       if (response?.status === true) {
         router.push("/payment-result?vnp_ResponseCode=00");
       }

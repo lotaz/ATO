@@ -6,7 +6,7 @@ import {
   CardContent,
   Chip,
   Grid,
-  Typography
+  Typography,
 } from "@mui/material";
 import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
@@ -72,8 +72,6 @@ const BookedToursPage = () => {
     [PaymentStatus.Refunded]: "Đã hoàn tiền",
   };
 
-  console.log("bookedTours", bookedTours);
-
   return (
     <CustomerDashboardLayout>
       <UserDashboardHeader
@@ -88,7 +86,9 @@ const BookedToursPage = () => {
               <CardContent>
                 <Box display="flex" justifyContent="space-between" mb={2}>
                   <Typography variant="h6">
-                    <strong>{booking.agriculturalTourPackage?.packageName}</strong>
+                    <strong>
+                      {booking.agriculturalTourPackage?.packageName}
+                    </strong>
                   </Typography>
                   <Box>
                     {statusBookingTranslations[booking.statusBooking] && (
@@ -107,20 +107,23 @@ const BookedToursPage = () => {
                 </Box>
 
                 <Typography variant="body2" color="text.secondary" mb={2}>
-                <strong>Ngày đặt: </strong>
+                  <strong>Ngày đặt: </strong>
                   {new Date(booking.bookingDate).toLocaleDateString()}
                 </Typography>
 
                 <Typography variant="body1" mb={2}>
-                <strong>Số vé người lớn: </strong>
-                  {booking.numberOfAdults} vé
+                  <strong>Số vé người lớn: </strong>
+                  {booking.numberOfChildren} vé
                 </Typography>
                 <Typography variant="body1" mb={2}>
-                <strong>Số vé trẻ em: </strong>
+                  <strong>Số vé trẻ em: </strong>
                   {booking.numberOfAdults} vé
                 </Typography>
                 <Typography variant="h6" mb={2} color="error.main">
-                  <strong>Tổng tiền: {Number(booking.totalAmmount).toLocaleString()} VNĐ</strong>
+                  <strong>
+                    Tổng tiền: {Number(booking.totalAmmount).toLocaleString()}{" "}
+                    VNĐ
+                  </strong>
                 </Typography>
 
                 {booking.orders?.map((order) => (

@@ -17,10 +17,10 @@ export const PaymentType = {
 };
 
 export const StatusOrder = {
+  RejecOrder: -1,
   Processing: 0,
-  Shipped: 1,
+  AcceptOrder: 1,
   Completed: 2,
-  Canceled: 3,
 };
 
 export const StatusBooking = {

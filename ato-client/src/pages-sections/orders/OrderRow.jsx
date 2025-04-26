@@ -16,7 +16,7 @@ const OrderRow = ({ order }) => {
         return "info";
       case StatusOrder.Completed:
         return "success";
-      case StatusOrder.Canceled:
+      case StatusOrder.RejecOrder:
         return "error";
       default:
         return "secondary";
@@ -27,11 +27,11 @@ const OrderRow = ({ order }) => {
     switch (status) {
       case StatusOrder.Processing:
         return "Đang xử lý";
-      case StatusOrder.Shipped:
+      case StatusOrder.AcceptOrder:
         return "Đang giao hàng";
       case StatusOrder.Completed:
         return "Đã hoàn thành";
-      case StatusOrder.Canceled:
+      case StatusOrder.RejecOrder:
         return "Đã hủy";
       default:
         return status;
