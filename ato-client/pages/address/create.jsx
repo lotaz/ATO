@@ -9,57 +9,35 @@ import {
   Grid,
   MenuItem,
   TextField,
+  Typography,
 } from "@mui/material";
+import { FlexBox } from "components/flex-box";
 import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
 import { Formik } from "formik";
-import { get, put } from "helpers/axios-helper";
+import { get, post } from "helpers/axios-helper";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import * as yup from "yup";
 
-const AddressEditor = () => {
+const CreateAddress = () => {
   const router = useRouter();
-  const { id } = router.query;
   const { enqueueSnackbar } = useSnackbar();
-  const [address, setAddress] = useState(null);
   const [provinces, setProvinces] = useState([]);
   const [districts, setDistricts] = useState([]);
   const [wards, setWards] = useState([]);
 
+  // Fetch provinces on component mount
   useEffect(() => {
-    if (id) {
-      fetchAddress();
-      fetchProvinces();
-    }
-  }, [id]);
+    fetchProvinces();
+  }, []);
 
-  const fetchAddress = async () => {
-    try {
-      const response = await get(`/tourist/address/${id}`);
-      const addressData = response.data;
-      setAddress(addressData);
-
-      // Fetch related location data
-      if (addressData.toProvinceId) {
-        await fetchDistricts(addressData.toProvinceId);
-      }
-      if (addressData.toDistrictId) {
-        await fetchWards(addressData.toDistrictId);
-      }
-    } catch (error) {
-      console.error("Failed to fetch address:", error);
-      enqueueSnackbar("Không thể tải thông tin địa chỉ", { variant: "error" });
-      router.push("/address");
-    }
-  };
-
-  // Keep your existing fetch functions for provinces, districts, and wards
   const fetchProvinces = async () => {
     try {
       const response = await get("/tourist/address/provinces");
+      console.log("pro", response.data.data);
       setProvinces(response.data.data);
     } catch (error) {
       console.error("Failed to fetch provinces:", error);
@@ -72,6 +50,8 @@ const AddressEditor = () => {
   const fetchDistricts = async (provinceId) => {
     try {
       const response = await get(`/tourist/address/districts/${provinceId}`);
+      console.log("Distr", response.data.data);
+
       setDistricts(response.data.data);
     } catch (error) {
       console.error("Failed to fetch districts:", error);
@@ -84,6 +64,8 @@ const AddressEditor = () => {
   const fetchWards = async (districtId) => {
     try {
       const response = await get(`/tourist/address/wards/${districtId}`);
+      console.log("ward", response.data.data);
+
       setWards(response.data.data);
     } catch (error) {
       console.error("Failed to fetch wards:", error);
@@ -91,6 +73,15 @@ const AddressEditor = () => {
         variant: "error",
       });
     }
+  };
+
+  const initialValues = {
+    toName: "",
+    toPhone: "",
+    toProvinceId: "",
+    toDistrictId: "",
+    toWardCode: "",
+    defaultAddress: false,
   };
 
   const validationSchema = yup.object().shape({
@@ -106,6 +97,7 @@ const AddressEditor = () => {
 
   const handleFormSubmit = async (values) => {
     try {
+      // Find the selected items to get their names
       const selectedProvince = provinces.find(
         (p) => p.provinceID === values.toProvinceId
       );
@@ -114,20 +106,19 @@ const AddressEditor = () => {
       );
       const selectedWard = wards.find((w) => w.wardCode === values.toWardCode);
 
-      const updateData = {
-        shipAddressId: id,
+      const addressData = {
         defaultAddress: values.defaultAddress,
         toName: values.toName,
         toPhone: values.toPhone,
         toProvinceId: values.toProvinceId,
         toProvinceName: selectedProvince?.provinceName || "",
         toDistrictId: values.toDistrictId,
-        ToDistrictName: selectedDistrict?.districtName || "",
+        toDistrictName: selectedDistrict?.districtName || "",
         toWardCode: values.toWardCode,
         toWardName: selectedWard?.wardName || "",
       };
 
-      const response = await put("/tourist/address", updateData);
+      const response = await post("/tourist/address", addressData);
       const data = response.data;
 
       enqueueSnackbar(data.message, {
@@ -138,18 +129,16 @@ const AddressEditor = () => {
         router.push("/address");
       }
     } catch (error) {
-      console.error("Update failed:", error);
-      enqueueSnackbar("Cập nhật địa chỉ thất bại", { variant: "error" });
+      console.error("Create address failed:", error);
+      enqueueSnackbar("Thêm địa chỉ thất bại", { variant: "error" });
     }
   };
-
-  if (!address) return null;
 
   return (
     <CustomerDashboardLayout>
       <UserDashboardHeader
         icon={Place}
-        title="Chỉnh sửa địa chỉ"
+        title="Thêm địa chỉ mới"
         button={
           <Link href="/address" passHref>
             <Button
@@ -167,17 +156,9 @@ const AddressEditor = () => {
       <Card sx={{ p: 4 }}>
         <Formik
           onSubmit={handleFormSubmit}
-          initialValues={{
-            toName: address.toName || "",
-            toPhone: address.toPhone || "",
-            toProvinceId: address.toProvinceId || "",
-            toDistrictId: address.toDistrictId || "",
-            toWardCode: address.toWardCode || "",
-            defaultAddress: address.defaultAddress || false,
-          }}
+          initialValues={initialValues}
           validationSchema={validationSchema}
         >
-          {/* Keep the same form fields structure as your create page */}
           {({
             values,
             errors,
@@ -189,7 +170,6 @@ const AddressEditor = () => {
           }) => (
             <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
-                {/* Name field */}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -203,7 +183,6 @@ const AddressEditor = () => {
                   />
                 </Grid>
 
-                {/* Phone field */}
                 <Grid item xs={12}>
                   <TextField
                     fullWidth
@@ -217,7 +196,6 @@ const AddressEditor = () => {
                   />
                 </Grid>
 
-                {/* Province field */}
                 <Grid item xs={12}>
                   <TextField
                     select
@@ -246,7 +224,6 @@ const AddressEditor = () => {
                   </TextField>
                 </Grid>
 
-                {/* District field */}
                 <Grid item xs={12}>
                   <TextField
                     select
@@ -275,7 +252,6 @@ const AddressEditor = () => {
                   </TextField>
                 </Grid>
 
-                {/* Ward field */}
                 <Grid item xs={12}>
                   <TextField
                     select
@@ -297,7 +273,6 @@ const AddressEditor = () => {
                   </TextField>
                 </Grid>
 
-                {/* Default address checkbox */}
                 <Grid item xs={12}>
                   <FormControlLabel
                     control={
@@ -311,7 +286,6 @@ const AddressEditor = () => {
                   />
                 </Grid>
 
-                {/* Submit button */}
                 <Grid item xs={12}>
                   <Button
                     type="submit"
@@ -320,7 +294,7 @@ const AddressEditor = () => {
                     startIcon={<Save />}
                     sx={{ mt: 2 }}
                   >
-                    Lưu thay đổi
+                    Lưu địa chỉ
                   </Button>
                 </Grid>
               </Grid>
@@ -332,4 +306,4 @@ const AddressEditor = () => {
   );
 };
 
-export default AddressEditor;
+export default CreateAddress;

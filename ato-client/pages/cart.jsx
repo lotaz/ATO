@@ -23,8 +23,9 @@ import { get, post } from "helpers/axios-helper";
 import { currency } from "lib";
 import { useRouter } from "next/router";
 import CheckoutForm from "pages-sections/checkout/CheckoutForm";
-import { useEffect, useState } from "react";
+import { useEffect, useLayoutEffect, useState } from "react";
 import paymentService from "services/payment.service";
+import { enqueueSnackbar } from "notistack";
 
 const Cart = () => {
   const { state } = useAppContext();
@@ -33,7 +34,12 @@ const Cart = () => {
   const [selectedProducts, setSelectedProducts] = useState({});
   const [selectAll, setSelectAll] = useState(false);
 
-  console.log("cartList", cartList);
+  useLayoutEffect(() => {
+    const token = localStorage.getItem("jwt_token");
+    if (!token) {
+      router.push("/login");
+    }
+  }, [router]);
 
   const calculateShippingFee = async (address) => {
     if (!address) return;
@@ -157,12 +163,13 @@ const Cart = () => {
   const [addresses, setAddresses] = useState([]);
   const [shippingFee, setShippingFee] = useState(0);
   const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [ids, setIds] = useState([]);
 
   // Fetch addresses on component mount
   useEffect(() => {
     const fetchAddresses = async () => {
       try {
-        const response = await get("tourist/shipp-address/list-ship-addresses");
+        const response = await get("tourist/address");
         setAddresses(response.data || []);
       } catch (error) {
         console.error("Failed to fetch addresses:", error);
@@ -219,22 +226,45 @@ const Cart = () => {
         TotalAmount: getTotalPrice(),
       };
 
-      console.log("orderRequest", orderRequest);
-
       const response = await paymentService.createOrder(orderRequest);
+      router.push(response);
 
-      if (response?.status === true) {
-        sessionStorage.removeItem("cart");
-        router.push("/payment-result?vnp_ResponseCode=00");
-      } else if (response) {
-        sessionStorage.removeItem("cart");
-        router.push(response);
+      if (response?.status === 200) {
+        orderDetails.forEach((orderDetail) => {
+          console.log("orderDetail", orderDetail);
+          dispatch({
+            type: "CHANGE_CART_AMOUNT",
+            payload: {
+              id: orderDetail.ProductId,
+              qty: 0,
+            },
+          }); // SHOW ALERT PRODUCT ADDED OR REMOVE
+        });
       }
     } catch (error) {
       console.error("Order creation failed:", error);
       alert("Đặt hàng thất bại. Vui lòng thử lại sau.");
     }
   };
+
+  useEffect(() => {
+    const orderDetails = [];
+    Object.entries(groupedProducts).forEach(([facilityId, group]) => {
+      group.products.forEach((item) => {
+        if (selectedProducts[facilityId]?.products?.[item.id]) {
+          orderDetails.push({
+            ProductId: item.id,
+            Quantity: item.qty,
+            UnitPrice: item.price,
+            FacilityId: facilityId,
+          });
+        }
+      });
+    });
+    const ids = orderDetails.map((orderDetail) => orderDetail.ProductId);
+
+    sessionStorage.setItem("ids", JSON.stringify(ids));
+  }, [groupedProducts]);
 
   return (
     <CheckoutNavLayout>
@@ -600,8 +630,6 @@ const CartProductCard = ({
   const { dispatch } = useAppContext();
 
   const handleCartAmountChange = (amount) => () => {
-    console.log("product", id);
-
     dispatch({
       type: "CHANGE_CART_AMOUNT",
       payload: {

@@ -76,7 +76,6 @@ export const getStaticProps = async () => {
   const mainCarouselData = await api.getMainCarousel();
   const categories = await api.getCategories();
 
-  console.log("categories", categories);
   const testimonials = await api.getTestimonials();
   const brands = await api.getBrands();
   const blogs = await api.getBlogs();

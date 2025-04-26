@@ -31,7 +31,9 @@ const PaymentResult = () => {
       if (isSuccess) {
         enqueueSnackbar("Đặt hàng thành công", { variant: "success" });
         // Clear cart and shipping info after successful payment
-        sessionStorage.removeItem("cart");
+        dispatch({
+          type: "RESET_CART",
+        });
       }
     }
   }, [router.query, dispatch]);
