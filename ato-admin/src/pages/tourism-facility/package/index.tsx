@@ -1,28 +1,16 @@
+import { EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
+import { Button, Card, Chip, IconButton, Stack, Typography } from '@mui/material';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import {
-  Button,
-  Card,
-  Chip,
-  IconButton,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography
-} from '@mui/material';
-import { EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
 import { NoDataDisplay } from '../../../components/no-data/NoDataDisplay';
 import AppSearchBar from '../../../components/table/SearchBar';
-import dayjs from 'dayjs';
-import { StatusApproval, StatusOperating, TimeType, TourismPackageResponse } from '../../../types/tourism-facility/package.types';
+import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls';
 import { packageService } from '../../../services/tourism-facility/package.service';
+import { StatusApproval, StatusOperating, TimeType, TourismPackageResponse } from '../../../types/tourism-facility/package.types';
+
+import { CalendarOutlined, ClockCircleOutlined, DollarOutlined } from '@ant-design/icons';
+import { Box, CardContent, CardMedia, Grid, Pagination } from '@mui/material';
 
 const getDurationType = (type: TimeType) => {
   const types = {
@@ -90,15 +78,6 @@ const PackageList = () => {
     }
   };
 
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
   const filteredPackages = packages.filter(
     (pkg) =>
       pkg.packageName.toLowerCase().includes(searchText.toLowerCase()) ||
@@ -112,7 +91,7 @@ const PackageList = () => {
   }
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
         <AppSearchBar placeholder="Tìm kiếm gói du lịch" onChange={(e) => setSearchText(e.target.value)} />
         <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => navigate(TOURISM_FACILITY_URLs.PACKAGE.CREATE)}>
@@ -120,80 +99,135 @@ const PackageList = () => {
         </Button>
       </Stack>
 
-      <Card>
-        {currentPackages.length > 0 ? (
-          <TableContainer component={Paper}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tên gói</TableCell>
-                  <TableCell>Giá</TableCell>
-                  <TableCell>Thời gian</TableCell>
-                  <TableCell>Trạng thái duyệt</TableCell>
-                  <TableCell>Trạng thái hoạt động</TableCell>
-                  <TableCell>Ngày tạo</TableCell>
-                  <TableCell align="right">Hành động</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {currentPackages?.map((pkg) => (
-                  <TableRow key={pkg.packageId}>
-                    <TableCell>
-                      <Typography sx={{ maxWidth: 300, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {pkg.packageName}
-                      </Typography>
-                    </TableCell>
-                    <TableCell>{pkg.price.toLocaleString('vi-VN')} VNĐ</TableCell>
-                    <TableCell>
-                      {pkg.durations} {getDurationType(pkg.durationsType)}
-                    </TableCell>
-                    <TableCell>
-                      <Chip label={getStatusApprovalLabel(pkg.statusApproval)} size="small" color={getStatusColor(pkg.statusApproval)} />
-                    </TableCell>
-                    <TableCell>
-                      <Chip
-                        label={getOperatingStatusLabel(pkg.statusOperating)}
-                        size="small"
-                        color={getOperatingStatusColor(pkg.statusOperating)}
-                      />
-                    </TableCell>
-                    <TableCell>{dayjs(pkg.createDate).format('DD/MM/YYYY')}</TableCell>
-                    <TableCell align="right">
-                      <Stack direction="row" spacing={1} justifyContent="flex-end">
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PACKAGE.DETAILS.replace(':id', pkg?.packageId.toString())}`)}
-                        >
-                          <EyeOutlined />
-                        </IconButton>
-                        <IconButton
-                          size="small"
-                          onClick={() => navigate(`${TOURISM_FACILITY_URLs.PACKAGE.UPDATE.replace(':id', pkg?.packageId.toString())}`)}
-                        >
-                          <EditOutlined />
-                        </IconButton>
+      {isLoading ? (
+        <Typography>Đang tải...</Typography>
+      ) : currentPackages.length > 0 ? (
+        <>
+          <Grid container spacing={0}>
+            {currentPackages.map((pkg) => (
+              <Grid sx={{ paddingRight: 2, paddingBottom: 2 }} item xs={12} sm={6} md={3} key={pkg.packageId}>
+                <Card
+                  sx={{
+                    height: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    '&:hover': {
+                      boxShadow: 6,
+                      transition: 'all 0.3s ease-in-out',
+                      transform: 'translateY(-4px)'
+                    }
+                  }}
+                >
+                  <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      noWrap
+                      title={pkg.packageName}
+                      sx={{
+                        borderBottom: '2px solid',
+                        borderColor: 'primary.main',
+                        pb: 1,
+                        mb: 2
+                      }}
+                    >
+                      {pkg.packageName}
+                    </Typography>
+
+                    <Stack spacing={2} sx={{ flex: 1 }}>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <DollarOutlined style={{ color: '#666' }} />
+                        <Typography>{pkg.price.toLocaleString('vi-VN')} VNĐ</Typography>
                       </Stack>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-            <TablePagination
-              rowsPerPageOptions={[10, 25, 100]}
-              component="div"
-              count={filteredPackages.length}
-              rowsPerPage={rowsPerPage}
-              page={page}
-              onPageChange={handleChangePage}
-              onRowsPerPageChange={handleChangeRowsPerPage}
-              labelRowsPerPage="Số hàng mỗi trang:"
-              labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
+
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <ClockCircleOutlined style={{ color: '#666' }} />
+                        <Typography>
+                          {pkg.durations} {getDurationType(pkg.durationsType)}
+                        </Typography>
+                      </Stack>
+
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <CalendarOutlined style={{ color: '#666' }} />
+                        <Typography>{dayjs(pkg.createDate).format('DD/MM/YYYY')}</Typography>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1}>
+                        <Chip label={getStatusApprovalLabel(pkg.statusApproval)} size="small" color={getStatusColor(pkg.statusApproval)} />
+                        <Chip
+                          label={getOperatingStatusLabel(pkg.statusOperating)}
+                          size="small"
+                          color={getOperatingStatusColor(pkg.statusOperating)}
+                        />
+                      </Stack>
+
+                      {pkg.description && (
+                        <Typography
+                          variant="body2"
+                          color="text.secondary"
+                          sx={{
+                            overflow: 'hidden',
+                            textOverflow: 'ellipsis',
+                            display: '-webkit-box',
+                            WebkitLineClamp: 2,
+                            WebkitBoxOrient: 'vertical'
+                          }}
+                        >
+                          {pkg.description}
+                        </Typography>
+                      )}
+                    </Stack>
+
+                    <Stack
+                      direction="row"
+                      spacing={1}
+                      justifyContent="flex-end"
+                      sx={{
+                        mt: 2,
+                        pt: 2,
+                        borderTop: '1px solid',
+                        borderColor: 'divider'
+                      }}
+                    >
+                      <IconButton
+                        size="small"
+                        onClick={() => navigate(`${TOURISM_FACILITY_URLs.PACKAGE.DETAILS.replace(':id', pkg.packageId.toString())}`)}
+                        sx={{
+                          color: 'info.main',
+                          '&:hover': { bgcolor: 'info.lighter' }
+                        }}
+                      >
+                        <EyeOutlined />
+                      </IconButton>
+                      <IconButton
+                        size="small"
+                        onClick={() => navigate(`${TOURISM_FACILITY_URLs.PACKAGE.UPDATE.replace(':id', pkg.packageId.toString())}`)}
+                        sx={{
+                          color: 'warning.main',
+                          '&:hover': { bgcolor: 'warning.lighter' }
+                        }}
+                      >
+                        <EditOutlined />
+                      </IconButton>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box display="flex" justifyContent="center">
+            <Pagination
+              count={Math.ceil(filteredPackages.length / rowsPerPage)}
+              page={page + 1}
+              onChange={(_, newPage) => setPage(newPage - 1)}
+              color="primary"
             />
-          </TableContainer>
-        ) : (
-          <NoDataDisplay />
-        )}
-      </Card>
+          </Box>
+        </>
+      ) : (
+        <NoDataDisplay />
+      )}
     </Stack>
   );
 };

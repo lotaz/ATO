@@ -1,20 +1,6 @@
-import { EditOutlined, EyeOutlined, PlusOutlined } from '@ant-design/icons';
-import {
-  Button,
-  Card,
-  Chip,
-  IconButton,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography
-} from '@mui/material';
+import { EditOutlined, EyeOutlined, PlusOutlined, ShopOutlined, HomeOutlined, NumberOutlined } from '@ant-design/icons';
+// Add CardMedia to imports
+import { Box, Button, Card, CardContent, CardMedia, Chip, Grid, IconButton, Pagination, Stack, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
@@ -30,19 +16,9 @@ const ProductList = () => {
   const navigate = useNavigate();
   const { products } = useSelector((state: RootState) => state.productSlice);
   const [searchText, setSearchText] = useState('');
-  const [page, setPage] = useState(0); // MUI pagination starts from 0
-  const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [page, setPage] = useState(1); // Starting from 1 for better UX
+  const [rowsPerPage] = useState(12); // Adjusted for grid layout
 
-  const handleChangePage = (_: unknown, newPage: number) => {
-    setPage(newPage);
-  };
-
-  const handleChangeRowsPerPage = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setRowsPerPage(+event.target.value);
-    setPage(0);
-  };
-
-  // Filter products based on search text
   const filteredProducts =
     products?.filter(
       (product) =>
@@ -51,15 +27,15 @@ const ProductList = () => {
         product.origin.toLowerCase().includes(searchText.toLowerCase())
     ) || [];
 
-  // Get current page products
-  const currentProducts = filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const currentProducts = filteredProducts.slice((page - 1) * rowsPerPage, page * rowsPerPage);
+  const pageCount = Math.ceil(filteredProducts.length / rowsPerPage);
 
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={2}>
         <AppSearchBar placeholder="Tìm kiếm sản phẩm" onChange={(e) => setSearchText(e.target.value)} />
         <Button variant="contained" startIcon={<PlusOutlined />} onClick={() => navigate(TOURISM_FACILITY_URLs.PRODUCT.CREATE)}>
@@ -67,98 +43,176 @@ const ProductList = () => {
         </Button>
       </Stack>
 
-      <Card>
-        {products && products.length > 0 ? (
-          <>
-            {currentProducts.length > 0 ? (
-              <TableContainer component={Paper}>
-                <Table>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell width={500}>Tên sản phẩm</TableCell>
-                      <TableCell>Nhà sản xuất</TableCell>
-                      <TableCell>Nguồn gốc</TableCell>
-                      <TableCell>Số lượng</TableCell>
-                      <TableCell>Danh mục</TableCell>
-                      <TableCell align="right">Hành động</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {currentProducts?.map((product) => (
-                      <TableRow key={product.productId}>
-                        <TableCell>
-                          <Typography
-                            sx={{
-                              maxWidth: 500,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {product.productName}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>
-                          <Typography
-                            sx={{
-                              maxWidth: 150,
-                              overflow: 'hidden',
-                              textOverflow: 'ellipsis',
-                              whiteSpace: 'nowrap'
-                            }}
-                          >
-                            {product.manufacturer}
-                          </Typography>
-                        </TableCell>
-                        <TableCell>{product.origin}</TableCell>
-                        <TableCell>{product.unitProduct}</TableCell>
-                        <TableCell>
-                          <Chip label={ProductCategoryLabels[product.productCategory as ProductCategory]} color="primary" size="small" />
-                        </TableCell>
-                        <TableCell align="right">
-                          <Stack direction="row" spacing={1} justifyContent="flex-end">
-                            <IconButton
-                              size="small"
-                              onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${product.productId}`)}
-                            >
-                              <EyeOutlined />
-                            </IconButton>
-                            <IconButton
-                              size="small"
-                              onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?productId=${product.productId}`)}
-                            >
-                              <EditOutlined />
-                            </IconButton>
+      {products && products.length > 0 ? (
+        <>
+          {currentProducts.length > 0 ? (
+            <>
+              <Grid container spacing={0}>
+                {currentProducts.map((product) => (
+                  <Grid sx={{ paddingRight: 2, paddingBottom: 2 }} item xs={12} sm={6} md={4} lg={3} key={product.productId}>
+                    <Card
+                      sx={{
+                        height: '100%',
+                        display: 'flex',
+                        flexDirection: 'column',
+                        '&:hover': {
+                          boxShadow: 6,
+                          transition: 'all 0.3s ease-in-out',
+                          transform: 'translateY(-4px)'
+                        },
+                        position: 'relative',
+                        overflow: 'visible'
+                      }}
+                    >
+                      <CardMedia
+                        component="img"
+                        height="200"
+                        image={product.imgs?.[0] || '/default-product.png'} // Make sure to add a default product image
+                        alt={product.productName}
+                        sx={{
+                          objectFit: 'cover',
+                          borderBottom: '1px solid',
+                          borderColor: 'divider'
+                        }}
+                      />
+
+                      <Box
+                        sx={{
+                          position: 'absolute',
+                          top: 12,
+                          right: 12,
+                          bgcolor: 'rgba(0, 0, 0, 0.6)',
+                          color: 'white',
+                          borderRadius: '4px',
+                          px: 1,
+                          py: 0.5,
+                          fontSize: '0.75rem',
+                          fontWeight: 'bold'
+                        }}
+                      >
+                        ID: {product.productId.slice(-3)}
+                      </Box>
+
+                      <CardContent sx={{ flex: 1, display: 'flex', flexDirection: 'column', pt: 2 }}>
+                        <Typography
+                          variant="h6"
+                          gutterBottom
+                          noWrap
+                          title={product.productName}
+                          sx={{
+                            borderBottom: '2px solid',
+                            borderColor: 'primary.main',
+                            pb: 1,
+                            mb: 2
+                          }}
+                        >
+                          {product.productName}
+                        </Typography>
+
+                        <Stack spacing={2} sx={{ flex: 1 }}>
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <ShopOutlined style={{ color: '#666' }} />
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                Nhà sản xuất
+                              </Typography>
+                              <Typography variant="body1" noWrap title={product.manufacturer}>
+                                {product.manufacturer}
+                              </Typography>
+                            </Box>
                           </Stack>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-                <TablePagination
-                  rowsPerPageOptions={[10, 25, 100]}
-                  component="div"
-                  count={filteredProducts.length}
-                  rowsPerPage={rowsPerPage}
-                  page={page}
-                  onPageChange={handleChangePage}
-                  onRowsPerPageChange={handleChangeRowsPerPage}
-                  labelRowsPerPage="Số hàng mỗi trang:"
-                  labelDisplayedRows={({ from, to, count }) => `${from}-${to} trên ${count}`}
-                />
-              </TableContainer>
-            ) : (
-              <Stack alignItems="center" justifyContent="center" py={3}>
-                <Typography variant="body1" color="text.secondary">
-                  Không tìm thấy sản phẩm phù hợp với từ khóa tìm kiếm
-                </Typography>
-              </Stack>
-            )}
-          </>
-        ) : (
-          <NoDataDisplay />
-        )}
-      </Card>
+
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <HomeOutlined style={{ color: '#666' }} />
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                Nguồn gốc
+                              </Typography>
+                              <Typography variant="body1" noWrap>
+                                {product.origin}
+                              </Typography>
+                            </Box>
+                          </Stack>
+
+                          <Stack direction="row" alignItems="center" spacing={1}>
+                            <NumberOutlined style={{ color: '#666' }} />
+                            <Box>
+                              <Typography variant="body2" color="text.secondary">
+                                Số lượng
+                              </Typography>
+                              <Typography variant="body1">{product.unitProduct}</Typography>
+                            </Box>
+                          </Stack>
+
+                          <Box sx={{ mt: 'auto' }}>
+                            <Chip
+                              label={ProductCategoryLabels[product.productCategory as ProductCategory]}
+                              color="primary"
+                              size="small"
+                              sx={{
+                                alignSelf: 'flex-start',
+                                bgcolor: 'primary.light',
+                                '& .MuiChip-label': {
+                                  fontWeight: 500
+                                }
+                              }}
+                            />
+                          </Box>
+                        </Stack>
+
+                        <Stack
+                          direction="row"
+                          spacing={1}
+                          justifyContent="flex-end"
+                          sx={{
+                            mt: 2,
+                            pt: 2,
+                            borderTop: '1px solid',
+                            borderColor: 'divider'
+                          }}
+                        >
+                          <IconButton
+                            size="small"
+                            onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${product.productId}`)}
+                            sx={{
+                              color: 'info.main',
+                              '&:hover': { bgcolor: 'info.lighter' }
+                            }}
+                          >
+                            <EyeOutlined />
+                          </IconButton>
+                          <IconButton
+                            size="small"
+                            onClick={() => navigate(`${TOURISM_FACILITY_URLs.PRODUCT.UPDATE}?productId=${product.productId}`)}
+                            sx={{
+                              color: 'warning.main',
+                              '&:hover': { bgcolor: 'warning.lighter' }
+                            }}
+                          >
+                            <EditOutlined />
+                          </IconButton>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+
+              <Box display="flex" justifyContent="center">
+                <Pagination count={pageCount} page={page} onChange={(_, newPage) => setPage(newPage)} color="primary" />
+              </Box>
+            </>
+          ) : (
+            <Stack alignItems="center" justifyContent="center" py={3}>
+              <Typography variant="body1" color="text.secondary">
+                Không tìm thấy sản phẩm phù hợp với từ khóa tìm kiếm
+              </Typography>
+            </Stack>
+          )}
+        </>
+      ) : (
+        <NoDataDisplay />
+      )}
     </Stack>
   );
 };
