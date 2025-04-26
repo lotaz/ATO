@@ -1,29 +1,13 @@
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  Chip,
-  Paper,
-  Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TablePagination,
-  TableRow,
-  Typography
-} from '@mui/material';
-import { useState, useEffect } from 'react';
+import { CalendarOutlined, DollarOutlined, EyeOutlined, ShopOutlined } from '@ant-design/icons';
+import { Box, Card, CardContent, Chip, Grid, IconButton, MenuItem, Pagination, Select, Stack, Typography } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ProductDTO_CM } from '../../../types/content-moderator/product.types';
-import { productService } from '../../../services/content-moderator/product.service';
-import { StatusApproval } from '../../../types/content-moderator/certification.types';
-import { ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 import AppSearchBar from '../../../components/table/SearchBar';
 import { CONTENT_MODERATOR_URLs } from '../../../constants/content-moderator-urls';
-import { MenuItem, Select } from '@mui/material';
+import { productService } from '../../../services/content-moderator/product.service';
+import { StatusApproval } from '../../../types/content-moderator/certification.types';
+import { ProductDTO_CM } from '../../../types/content-moderator/product.types';
+import { ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
 
 const ProductList = () => {
   const [products, setProducts] = useState<ProductDTO_CM[]>([]);
@@ -98,7 +82,7 @@ const ProductList = () => {
   if (error) return <div>{error}</div>;
 
   return (
-    <Stack spacing={2}>
+    <Stack spacing={3}>
       <Stack direction="row" gap={4} alignItems="center" mb={2}>
         <AppSearchBar
           value={searchText}
@@ -116,62 +100,69 @@ const ProductList = () => {
       </Stack>
 
       {filteredProducts.length > 0 ? (
-        <Paper sx={{ width: '100%', overflow: 'hidden' }}>
-          <TableContainer>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Tên sản phẩm</TableCell>
-                  <TableCell>Danh mục</TableCell>
-                  <TableCell>Cơ sở</TableCell>
-                  <TableCell>Giá</TableCell>
-                  <TableCell>Trạng thái</TableCell>
-                  <TableCell>Ngày tạo</TableCell>
-                  <TableCell>Thao tác</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
-                  <TableRow key={product.productId}>
-                    <TableCell>{product.productName}</TableCell>
-                    <TableCell>{ProductCategoryLabels[product.productCategory]}</TableCell>
-                    <TableCell>{product.touristFacility?.touristFacilityName || '-'}</TableCell>
-                    <TableCell>{product.price ? `${product.price.toFixed(2)} VND` : '-'}</TableCell>
-                    <TableCell>
-                      <Chip label={getStatusLabel(product.statusApproval)} color={getStatusColor(product.statusApproval)} />
-                    </TableCell>
-                    <TableCell>{new Date(product.createDate).toLocaleDateString()}</TableCell>
-                    <TableCell>
-                      <Button
-                        variant="contained"
-                        size="small"
-                        sx={{ width: '120px' }}
-                        onClick={() => navigate(CONTENT_MODERATOR_URLs.PRODUCT.DETAILS + '?id=' + product.productId)}
-                      >
-                        Xem chi tiết
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+        <>
+          <Grid container spacing={0}>
+            {filteredProducts.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((product) => (
+              <Grid item xs={12} sm={6} md={4} key={product.productId} sx={{ paddingRight: 2, paddingBottom: 2 }}>
+                <Card variant="outlined" sx={{ height: '100%' }}>
+                  <CardContent>
+                    <Stack spacing={2}>
+                      <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                        <Typography variant="h6" noWrap sx={{ maxWidth: '70%' }}>
+                          {product.productName}
+                        </Typography>
+                        <IconButton
+                          size="small"
+                          color="primary"
+                          onClick={() => navigate(CONTENT_MODERATOR_URLs.PRODUCT.DETAILS + '?id=' + product.productId)}
+                        >
+                          <EyeOutlined />
+                        </IconButton>
+                      </Stack>
 
-          <TablePagination
-            rowsPerPageOptions={[5, 10, 25]}
-            component="div"
-            count={filteredProducts.length}
-            rowsPerPage={rowsPerPage}
-            page={page}
-            onPageChange={(_, newPage) => setPage(newPage)}
-            onRowsPerPageChange={(e) => {
-              setRowsPerPage(parseInt(e.target.value, 10));
-              setPage(0);
-            }}
-          />
-        </Paper>
+                      <Stack direction="row" alignItems="center" spacing={1}>
+                        <ShopOutlined />
+                        <Typography variant="body2" color="text.secondary" noWrap>
+                          {product.touristFacility?.touristFacilityName || '-'}
+                        </Typography>
+                      </Stack>
+
+                      <Stack spacing={1}>
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <DollarOutlined />
+                          <Typography variant="body2">{product.price ? `${product.price.toLocaleString()} VND` : '-'}</Typography>
+                        </Stack>
+
+                        <Stack direction="row" alignItems="center" spacing={1}>
+                          <CalendarOutlined />
+                          <Typography variant="body2">{new Date(product.createDate).toLocaleDateString('vi-VN')}</Typography>
+                        </Stack>
+                      </Stack>
+
+                      <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                        <Chip label={ProductCategoryLabels[product.productCategory]} size="small" variant="outlined" />
+                        <Chip label={getStatusLabel(product.statusApproval)} color={getStatusColor(product.statusApproval)} size="small" />
+                      </Stack>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+            ))}
+          </Grid>
+
+          <Box display="flex" justifyContent="center">
+            <Pagination
+              count={Math.ceil(filteredProducts.length / rowsPerPage)}
+              page={page + 1}
+              onChange={(_, newPage) => setPage(newPage - 1)}
+              color="primary"
+            />
+          </Box>
+        </>
       ) : (
-        <Box mt={4}>Không tìm thấy sản phẩm cần duyệt</Box>
+        <Box mt={4}>
+          <Typography>Không tìm thấy sản phẩm cần duyệt</Typography>
+        </Box>
       )}
     </Stack>
   );
