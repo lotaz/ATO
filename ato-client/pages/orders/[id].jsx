@@ -2,9 +2,11 @@ import { Done, ShoppingBag } from "@mui/icons-material";
 import {
   Avatar,
   Box,
+  Button,
   Card,
   Chip,
   Grid,
+  Modal,
   Typography,
   styled,
 } from "@mui/material";
@@ -17,14 +19,14 @@ import PackageBox from "components/icons/PackageBox";
 import TruckFilled from "components/icons/TruckFilled";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
+import { PaymentStatus, StatusOrder } from "constants/order-enums";
 import { format } from "date-fns";
 import useWindowSize from "hooks/useWindowSize";
 import { currency } from "lib";
 import { useRouter } from "next/router";
+import { enqueueSnackbar } from "notistack";
 import { Fragment } from "react";
 import api from "utils/__api__/orders"; // styled components
-import { StatusOrder } from "constants/order-enums";
-import { PaymentStatus, StatusBooking } from "constants/order-enums";
 
 const StyledFlexbox = styled(FlexBetween)(({ theme }) => ({
   flexWrap: "wrap",
@@ -58,6 +60,8 @@ const OrderDetails = () => {
   const { id } = router.query;
   const [order, setOrder] = useState(null);
   const [isRefunding, setIsRefunding] = useState(false);
+  const [isCompleting, setIsCompleting] = useState(false);
+  const [showCompleteModal, setShowCompleteModal] = useState(false);
   const width = useWindowSize();
   const breakpoint = 350;
   const stepIconList = [PackageBox, TruckFilled, Delivery];
@@ -72,7 +76,7 @@ const OrderDetails = () => {
       const response = await api.getOrder(id);
       const formattedOrder = api.formatOrderData(response);
       setOrder(formattedOrder);
-      alert("Hủy đơn hàng thành công");
+      enqueueSnackbar("Hủy đơn hàng thành công", { variant: "success" });
     } catch (error) {
       console.error("Failed to refund order:", error);
       alert("Không thể hủy đơn hàng. Vui lòng thử lại sau.");
@@ -101,12 +105,32 @@ const OrderDetails = () => {
     switch (status) {
       case StatusOrder.Processing:
         return 0;
-      case StatusOrder.Shipped:
+      case StatusOrder.AcceptOrder:
         return 1;
       case StatusOrder.RejecOrder:
         return 2;
+      case StatusOrder.Completed:
+        return 3;
       default:
         return -1;
+    }
+  };
+  const handleCompleteOrder = async () => {
+    setIsCompleting(true);
+    try {
+      await post(`/tourist/order/complete/${id}`);
+      const response = await api.getOrder(id);
+      const formattedOrder = api.formatOrderData(response);
+      setOrder(formattedOrder);
+      setShowCompleteModal(false);
+      enqueueSnackbar("Xác nhận nhận hàng thành công", { variant: "success" });
+    } catch (error) {
+      console.error("Failed to complete order:", error);
+      enqueueSnackbar("Không thể xác nhận nhận hàng. Vui lòng thử lại sau.", {
+        variant: "error",
+      });
+    } finally {
+      setIsCompleting(false);
     }
   };
 
@@ -208,9 +232,9 @@ const OrderDetails = () => {
               label={
                 order.status === StatusOrder.Processing
                   ? "Đang xử lý"
-                  : order.status === StatusOrder.Shipped
+                  : order.status === StatusOrder.AcceptOrder
                   ? "Đang giao hàng"
-                  : order.status === StatusOrder.Completed
+                  : order.status === StatusOrder.RejecOrder
                   ? "Đã hủy"
                   : "Hoàn thành"
               }
@@ -253,7 +277,7 @@ const OrderDetails = () => {
       {/* SHIPPING AND ORDER SUMMERY */}
       <Grid container spacing={3}>
         <Grid item lg={6} md={6} xs={12}>
-          <Card sx={{ p: "20px 30px" }}>
+          <Card sx={{ p: "20px 30px", height: 190 }}>
             <H5 mt={0} mb={2}>
               Thông tin thanh toán
             </H5>
@@ -304,12 +328,83 @@ const OrderDetails = () => {
               Tổng thanh toán
             </H5>
             <FlexBetween mb={2}>
+              <H6 my="0px">Tổng tiền sản phẩm</H6>
+              <H6 my="0px">
+                {currency(
+                  order.items.reduce(
+                    (total, item) => total + item.price * item.quantity,
+                    0
+                  )
+                )}
+              </H6>
+            </FlexBetween>
+            <FlexBetween mb={2}>
+              <H6 my="0px">Phí giao hàng</H6>
+              <H6 my="0px">{currency(21001)}</H6>
+            </FlexBetween>
+            <FlexBetween mb={2}>
               <H6 my="0px">Tổng tiền</H6>
               <H6 my="0px">{currency(order.totalAmount)}</H6>
             </FlexBetween>
           </Card>
         </Grid>
       </Grid>
+
+      <Modal
+        open={showCompleteModal}
+        onClose={() => setShowCompleteModal(false)}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: 400,
+            bgcolor: "background.paper",
+            boxShadow: 24,
+            p: 4,
+            borderRadius: 2,
+          }}
+        >
+          <Typography variant="h6" gutterBottom>
+            Xác nhận nhận hàng
+          </Typography>
+          <Typography sx={{ mb: 3 }}>
+            Bạn có chắc chắn đã nhận được hàng?
+          </Typography>
+          <Box sx={{ display: "flex", justifyContent: "flex-end", gap: 2 }}>
+            <Button
+              variant="outlined"
+              onClick={() => setShowCompleteModal(false)}
+            >
+              Hủy
+            </Button>
+            <LoadingButton
+              variant="contained"
+              color="success"
+              loading={isCompleting}
+              onClick={handleCompleteOrder}
+            >
+              Xác nhận
+            </LoadingButton>
+          </Box>
+        </Box>
+      </Modal>
+
+      {/* Add Complete Order Button */}
+      {order?.status === StatusOrder.Shipped && (
+        <Box sx={{ mt: 3, textAlign: "center" }}>
+          <LoadingButton
+            variant="contained"
+            color="success"
+            onClick={() => setShowCompleteModal(true)}
+            sx={{ px: 6, color: "white" }}
+          >
+            Đã nhận được hàng
+          </LoadingButton>
+        </Box>
+      )}
     </CustomerDashboardLayout>
   );
 };

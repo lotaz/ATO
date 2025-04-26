@@ -70,6 +70,7 @@ const ProductDetails = () => {
   if (!product) return <div>Product not found</div>;
   const cartItem = state.cart.find((item) => item.slug === id);
 
+  console.log("product", product);
   const handleCartAmountChange = (amount, type) => () => {
     dispatch({
       type: "CHANGE_CART_AMOUNT",
@@ -77,9 +78,10 @@ const ProductDetails = () => {
         price: product.price,
         imgUrl: product.imgs[0],
         id,
-        name: product.name,
+        name: product.productName,
         qty: amount,
         slug: id,
+        product,
       },
     }); // SHOW ALERT PRODUCT ADDED OR REMOVE
 
