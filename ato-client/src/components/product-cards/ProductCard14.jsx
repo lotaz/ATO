@@ -162,7 +162,7 @@ const ProductCard14 = (props) => {
         slug,
         product,
       },
-    }); // SHOW ALERT PRODUCT ADDED OR REMOVE
+    });
 
     if (type === "remove") {
       enqueueSnackbar("Xóa khỏi giỏ hàng", {
