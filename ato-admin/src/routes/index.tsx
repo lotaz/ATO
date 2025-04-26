@@ -11,6 +11,9 @@ import TourGuideRoutes from './tour-guide';
 import TourCompanyRoutes from './tourism-company';
 import TourFacilityoutes from './tourism-facility';
 import { TRoute } from './types';
+import ContractRoutes from './ContractRoutes';
+import BankAccountRoutes from './BankAccountRoutes';
+import WithdrawalRoutes from './WithdrawalRoutes';
 
 // ==============================|| ROUTING RENDER ||============================== //
 const Index = Loadable(lazy(() => import('../pages/index')));
@@ -27,7 +30,18 @@ const IndexRoutes: TRoute = {
 };
 
 const router = createBrowserRouter(
-  [IndexRoutes, AuthenRoutes, AdminRoutes, ContentModeratorRoutes, TourGuideRoutes, TourCompanyRoutes, TourFacilityoutes],
+  [
+    IndexRoutes,
+    AuthenRoutes,
+    AdminRoutes,
+    ContentModeratorRoutes,
+    TourGuideRoutes,
+    TourCompanyRoutes,
+    TourFacilityoutes,
+    ContractRoutes,
+    BankAccountRoutes,
+    WithdrawalRoutes
+  ],
   { basename: '/' }
 );
 

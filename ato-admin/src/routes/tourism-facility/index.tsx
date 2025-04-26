@@ -19,7 +19,6 @@ const TourFacilityoutes: TRoute = {
     ...tourismFacilityPackagesRoutes,
     ...tourismFacilityActivityRoutes,
     ...tourismFacilityOrderRoutes,
-    ...tourismFacilityContractRoutes,
     ...ocopSellRoutes,
     ...historyPaymentRoutes
   ]
