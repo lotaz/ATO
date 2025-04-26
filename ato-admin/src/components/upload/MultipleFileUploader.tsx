@@ -9,6 +9,7 @@ interface FileUploaderProps {
   onChange: (urls: string[]) => void;
   accept?: string;
   maxFiles?: number;
+  disabled?: boolean;
 }
 
 const UploadWrapper = styled(Paper)(({ theme }) => ({
@@ -23,7 +24,7 @@ const UploadWrapper = styled(Paper)(({ theme }) => ({
   }
 }));
 
-const ImagePreview = styled(Box)(({ theme }) => ({
+const ImagePreview = styled(Box)(({}) => ({
   position: 'relative',
   width: '150px',
   height: '150px',
@@ -39,7 +40,7 @@ const PreviewImage = styled('img')({
   borderRadius: '8px'
 });
 
-const DeleteOverlay = styled(Box)(({ theme }) => ({
+const DeleteOverlay = styled(Box)(({}) => ({
   position: 'absolute',
   top: 0,
   left: 0,
@@ -54,7 +55,7 @@ const DeleteOverlay = styled(Box)(({ theme }) => ({
   borderRadius: '8px'
 }));
 
-export const MultipleFileUploader = ({ values = [], onChange, accept = 'image/*', maxFiles = 5 }: FileUploaderProps) => {
+export const MultipleFileUploader = ({ values = [], onChange, accept = 'image/*', maxFiles = 5, disabled }: FileUploaderProps) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const uploadFile = async (file: File): Promise<string> => {
@@ -106,20 +107,22 @@ export const MultipleFileUploader = ({ values = [], onChange, accept = 'image/*'
             <Grid item key={index}>
               <ImagePreview>
                 <PreviewImage src={url} alt={`Preview ${index + 1}`} />
-                <DeleteOverlay className="delete-overlay">
-                  <Tooltip title="Xóa ảnh">
-                    <IconButton size="small" sx={{ color: 'red' }} onClick={() => handleRemoveImage(index)}>
-                      <DeleteOutlined />
-                    </IconButton>
-                  </Tooltip>
-                </DeleteOverlay>
+                {!disabled && (
+                  <DeleteOverlay className="delete-overlay">
+                    <Tooltip title="Xóa ảnh">
+                      <IconButton size="small" sx={{ color: 'red' }} onClick={() => handleRemoveImage(index)}>
+                        <DeleteOutlined />
+                      </IconButton>
+                    </Tooltip>
+                  </DeleteOverlay>
+                )}
               </ImagePreview>
             </Grid>
           ))}
         </Grid>
       )}
 
-      {values.length < maxFiles && (
+      {values.length < maxFiles && !disabled && (
         <UploadWrapper onClick={() => fileInputRef.current?.click()}>
           <Stack spacing={1} alignItems="center">
             <CameraOutlined color="primary" />

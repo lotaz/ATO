@@ -18,5 +18,9 @@ export const CONTENT_MODERATOR_URLs = {
   PRODUCT: {
     INDEX: `${CONTENT_MODERATOR_BASE_URL}/product`,
     DETAILS: `${CONTENT_MODERATOR_BASE_URL}/product/details`
+  },
+  PACKAGE: {
+    INDEX: `${CONTENT_MODERATOR_BASE_URL}/package`,
+    DETAILS: `${CONTENT_MODERATOR_BASE_URL}/package/details`
   }
 };

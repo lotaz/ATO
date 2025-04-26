@@ -1,7 +1,10 @@
 // assets
-import { BoxPlotOutlined, ProductOutlined, ShopOutlined } from '@ant-design/icons';
+import { BankOutlined, BookOutlined, BoxPlotOutlined, ProductOutlined, ShopOutlined } from '@ant-design/icons';
 import { TOURISM_FACILITY_URLs } from '../constants/tourism-facility-urls';
 import { TMenu } from './types';
+import { CONTRACT_BASE_URL } from '../constants/contract-urls';
+import { BANK_BASE_URL } from '../constants/bank-account-urls';
+import { WITHDRAWAL_BASE_URL } from '../constants/withdrawal-history-urls';
 
 const tourismFacilityMenu: TMenu = {
   id: 'pages',
@@ -57,6 +60,30 @@ const tourismFacilityMenu: TMenu = {
       type: 'item',
       url: TOURISM_FACILITY_URLs.HISTORY_PAYMENT_ORDER.INDEX,
       icon: ShopOutlined
+    },
+    {
+      id: 'contract',
+      title: 'Quản lý hợp đồng',
+      type: 'item',
+      url: CONTRACT_BASE_URL.replace(':entity', 'facility'),
+      icon: BookOutlined,
+      subItems: []
+    },
+    {
+      id: 'bank',
+      title: 'Quản lý tài khoản ngân hàng',
+      type: 'item',
+      url: BANK_BASE_URL,
+      icon: BankOutlined,
+      subItems: []
+    },
+    {
+      id: 'withdrawal-history',
+      title: 'Lịch sử giải ngân',
+      type: 'item',
+      url: WITHDRAWAL_BASE_URL,
+      icon: BankOutlined,
+      subItems: []
     }
   ]
 };
