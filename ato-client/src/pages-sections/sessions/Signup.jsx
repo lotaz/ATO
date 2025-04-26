@@ -1,24 +1,49 @@
-import { useCallback, useState } from "react";
-import { Button, Checkbox, Box, FormControlLabel } from "@mui/material";
-import Link from "next/link";
-import * as yup from "yup";
-import { useFormik } from "formik";
-import { FlexBox, FlexRowCenter } from "components/flex-box";
-import { H1, H6 } from "components/Typography";
+import { Box, Button, Checkbox, FormControlLabel } from "@mui/material";
 import BazaarImage from "components/BazaarImage";
 import BazaarTextField from "components/BazaarTextField";
-import { Wrapper } from "./Login";
-import SocialButtons from "./SocialButtons";
+import { FlexBox, FlexRowCenter } from "components/flex-box";
+import { H1, H6 } from "components/Typography";
+import { useFormik } from "formik";
+import { post } from "helpers/axios-helper";
+import Link from "next/link";
+import { useCallback, useState } from "react";
+import * as yup from "yup";
 import EyeToggleButton from "./EyeToggleButton";
+import { Wrapper } from "./Login";
+import { useSnackbar } from "notistack";
+import { useRouter } from "next/router";
 
 const Signup = () => {
+  const { enqueueSnackbar } = useSnackbar();
+  const router = useRouter();
+
   const [passwordVisibility, setPasswordVisibility] = useState(false);
   const togglePasswordVisibility = useCallback(() => {
     setPasswordVisibility((visible) => !visible);
   }, []);
 
   const handleFormSubmit = async (values) => {
-    console.log(values);
+    const signupData = {
+      userName: values.userName,
+      email: values.email,
+      phoneNumber: values.phoneNumber,
+      fullname: values.fullname,
+      gender: values.gender,
+      password: values.password,
+      dob: values.dob,
+      role: "3fa85f64-5717-4562-b3fc-2c963f66afa6", // Default role for tourist
+    };
+
+    const response = await post("auth/sign-up", signupData);
+    const data = response.data;
+    if (data.status === true) {
+      enqueueSnackbar(data.message, { variant: "success" });
+      router.push("/login");
+    } else {
+      enqueueSnackbar(data.message, {
+        variant: "error",
+      });
+    }
   };
 
   const { values, errors, touched, handleBlur, handleChange, handleSubmit } =
@@ -40,7 +65,6 @@ const Signup = () => {
             }}
           />
         </Link>
-
         <H1 textAlign="center" mt={2} mb={4} fontSize={20}>
           Đăng Ký Tài Khoản
         </H1>
@@ -48,18 +72,31 @@ const Signup = () => {
         <BazaarTextField
           mb={1.5}
           fullWidth
-          name="name"
+          name="userName"
+          size="small"
+          label="Tên đăng nhập"
+          variant="outlined"
+          onBlur={handleBlur}
+          value={values.userName}
+          onChange={handleChange}
+          placeholder="username"
+          error={!!touched.userName && !!errors.userName}
+          helperText={touched.userName && errors.userName}
+        />
+        <BazaarTextField
+          mb={1.5}
+          fullWidth
+          name="fullname"
           size="small"
           label="Họ và tên"
           variant="outlined"
           onBlur={handleBlur}
-          value={values.name}
+          value={values.fullname}
           onChange={handleChange}
           placeholder="Nguyễn Văn A"
-          error={!!touched.name && !!errors.name}
-          helperText={touched.name && errors.name}
+          error={!!touched.fullname && !!errors.fullname}
+          helperText={touched.fullname && errors.fullname}
         />
-
         <BazaarTextField
           mb={1.5}
           fullWidth
@@ -70,10 +107,24 @@ const Signup = () => {
           onBlur={handleBlur}
           value={values.email}
           onChange={handleChange}
-          label="Tên đăng nhập"
-          placeholder="Nhập tên đăng nhập của bạn"
+          label="Email"
+          placeholder="example@mail.com"
           error={!!touched.email && !!errors.email}
           helperText={touched.email && errors.email}
+        />
+        <BazaarTextField
+          mb={1.5}
+          fullWidth
+          name="phoneNumber"
+          size="small"
+          variant="outlined"
+          onBlur={handleBlur}
+          value={values.phoneNumber}
+          onChange={handleChange}
+          label="Số điện thoại"
+          placeholder="0123456789"
+          error={!!touched.phoneNumber && !!errors.phoneNumber}
+          helperText={touched.phoneNumber && errors.phoneNumber}
         />
 
         <BazaarTextField
@@ -100,7 +151,6 @@ const Signup = () => {
             ),
           }}
         />
-
         <BazaarTextField
           fullWidth
           size="small"
@@ -124,7 +174,6 @@ const Signup = () => {
             ),
           }}
         />
-
         <FormControlLabel
           name="agreement"
           className="agreement"
@@ -149,7 +198,6 @@ const Signup = () => {
             </FlexBox>
           }
         />
-
         <Button
           fullWidth
           type="submit"
@@ -178,27 +226,35 @@ const Signup = () => {
 };
 
 const initialValues = {
-  name: "",
+  userName: "",
   email: "",
+  phoneNumber: "",
+  fullname: "",
   password: "",
   re_password: "",
+  gender: true,
+  dob: new Date(),
   agreement: false,
 };
+
 const formSchema = yup.object().shape({
-  name: yup.string().required("Name is required"),
-  email: yup.string().email("invalid email").required("Email is required"),
-  password: yup.string().required("Password is required"),
+  userName: yup.string().required("Tên đăng nhập là bắt buộc"),
+  email: yup.string().email("Email không hợp lệ").required("Email là bắt buộc"),
+  phoneNumber: yup.string().required("Số điện thoại là bắt buộc"),
+  fullname: yup.string().required("Họ tên là bắt buộc"),
+  password: yup.string().required("Mật khẩu là bắt buộc"),
   re_password: yup
     .string()
-    .oneOf([yup.ref("password"), null], "Passwords must match")
-    .required("Please re-type password"),
+    .oneOf([yup.ref("password"), null], "Mật khẩu không khớp")
+    .required("Vui lòng nhập lại mật khẩu"),
   agreement: yup
     .bool()
     .test(
       "agreement",
-      "You have to agree with our Terms and Conditions!",
+      "Bạn phải đồng ý với điều khoản sử dụng!",
       (value) => value === true
     )
-    .required("You have to agree with our Terms and Conditions!"),
+    .required("Bạn phải đồng ý với điều khoản sử dụng!"),
 });
+
 export default Signup;

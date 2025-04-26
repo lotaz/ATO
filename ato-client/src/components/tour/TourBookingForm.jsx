@@ -13,13 +13,23 @@ import { useRouter } from "next/router";
 import { useSnackbar } from "notistack";
 import { useState } from "react";
 import tourBookingService from "services/tour-booking.service";
-const TourBookingForm = ({ tourId, priceOfAdults, priceOfChildren }) => {
+const TourBookingForm = ({
+  tourId,
+  priceOfAdults,
+  priceOfChildren,
+  slot,
+  people,
+}) => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
   const [numberOfAdults, setNumberOfAdults] = useState(1);
   const [numberOfChildren, setNumberOfChildren] = useState(0);
   const [paymentMethod, setPaymentMethod] = useState(PaymentType.Transfer);
   const [isLoading, setIsLoading] = useState(false);
+
+  const isStop = numberOfAdults + numberOfChildren >= slot;
+  console.log(isStop);
+  console.log(slot);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -79,7 +89,7 @@ const TourBookingForm = ({ tourId, priceOfAdults, priceOfChildren }) => {
       <Typography sx={{ mx: 2, minWidth: "30px", textAlign: "center" }}>
         {value}
       </Typography>
-      <IconButton size="small" onClick={onIncrease}>
+      <IconButton disabled={isStop} size="small" onClick={onIncrease}>
         <Add fontSize="small" />
       </IconButton>
     </Box>
@@ -156,7 +166,20 @@ const TourBookingForm = ({ tourId, priceOfAdults, priceOfChildren }) => {
         >
           Đặt tour
         </Typography>
-
+        <Typography
+          variant="subtitle1"
+          sx={{
+            color: "text.secondary",
+            bgcolor: "grey.100",
+            px: 2,
+            py: 1,
+            borderRadius: 2,
+            fontWeight: 500,
+          }}
+        >
+          Chỗ còn lại: {slot - people - (numberOfAdults + numberOfChildren)} /{" "}
+          {slot}
+        </Typography>
         <Box component="form" onSubmit={handleSubmit}>
           <Box sx={{ mb: 4 }}>
             {/* Người lớn selector */}

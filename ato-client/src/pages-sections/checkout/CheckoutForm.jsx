@@ -46,7 +46,8 @@ const CheckoutForm = ({
                         {address.defaultAddress && " (Mặc định)"}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {address.toWardName}, {address.toDistrictName}
+                        {address.toWardName}, {address.toDistrictName},{" "}
+                        {address.toProvinceName}
                       </Typography>
                     </Box>
                   }

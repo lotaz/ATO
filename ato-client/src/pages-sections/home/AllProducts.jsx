@@ -3,6 +3,7 @@ import { Paragraph } from "components/Typography";
 import { FlexRowCenter } from "components/flex-box";
 import ProductCard14 from "components/product-cards/ProductCard14";
 import CategorySectionCreator from "components/CategorySectionCreator";
+import { useRouter } from "next/router";
 // styled component
 const SubTitle = styled(Paragraph)(({ theme }) => ({
   fontSize: 12,
@@ -13,8 +14,13 @@ const SubTitle = styled(Paragraph)(({ theme }) => ({
 
 // ===========================================================
 const AllProducts = ({ products }) => {
+  const router = useRouter();
   return (
-    <CategorySectionCreator title="Tất cả sản phẩm" seeMoreLink="#" mb={0}>
+    <CategorySectionCreator
+      title="Tất cả sản phẩm"
+      seeMoreLink="/products"
+      mb={0}
+    >
       <SubTitle>
         Phát triển bền vững, bao trùm và đa giá trị. Nền tảng du lịch nông thôn
         kết hợp giới thiệu sản phẩm OCOP địa phương
@@ -37,7 +43,11 @@ const AllProducts = ({ products }) => {
       </Grid>
 
       <FlexRowCenter mt={6}>
-        <Button color="primary" variant="contained">
+        <Button
+          onClick={() => router.push("/products")}
+          color="primary"
+          variant="contained"
+        >
           Xem tất cả sản phẩm
         </Button>
       </FlexRowCenter>
