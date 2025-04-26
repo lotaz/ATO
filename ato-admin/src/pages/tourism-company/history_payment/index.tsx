@@ -1,6 +1,7 @@
 import { CloseOutlined } from '@ant-design/icons';
 import {
   Avatar,
+  Box,
   Card,
   CardContent,
   Chip,
@@ -32,7 +33,7 @@ enum TimeType {
   Day = 1
 }
 
-enum StatusActive {
+export enum StatusActive {
   Active = 1,
   Inactive = 0
 }
@@ -131,48 +132,66 @@ const TourPaymentHistory = () => {
 
   return (
     <Paper sx={{ p: 2 }}>
-      <Typography variant="h4" gutterBottom>
-        Lịch sử thanh toán
-      </Typography>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Mã giao dịch</TableCell>
-              <TableCell>Tên tour</TableCell>
-              <TableCell>Khách hàng</TableCell>
-              <TableCell>Email</TableCell>
-              <TableCell>Thời gian</TableCell>
-              <TableCell>Số tiền</TableCell>
-              <TableCell>Trạng thái</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {payments.map((payment) => (
-              <TableRow key={payment.responseId} hover onClick={() => handlePaymentClick(payment)} sx={{ cursor: 'pointer' }}>
-                <TableCell>{payment.txnRef}</TableCell>
-                <TableCell>{payment.bookingAgriculturalTour?.agriculturalTourPackage?.packageName || 'N/A'}</TableCell>
-                <TableCell>
-                  <Stack direction="row" spacing={2} alignItems="center">
-                    <Avatar src={payment.bookingAgriculturalTour?.customer?.avatarURL} />
-                    {payment.bookingAgriculturalTour?.customer?.fullname || 'N/A'}
-                  </Stack>
-                </TableCell>
-                <TableCell>{payment.bookingAgriculturalTour?.customer?.email || 'N/A'}</TableCell>
-                <TableCell>{formatDateTime(payment.payDate)}</TableCell>
-                <TableCell>{formatCurrency(payment.amount)}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={getPaymentStatusText(payment.responseCode)}
-                    color={payment.responseCode === '00' ? 'success' : 'error'}
-                    size="small"
-                  />
-                </TableCell>
+      {payments.length === 0 ? (
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            minHeight: '300px',
+            textAlign: 'center',
+            p: 4
+          }}
+        >
+          <Typography variant="h6" color="text.secondary">
+            Không tìm thấy lịch sử thanh toán
+          </Typography>
+          <Typography variant="body1" color="text.secondary" sx={{ mt: 1 }}>
+            Hiện tại không có giao dịch nào được ghi nhận
+          </Typography>
+        </Box>
+      ) : (
+        <TableContainer>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Mã giao dịch</TableCell>
+                <TableCell>Tên tour</TableCell>
+                <TableCell>Khách hàng</TableCell>
+                <TableCell>Email</TableCell>
+                <TableCell>Thời gian</TableCell>
+                <TableCell>Số tiền</TableCell>
+                <TableCell>Trạng thái</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+            </TableHead>
+            <TableBody>
+              {payments.map((payment) => (
+                <TableRow key={payment.responseId} hover onClick={() => handlePaymentClick(payment)} sx={{ cursor: 'pointer' }}>
+                  <TableCell>{payment.txnRef}</TableCell>
+                  <TableCell>{payment.bookingAgriculturalTour?.agriculturalTourPackage?.packageName || 'N/A'}</TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={2} alignItems="center">
+                      <Avatar src={payment.bookingAgriculturalTour?.customer?.avatarURL} />
+                      {payment.bookingAgriculturalTour?.customer?.fullname || 'N/A'}
+                    </Stack>
+                  </TableCell>
+                  <TableCell>{payment.bookingAgriculturalTour?.customer?.email || 'N/A'}</TableCell>
+                  <TableCell>{formatDateTime(payment.payDate)}</TableCell>
+                  <TableCell>{formatCurrency(payment.amount)}</TableCell>
+                  <TableCell>
+                    <Chip
+                      label={getPaymentStatusText(payment.responseCode)}
+                      color={payment.responseCode === '00' ? 'success' : 'error'}
+                      size="small"
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
 
       <Dialog open={Boolean(selectedPayment)} onClose={handleCloseDialog} maxWidth="md" fullWidth>
         {selectedPayment && (

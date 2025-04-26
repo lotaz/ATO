@@ -10,12 +10,14 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
+  FormControlLabel,
   Grid,
   IconButton,
   ImageList,
   ImageListItem,
   MenuItem,
   Stack,
+  Switch,
   TextField,
   Typography
 } from '@mui/material';
@@ -65,6 +67,7 @@ interface FormValues {
   durations: number;
   durationsType: TimeType;
   tourGuides: string[];
+  statusActive: number;
   tourDestinations: {
     title: string;
     description: string;
@@ -103,7 +106,8 @@ const validationSchema = Yup.object().shape({
       visitOrder: Yup.number().required('Vui lòng nhập thứ tự'),
       typeActivity: Yup.number().required('Vui lòng chọn loại hoạt động')
     })
-  )
+  ),
+  statusActive: Yup.number().required('Status is required')
 });
 const UpdateTourPackage = () => {
   const navigate = useNavigate();
@@ -225,6 +229,7 @@ const UpdateTourPackage = () => {
     durations: tourPackage?.durations || 0,
     durationsType: tourPackage?.durationsType || TimeType.DAY,
     tourGuides: tourPackage?.tourGuides?.map((g: any) => g.guideId) || [],
+    statusActive: tourPackage?.statusActive || 0,
     tourDestinations:
       tourPackage?.tourDestinations?.map((dest: any) => ({
         title: dest.title || '',
@@ -1055,7 +1060,18 @@ const UpdateTourPackage = () => {
                       ))}
                     </TextField>
                   </Grid>
-
+                  <Grid item xs={12} md={6}>
+                    <FormControlLabel
+                      control={
+                        <Switch
+                          checked={values.statusActive === 0}
+                          onChange={(e) => setFieldValue('statusActive', e.target.checked ? 0 : 1)}
+                          color="primary"
+                        />
+                      }
+                      label={values.statusActive === 0 ? 'Đang hoạt động' : 'Ngừng hoạt động'}
+                    />
+                  </Grid>
                   <Grid item xs={12}>
                     <Button fullWidth type="submit" variant="contained" disabled={isSubmitting || uploading}>
                       {id ? 'Cập nhật' : 'Tạo mới'}

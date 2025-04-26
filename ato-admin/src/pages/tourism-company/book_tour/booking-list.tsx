@@ -1,5 +1,6 @@
-import { CloseOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, CloseOutlined, ExpandOutlined, SearchOutlined } from '@ant-design/icons';
 import {
+  Avatar,
   Card,
   CardContent,
   Chip,
@@ -9,6 +10,8 @@ import {
   Divider,
   Grid,
   IconButton,
+  InputAdornment,
+  Paper,
   Stack,
   Table,
   TableBody,
@@ -20,6 +23,8 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { bookTourService, TourBooking } from '../../../services/tourism-company/book-tour.service';
+import { TextField } from '@mui/material';
+
 const BookingList = () => {
   const getPaymentStatusText = (status: number) => {
     switch (status) {
@@ -66,45 +71,129 @@ const BookingList = () => {
     const childTotal = booking.numberOfChildren * booking.agriculturalTourPackage.priceOfChildren;
     return { adultTotal, childTotal, total: adultTotal + childTotal };
   };
+  // Group bookings by tour ID
+  const groupedBookings = bookings.reduce((acc, booking) => {
+    const tourId = booking.agriculturalTourPackage.packageId;
+    if (!acc[tourId]) {
+      acc[tourId] = {
+        packageName: booking.agriculturalTourPackage.packageName,
+        bookings: []
+      };
+    }
+    acc[tourId].bookings.push(booking);
+    return acc;
+  }, {});
+
+  const [expandedTours, setExpandedTours] = useState({});
+
+  const toggleTour = (tourId) => {
+    setExpandedTours((prev) => ({
+      ...prev,
+      [tourId]: !prev[tourId]
+    }));
+  };
+
+  const [searchTerm, setSearchTerm] = useState('');
+
+  // Filter function
+  const filteredGroupedBookings = Object.entries(groupedBookings).filter(([_, tourGroup]) =>
+    tourGroup.packageName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   return (
     <>
-      <TableContainer>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Mã đặt tour</TableCell>
-              <TableCell>Tên tour</TableCell>
-              <TableCell>Ngày đặt</TableCell>
-              <TableCell>Số lượng</TableCell>
-              <TableCell>Tổng tiền</TableCell>
-              <TableCell>Trạng thái thanh toán</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {bookings.map((booking) => (
-              <TableRow key={booking.bookingId} hover onClick={() => setSelectedBooking(booking)} sx={{ cursor: 'pointer' }}>
-                <TableCell>{booking.bookingId}</TableCell>
-                <TableCell>{booking.agriculturalTourPackage.packageName}</TableCell>
-                <TableCell>{new Date(booking.bookingDate).toLocaleDateString('vi-VN')}</TableCell>
-                <TableCell>
-                  <Stack direction="row" spacing={1}>
-                    <Chip label={`${booking.numberOfAdults} người lớn`} size="small" />
-                    {booking.numberOfChildren > 0 && <Chip label={`${booking.numberOfChildren} trẻ em`} size="small" variant="outlined" />}
+      <Stack spacing={3} sx={{ mb: 3 }}>
+        <TextField
+          fullWidth
+          variant="outlined"
+          placeholder="Tìm kiếm theo tên tour"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          InputProps={{
+            startAdornment: (
+              <InputAdornment position="start">
+                <SearchOutlined />
+              </InputAdornment>
+            )
+          }}
+        />
+      </Stack>
+
+      {filteredGroupedBookings.map(([tourId, tourGroup]) => (
+        <Card key={tourId} sx={{ mb: 2, boxShadow: 3 }} onClick={() => toggleTour(tourId)}>
+          <CardContent>
+            <Stack direction="row" justifyContent="space-between" alignItems="center">
+              <Stack direction="row" alignItems="center" spacing={2}>
+                <Avatar src={tourGroup.bookings[0]?.agriculturalTourPackage?.imgs[0]} sx={{ width: 56, height: 56 }} variant="rounded" />
+                <Stack>
+                  <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
+                    {tourGroup.packageName}
+                  </Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <Typography variant="body2" color="text.secondary">
+                      {tourGroup.bookings.length} hóa đơn đặt
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      •
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      {new Intl.NumberFormat('vi-VN').format(
+                        tourGroup.bookings.reduce((sum, booking) => sum + calculatePriceBreakdown(booking).total, 0)
+                      )}{' '}
+                      VNĐ
+                    </Typography>
                   </Stack>
-                </TableCell>
-                <TableCell>{new Intl.NumberFormat('vi-VN').format(calculatePriceBreakdown(booking).total)} VNĐ</TableCell>
-                <TableCell>
-                  <Chip
-                    label={getPaymentStatusText(booking.paymentStatus)}
-                    color={booking.paymentStatus === 0 ? 'success' : 'warning'}
-                    size="small"
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                </Stack>
+              </Stack>
+              <IconButton sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}>
+                {expandedTours[tourId] ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
+              </IconButton>
+            </Stack>
+
+            {expandedTours[tourId] && (
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Mã đặt tour</TableCell>
+                      <TableCell>Ngày đặt</TableCell>
+                      <TableCell>Số lượng</TableCell>
+                      <TableCell>Tổng tiền</TableCell>
+                      <TableCell>Trạng thái thanh toán</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {tourGroup.bookings.map((booking) => (
+                      <TableRow key={booking.bookingId} hover onClick={() => setSelectedBooking(booking)} sx={{ cursor: 'pointer' }}>
+                        <TableCell>{booking.bookingId}</TableCell>
+                        <TableCell>{new Date(booking.bookingDate).toLocaleDateString('vi-VN')}</TableCell>
+                        <TableCell>
+                          <Stack direction="row" spacing={1}>
+                            <Chip label={`${booking.numberOfAdults} người lớn`} size="small" />
+                            {booking.numberOfChildren > 0 && (
+                              <Chip label={`${booking.numberOfChildren} trẻ em`} size="small" variant="outlined" />
+                            )}
+                          </Stack>
+                        </TableCell>
+                        <TableCell>{new Intl.NumberFormat('vi-VN').format(calculatePriceBreakdown(booking).total)} VNĐ</TableCell>
+                        <TableCell>
+                          <Chip
+                            label={getPaymentStatusText(booking.paymentStatus)}
+                            color={booking.paymentStatus === 0 ? 'success' : 'warning'}
+                            size="small"
+                          />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            )}
+          </CardContent>
+        </Card>
+      ))}
+
+      {filteredGroupedBookings.length === 0 && <Typography>Không tìm thấy dữ liệu</Typography>}
 
       <Dialog open={Boolean(selectedBooking)} onClose={() => setSelectedBooking(null)} maxWidth="md" fullWidth>
         {selectedBooking && (
