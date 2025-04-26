@@ -92,7 +92,7 @@ const CreateTourPackage = () => {
     priceOfAdults: Yup.number().min(0, 'Giá không được âm').required('Vui lòng nhập giá'),
     priceOfChildren: Yup.number().min(0, 'Giá không được âm').required('Vui lòng nhập giá'),
     childTicketAge: Yup.string().required('Vui lòng nhập tuổi'),
-    startTime: Yup.date().required('Vui lòng chọn thời gian bắt đầu'),
+    startTime: Yup.date().required('Vui lòng chọn thời gian bắt đầu').min(new Date(), 'Thời gian bắt đầu phải trong tương lai'),
     endTime: Yup.date()
       .min(Yup.ref('startTime'), 'Thời gian kết thúc phải sau thời gian bắt đầu')
       .required('Vui lòng chọn thời gian kết thúc'),
@@ -103,8 +103,10 @@ const CreateTourPackage = () => {
       Yup.object().shape({
         title: Yup.string().required('Vui lòng nhập tiêu đề'),
         description: Yup.string(),
-        startTime: Yup.date().required('Vui lòng chọn thời gian bắt đầu'),
-        endTime: Yup.date().required('Vui lòng chọn thời gian kết thúc'),
+        startTime: Yup.date().required('Vui lòng chọn thời gian bắt đầu').min(new Date(), 'Thời gian bắt đầu phải trong tương lai'),
+        endTime: Yup.date()
+          .required('Vui lòng chọn thời gian kết thúc')
+          .min(Yup.ref('startTime'), 'Thời gian kết thúc phải sau thời gian bắt đầu'),
         visitOrder: Yup.number().required('Vui lòng nhập thứ tự'),
         typeActivity: Yup.number().required('Vui lòng chọn loại hoạt động')
       })
@@ -332,12 +334,18 @@ const CreateTourPackage = () => {
                     <DateTimePicker
                       label="Thời gian bắt đầu"
                       value={values.startTime}
+                      minDateTime={dayjs()}
                       onChange={(date) => setFieldValue('startTime', date)}
                     />
                   </Grid>
 
                   <Grid item xs={12} md={6}>
-                    <DateTimePicker label="Thời gian kết thúc" value={values.endTime} onChange={(date) => setFieldValue('endTime', date)} />
+                    <DateTimePicker
+                      minDateTime={dayjs()}
+                      label="Thời gian kết thúc"
+                      value={values.endTime}
+                      onChange={(date) => setFieldValue('endTime', date)}
+                    />
                   </Grid>
 
                   <Grid item xs={12} md={6}>
@@ -439,6 +447,7 @@ const CreateTourPackage = () => {
                                     </Grid>
                                     <Grid item xs={12} md={6}>
                                       <DateTimePicker
+                                        minDateTime={dayjs()}
                                         label="Thời gian bắt đầu *"
                                         value={destination.startTime}
                                         onChange={(date) => setFieldValue(`tourDestinations.${index}.startTime`, date)}
@@ -461,6 +470,7 @@ const CreateTourPackage = () => {
 
                                     <Grid item xs={12} md={6}>
                                       <DateTimePicker
+                                        minDateTime={dayjs()}
                                         label="Thời gian kết thúc *"
                                         value={destination.endTime}
                                         onChange={(date) => setFieldValue(`tourDestinations.${index}.endTime`, date)}

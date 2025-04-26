@@ -58,12 +58,12 @@ const OrderList = () => {
         return 'success';
       case StatusOrder.Processing:
         return 'warning';
-      case StatusOrder.Canceled:
+      case StatusOrder.RejecOrder:
         return 'error';
-      case StatusOrder.Shipped:
+      case StatusOrder.AcceptOrder:
         return 'info';
       default:
-        return 'default';
+        return 'warning';
     }
   };
 
@@ -73,12 +73,12 @@ const OrderList = () => {
         return 'Hoàn thành';
       case StatusOrder.Processing:
         return 'Đang xử lý';
-      case StatusOrder.Canceled:
+      case StatusOrder.RejecOrder:
         return 'Đã hủy';
-      case StatusOrder.Shipped:
+      case StatusOrder.AcceptOrder:
         return 'Đang giao';
       default:
-        return 'Không xác định';
+        return 'Đang xử lý';
     }
   };
 

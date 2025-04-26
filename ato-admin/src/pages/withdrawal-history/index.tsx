@@ -1,6 +1,5 @@
 import {
   Box,
-  Button,
   Chip,
   CircularProgress,
   FormControl,
@@ -20,11 +19,10 @@ import {
 import { Stack } from '@mui/system';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import dayjs, { Dayjs } from 'dayjs';
-import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { get } from '../../helpers/axios-helper';
 import { WITHDRAWAL_URLs } from '../../constants/withdrawal-history-urls';
+import { get } from '../../helpers/axios-helper';
 
 interface WithdrawalHistory {
   withdrawalId: string;
@@ -48,28 +46,11 @@ const WithdrawalHistory = () => {
   const navigate = useNavigate();
   const [withdrawals, setWithdrawals] = useState<WithdrawalHistory[]>([]);
   const [loading, setLoading] = useState(true);
-  const [filterType, setFilterType] = useState<'all' | 'company' | 'facility'>('all');
   const [selectedDate, setSelectedDate] = useState<Dayjs | null>(dayjs());
   const [statusFilter, setStatusFilter] = useState<'all' | number>('all');
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
 
-  const handleGenerateMonthlyWithdrawals = async () => {
-    try {
-      const response = await get('/admin/withdrawals/generate-monthly');
-      if (response.data.status) {
-        enqueueSnackbar(response.data.message, { variant: 'success' });
-
-        // Refresh the data
-        fetchWithdrawals();
-      } else {
-        enqueueSnackbar(response.data.message, { variant: 'error' });
-      }
-    } catch (error) {
-      console.error('Failed to generate monthly withdrawals:', error);
-      enqueueSnackbar('Có lỗi xảy ra khi tạo yêu cầu hoàn tiền', { variant: 'error' });
-    }
-  };
   const fetchWithdrawals = async () => {
     try {
       const response = await get('/withdrawl');

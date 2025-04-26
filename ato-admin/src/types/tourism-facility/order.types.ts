@@ -20,10 +20,10 @@ export enum PaymentType {
 }
 
 export enum StatusOrder {
+  RejecOrder = -1,
   Processing = 0,
-  Shipped = 1,
-  Completed = 2,
-  Canceled = 3
+  AcceptOrder = 1,
+  Completed = 2
 }
 
 export interface ProductDTO_Order {

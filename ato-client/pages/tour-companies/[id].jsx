@@ -1,4 +1,9 @@
-import { Email, Language, LocationOn } from "@mui/icons-material";
+import {
+  Email,
+  Language,
+  LocationOn,
+  SentimentDissatisfied,
+} from "@mui/icons-material";
 import {
   Box,
   Card,
@@ -7,14 +12,45 @@ import {
   Tab,
   Tabs,
   Typography,
+  CircularProgress,
+  Pagination,
 } from "@mui/material";
 import { H2 } from "components/Typography";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { useState } from "react";
 import api from "utils/__api__/company";
+import useSWR from "swr";
+import { get } from "helpers/axios-helper";
+import { useRouter } from "next/router";
+
+const fetcher = (url) => get(url).then((res) => res.data);
 
 const CompanyDetails = ({ company }) => {
   const [tabValue, setTabValue] = useState(0);
+  const [page, setPage] = useState(1);
+  const itemsPerPage = 3;
+  const router = useRouter();
+  const {
+    data: packages = [],
+    error,
+    isLoading,
+  } = useSWR(
+    company?.tourCompanyId
+      ? `/tour-company/package/${company.tourCompanyId}`
+      : null,
+    fetcher
+  );
+
+  const totalPages = Math.ceil(packages.length / itemsPerPage);
+  const paginatedPackages = packages.slice(
+    (page - 1) * itemsPerPage,
+    page * itemsPerPage
+  );
+
+  const handlePageChange = (_, value) => {
+    setPage(value);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
 
   const handleTabChange = (_, newValue) => {
     setTabValue(newValue);
@@ -102,8 +138,220 @@ const CompanyDetails = ({ company }) => {
             <Box p={3}>
               {tabValue === 0 && (
                 <Box>
-                  {/* Tour packages will be added here */}
-                  <Typography>Tour du lịch coming soon...</Typography>
+                  {isLoading ? (
+                    <Box
+                      sx={{
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        minHeight: 400,
+                      }}
+                    >
+                      <CircularProgress />
+                    </Box>
+                  ) : error ? (
+                    <Box
+                      sx={{
+                        textAlign: "center",
+                        py: 8,
+                        px: 2,
+                      }}
+                    >
+                      <Typography color="error">
+                        Đã xảy ra lỗi khi tải dữ liệu
+                      </Typography>
+                    </Box>
+                  ) : packages.length > 0 ? (
+                    <>
+                      <Grid container spacing={3}>
+                        {paginatedPackages.map((pack) => (
+                          <Grid item xs={12} sm={6} md={4} key={pack.tourId}>
+                            <Card
+                              sx={{
+                                height: "100%",
+                                cursor: "pointer",
+                                transition: "all 0.3s ease",
+                                "&:hover": {
+                                  transform: "translateY(-8px)",
+                                  boxShadow: "0 8px 24px rgba(0,0,0,0.15)",
+                                  "& img": {
+                                    transform: "scale(1.1)",
+                                  },
+                                },
+                                borderRadius: 2,
+                                overflow: "hidden",
+                              }}
+                              onClick={() =>
+                                router.push(`/tour-packages/${pack.tourId}`)
+                              }
+                            >
+                              {/* Card content similar to tour packages page */}
+                              <Box sx={{ position: "relative" }}>
+                                <Box sx={{ height: 220, overflow: "hidden" }}>
+                                  <img
+                                    src={pack.imgs?.[0] || "/placeholder.jpg"}
+                                    alt={pack.packageName}
+                                    style={{
+                                      width: "100%",
+                                      height: "100%",
+                                      objectFit: "cover",
+                                      transition: "transform 0.3s ease",
+                                    }}
+                                  />
+                                </Box>
+                                <Box
+                                  sx={{
+                                    position: "absolute",
+                                    top: 12,
+                                    right: 12,
+                                    bgcolor: "error.main",
+                                    color: "white",
+                                    px: 2,
+                                    py: 0.5,
+                                    borderRadius: 1,
+                                    fontSize: "0.875rem",
+                                    fontWeight: "bold",
+                                  }}
+                                >
+                                  Còn {pack.slot - pack.people}/ {pack.slot} chỗ
+                                </Box>
+                              </Box>
+
+                              <Box sx={{ p: 2.5 }}>
+                                <Typography
+                                  sx={{
+                                    fontSize: "1.1rem",
+                                    fontWeight: "bold",
+                                    mb: 1.5,
+                                    height: 52,
+                                    overflow: "hidden",
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 2,
+                                    WebkitBoxOrient: "vertical",
+                                  }}
+                                >
+                                  {pack.packageName}
+                                </Typography>
+
+                                <Typography
+                                  variant="body2"
+                                  color="text.secondary"
+                                  sx={{
+                                    mb: 2,
+                                    height: 60,
+                                    overflow: "hidden",
+                                    display: "-webkit-box",
+                                    WebkitLineClamp: 3,
+                                    WebkitBoxOrient: "vertical",
+                                  }}
+                                >
+                                  {pack.description}
+                                </Typography>
+
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "flex-end",
+                                    justifyContent: "space-between",
+                                  }}
+                                >
+                                  <Box>
+                                    <Typography
+                                      variant="caption"
+                                      color="text.secondary"
+                                    >
+                                      Giá từ
+                                    </Typography>
+                                    <Typography
+                                      variant="h6"
+                                      color="primary.main"
+                                      sx={{ fontWeight: "bold" }}
+                                    >
+                                      {pack.priceOfAdults.toLocaleString(
+                                        "vi-VN"
+                                      )}{" "}
+                                      VNĐ
+                                    </Typography>
+                                  </Box>
+                                  <Typography
+                                    variant="button"
+                                    sx={{
+                                      bgcolor: "primary.main",
+                                      color: "white",
+                                      px: 1.5,
+                                      py: 1,
+                                      borderRadius: 2,
+                                      fontWeight: "bold",
+                                      transition: "all 0.2s ease",
+                                      "&:hover": {
+                                        bgcolor: "primary.dark",
+                                        transform: "translateY(-2px)",
+                                        boxShadow:
+                                          "0 4px 12px rgba(0,0,0,0.15)",
+                                      },
+                                      "&:active": {
+                                        transform: "translateY(0)",
+                                      },
+                                    }}
+                                  >
+                                    Đặt ngay
+                                  </Typography>
+                                </Box>
+                              </Box>
+                            </Card>
+                          </Grid>
+                        ))}
+                      </Grid>
+
+                      {totalPages > 1 && (
+                        <Box
+                          sx={{
+                            display: "flex",
+                            justifyContent: "center",
+                            alignItems: "center",
+                            mt: 6,
+                            mb: 4,
+                            gap: 2,
+                          }}
+                        >
+                          <Pagination
+                            count={totalPages}
+                            page={page}
+                            onChange={handlePageChange}
+                            color="primary"
+                            size="large"
+                            showFirstButton
+                            showLastButton
+                          />
+                          <Typography variant="body2" color="text.secondary">
+                            Trang {page} / {totalPages}
+                          </Typography>
+                        </Box>
+                      )}
+                    </>
+                  ) : (
+                    <Box
+                      sx={{
+                        textAlign: "center",
+                        py: 8,
+                        px: 2,
+                      }}
+                    >
+                      <SentimentDissatisfied
+                        sx={{
+                          fontSize: 60,
+                          color: "grey.400",
+                          mb: 2,
+                        }}
+                      />
+                      <Typography variant="h6" color="grey.600" gutterBottom>
+                        Không tìm thấy tour du lịch
+                      </Typography>
+                      <Typography color="grey.500">
+                        Công ty này hiện chưa có tour du lịch nào
+                      </Typography>
+                    </Box>
+                  )}
                 </Box>
               )}
 
