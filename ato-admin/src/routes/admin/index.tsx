@@ -3,11 +3,13 @@ import { lazy } from 'react';
 // project import
 import Loadable from '../../components/Loadable';
 import { ADMIN_BASE_URL, ADMIN_URLs } from '../../constants/admin-urls';
+import { TRoute } from '../types';
 import ManageAccountRoutes from './account';
 import ManageCompanyRoutes from './company';
-import { TRoute } from '../types';
-import ManageRequestRoutes from './request';
 import ManageFacilityRoutes from './facility';
+import ManageContractRoutes from './contract';
+import ManageRequestRoutes from './request';
+import ManagePaymentHistoryRoutes from './payment-history';
 
 const Layout = Loadable(lazy(() => import('../../layout')));
 const Dashboard = Loadable(lazy(() => import('../../pages/admin/dashboard/index')));
@@ -33,7 +35,9 @@ const AdminRoutes: TRoute = {
     ...ManageAccountRoutes,
     ...ManageCompanyRoutes,
     ...ManageRequestRoutes,
-    ...ManageFacilityRoutes
+    ...ManageFacilityRoutes,
+    ...ManageContractRoutes,
+    ...ManagePaymentHistoryRoutes
   ]
 };
 
