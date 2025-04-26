@@ -5,11 +5,11 @@ import { ADMIN_BASE_URL } from '../constants/admin-urls';
 import { AUTHEN_URLs } from '../constants/authen-url';
 import { RootState } from '../redux/store';
 import { Role } from '../types';
-import { TOUR_GUIDE_BASE_URL } from '../constants/tour-guide-url';
 import { TOURISM_FACILITY_BASE_URL } from '../constants/tourism-facility-urls';
 import { CONTENT_MODERATOR_BASE_URL } from '../constants/content-moderator-urls';
 import { TOURISM_COMPANY_BASE_URL } from '../constants/tourism-company-urls';
 import { CircularProgress } from '@mui/material';
+import { TOUR_GUIDE_BASE_URL } from '../constants/tour-guide-urls';
 
 const Index = () => {
   const navigate = useNavigate();

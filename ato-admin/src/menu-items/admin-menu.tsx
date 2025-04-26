@@ -1,12 +1,15 @@
 // assets
 import {
-  CarOutlined,
+  BankOutlined,
+  BookOutlined,
   DashboardOutlined,
+  DollarCircleOutlined,
+  HomeOutlined,
   MailOutlined,
   MessageOutlined,
   MoneyCollectOutlined,
+  PaperClipOutlined,
   ProfileOutlined,
-  SettingOutlined,
   TeamOutlined
 } from '@ant-design/icons';
 import { ADMIN_URLs } from '../constants/admin-urls';
@@ -55,11 +58,41 @@ const adminMenu: TMenu = {
       ]
     },
     {
+      id: 'contract',
+      title: 'Quản lý hợp đồng',
+      type: 'item',
+      url: ADMIN_URLs.CONTRACT.INDEX,
+      icon: BookOutlined,
+      subItems: [
+        {
+          id: 'create-contract',
+          title: 'Thêm mới hợp đồng',
+          type: 'item',
+          url: ADMIN_URLs.CONTRACT.CREATE,
+          icon: ProfileOutlined
+        },
+        {
+          id: 'view-contract',
+          title: 'Thông tin hợp đồng',
+          type: 'item',
+          url: ADMIN_URLs.CONTRACT.DETAILS,
+          icon: ProfileOutlined
+        },
+        {
+          id: 'update-contract',
+          title: 'Chỉnh sửa thông tin hợp đồng',
+          type: 'item',
+          url: ADMIN_URLs.CONTRACT.UPDATE,
+          icon: ProfileOutlined
+        }
+      ]
+    },
+    {
       id: 'company',
       title: 'Quản lý công ty tour',
       type: 'item',
       url: ADMIN_URLs.COMPANY.INDEX,
-      icon: CarOutlined,
+      icon: HomeOutlined,
       subItems: [
         {
           id: 'create-company',
@@ -89,7 +122,7 @@ const adminMenu: TMenu = {
       title: 'Quản lý cơ sở du lịch',
       type: 'item',
       url: ADMIN_URLs.FACILITY.INDEX,
-      icon: CarOutlined,
+      icon: BankOutlined,
       subItems: [
         {
           id: 'create-facility',
@@ -143,6 +176,13 @@ const adminMenu: TMenu = {
       type: 'item',
       icon: MoneyCollectOutlined,
       url: ADMIN_URLs.CONFIG.VNPAY
+    },
+    {
+      id: 'payment-history',
+      title: 'Lịch sử giải ngân',
+      type: 'item',
+      icon: DollarCircleOutlined,
+      url: ADMIN_URLs.PAYMENTHISTORY.INDEX
     }
   ]
 };

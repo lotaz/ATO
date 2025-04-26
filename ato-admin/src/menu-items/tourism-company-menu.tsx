@@ -1,7 +1,20 @@
 // assets
-import { BoxPlotOutlined, CarOutlined, HomeOutlined, TeamOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  BookOutlined,
+  BoxPlotOutlined,
+  CarOutlined,
+  HistoryOutlined,
+  HomeOutlined,
+  MoneyCollectOutlined,
+  SpotifyOutlined,
+  TeamOutlined
+} from '@ant-design/icons';
 import { TOURISM_COMPANY_URLs } from '../constants/tourism-company-urls';
 import { TMenu } from './types';
+import { CONTRACT_BASE_URL } from '../constants/contract-urls';
+import { BANK_BASE_URL } from '../constants/bank-account-urls';
+import { WITHDRAWAL_BASE_URL } from '../constants/withdrawal-history-urls';
 
 const tourCompanuMenu: TMenu = {
   id: 'pages',
@@ -155,37 +168,39 @@ const tourCompanuMenu: TMenu = {
       title: 'Quản lý đặt gói du lịch',
       type: 'item',
       url: TOURISM_COMPANY_URLs.BOOKING.INDEX,
-      icon: HomeOutlined,
-      subItems: [
-        // {
-        //   id: 'create-accommodation',
-        //   title: 'Thêm nhà nghỉ',
-        //   type: 'item',
-        //   url: TOURISM_COMPANY_URLs.ACCOMMODATION.CREATE,
-        //   icon: HomeOutlined
-        // },
-        // {
-        //   id: 'view-accommodation',
-        //   title: 'Chi tiết nhà nghỉ',
-        //   type: 'item',
-        //   url: TOURISM_COMPANY_URLs.ACCOMMODATION.DETAILS,
-        //   icon: HomeOutlined
-        // },
-        // {
-        //   id: 'update-accommodation',
-        //   title: 'Cập nhật nhà nghỉ',
-        //   type: 'item',
-        //   url: TOURISM_COMPANY_URLs.ACCOMMODATION.UPDATE,
-        //   icon: HomeOutlined
-        // }
-      ]
+      icon: SpotifyOutlined,
+      subItems: []
     },
     {
       id: 'history-payment',
       title: 'Quản lý lịch sử thanh toán',
       type: 'item',
       url: TOURISM_COMPANY_URLs.HISTORY_PAYMENT.INDEX,
-      icon: HomeOutlined,
+      icon: MoneyCollectOutlined,
+      subItems: []
+    },
+    {
+      id: 'contract',
+      title: 'Quản lý hợp đồng',
+      type: 'item',
+      url: CONTRACT_BASE_URL.replace(':entity', 'company'),
+      icon: BookOutlined,
+      subItems: []
+    },
+    {
+      id: 'bank',
+      title: 'Quản lý tài khoản ngân hàng',
+      type: 'item',
+      url: BANK_BASE_URL,
+      icon: BankOutlined,
+      subItems: []
+    },
+    {
+      id: 'withdrawal-history',
+      title: 'Lịch sử giải ngân',
+      type: 'item',
+      url: WITHDRAWAL_BASE_URL,
+      icon: HistoryOutlined,
       subItems: []
     }
   ]

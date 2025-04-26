@@ -1,9 +1,9 @@
 // assets
 import {
   CheckCircleOutlined,
-  CheckCircleTwoTone,
   CheckSquareOutlined,
   ExclamationCircleOutlined,
+  FileMarkdownOutlined,
   NotificationOutlined,
   ProfileOutlined
 } from '@ant-design/icons';
@@ -88,6 +88,22 @@ const contentModeratorMenu: TMenu = {
           title: 'Chi tiết sản phẩm',
           type: 'item',
           url: CONTENT_MODERATOR_URLs.PRODUCT.DETAILS,
+          icon: ProfileOutlined
+        }
+      ]
+    },
+    {
+      id: 'package',
+      title: 'Phê duyệt gói du lịch',
+      type: 'item',
+      url: CONTENT_MODERATOR_URLs.PACKAGE.INDEX,
+      icon: FileMarkdownOutlined,
+      subItems: [
+        {
+          id: 'view-review',
+          title: 'Chi tiết gói du lịch',
+          type: 'item',
+          url: CONTENT_MODERATOR_URLs.PACKAGE.DETAILS,
           icon: ProfileOutlined
         }
       ]

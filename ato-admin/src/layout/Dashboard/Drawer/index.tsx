@@ -1,24 +1,22 @@
 import PropTypes from 'prop-types';
 import { useEffect, useMemo } from 'react';
 
-import useMediaQuery from '@mui/material/useMediaQuery';
-import Drawer from '@mui/material/Drawer';
 import Box from '@mui/material/Box';
+import Drawer from '@mui/material/Drawer';
+import useMediaQuery from '@mui/material/useMediaQuery';
 
 // project import
-import DrawerHeader from './DrawerHeader';
 import DrawerContent from './DrawerContent';
+import DrawerHeader from './DrawerHeader';
 import MiniDrawerStyled from './MiniDrawerStyled';
 
-import { drawerWidth } from '../../../config';
-import { handlerDrawerOpen, useGetMenuMaster } from '../../../api/menu';
 import { Theme } from '@mui/system';
-import { useDispatch, useSelector } from 'react-redux';
-import { RootState } from '../../../redux/store';
+import { useDispatch } from 'react-redux';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { handlerDrawerOpen, useGetMenuMaster } from '../../../api/menu';
+import { drawerWidth } from '../../../config';
 import { AUTHEN_URLs } from '../../../constants/authen-url';
 import authenSlice from '../../../redux/authenSlice';
-import { enqueueSnackbar } from 'notistack';
 
 // ==============================|| MAIN LAYOUT - DRAWER ||============================== //
 

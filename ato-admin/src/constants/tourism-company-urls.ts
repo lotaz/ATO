@@ -39,9 +39,19 @@ export const TOURISM_COMPANY_URLs = {
     DETAILS: `${TOURISM_COMPANY_BASE_URL}/accommodation/details/:id`
   },
   BOOKING: {
-    INDEX: `${TOURISM_COMPANY_BASE_URL}/book-tour`,
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/book-tour`
+  },
+  CONTRACT: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/contract`,
+    DETAILS: `${TOURISM_COMPANY_BASE_URL}/contract/details`
   },
   HISTORY_PAYMENT: {
-    INDEX: `${TOURISM_COMPANY_BASE_URL}/history-payment`,
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/history-payment`
+  },
+  BANK_ACCOUNTS: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}/bank-accounts`,
+    CREATE: `${TOURISM_COMPANY_BASE_URL}/bank-accounts/create`,
+    UPDATE: `${TOURISM_COMPANY_BASE_URL}/bank-accounts/update/:id`,
+    DETAILS: `${TOURISM_COMPANY_BASE_URL}/bank-accounts/details/:id`
   }
 };
