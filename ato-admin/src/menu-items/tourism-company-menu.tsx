@@ -4,6 +4,7 @@ import {
   BookOutlined,
   BoxPlotOutlined,
   CarOutlined,
+  DashboardOutlined,
   HistoryOutlined,
   HomeOutlined,
   MoneyCollectOutlined,
@@ -21,29 +22,36 @@ const tourCompanuMenu: TMenu = {
   type: 'group',
   children: [
     {
+      id: 'dashboard',
+      title: 'Trang chủ',
+      type: 'item',
+      url: TOURISM_COMPANY_URLs.DASHBOARD.INDEX,
+      icon: DashboardOutlined
+    },
+    {
       id: 'tour-package',
-      title: 'Quản lý gói du lịch',
+      title: 'Quản lí tour',
       type: 'item',
       url: TOURISM_COMPANY_URLs.TOUR_PACKAGE.INDEX,
       icon: BoxPlotOutlined,
       subItems: [
         {
           id: 'create-tour-package',
-          title: 'Thêm gói du lịch',
+          title: 'Thêm tour du lịch',
           type: 'item',
           url: TOURISM_COMPANY_URLs.TOUR_PACKAGE.CREATE,
           icon: BoxPlotOutlined
         },
         {
           id: 'view-tour-package',
-          title: 'Chi tiết gói du lịch',
+          title: 'Chi tiết tour du lịch',
           type: 'item',
           url: TOURISM_COMPANY_URLs.TOUR_PACKAGE.DETAILS,
           icon: BoxPlotOutlined
         },
         {
           id: 'update-tour-package',
-          title: 'Cập nhật gói du lịch',
+          title: 'Cập nhật tour du lịch',
           type: 'item',
           url: TOURISM_COMPANY_URLs.TOUR_PACKAGE.UPDATE,
           icon: BoxPlotOutlined
@@ -165,7 +173,7 @@ const tourCompanuMenu: TMenu = {
     },
     {
       id: 'booking',
-      title: 'Quản lý đặt gói du lịch',
+      title: 'Quản lý đặt tour',
       type: 'item',
       url: TOURISM_COMPANY_URLs.BOOKING.INDEX,
       icon: SpotifyOutlined,

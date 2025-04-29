@@ -16,6 +16,10 @@ const navbarNavigations = [
     url: "/tour-companies",
   },
   {
+    title: "Cơ sở du lịch",
+    url: "/facilities",
+  },
+  {
     title: "Tour du lịch",
     url: "/tour-packages", // Update this line
   },

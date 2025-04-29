@@ -53,5 +53,8 @@ export const TOURISM_COMPANY_URLs = {
     CREATE: `${TOURISM_COMPANY_BASE_URL}/bank-accounts/create`,
     UPDATE: `${TOURISM_COMPANY_BASE_URL}/bank-accounts/update/:id`,
     DETAILS: `${TOURISM_COMPANY_BASE_URL}/bank-accounts/details/:id`
+  },
+  DASHBOARD: {
+    INDEX: `${TOURISM_COMPANY_BASE_URL}`
   }
 };

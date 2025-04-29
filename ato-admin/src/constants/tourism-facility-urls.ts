@@ -19,6 +19,12 @@ export const TOURISM_FACILITY_URLs = {
         `${TOURISM_FACILITY_BASE_URL}/product/ocop-sell/view?productId=${productId}&id=${ocopSellId}`
     }
   },
+  CERTIFICATES: {
+    INDEX: '/tourism-facility/certificates',
+    CREATE: '/tourism-facility/certificates/create',
+    EDIT: '/tourism-facility/certificates/edit',
+    DETAILS: '/tourism-facility/certificates/details'
+  },
   PACKAGE: {
     INDEX: `${TOURISM_FACILITY_BASE_URL}/package`,
     CREATE: `${TOURISM_FACILITY_BASE_URL}/package/create`,
@@ -44,6 +50,6 @@ export const TOURISM_FACILITY_URLs = {
     DETAILS: `${TOURISM_FACILITY_BASE_URL}/contracts/details`
   },
   HISTORY_PAYMENT_ORDER: {
-    INDEX: `${TOURISM_FACILITY_BASE_URL}/history-payment-order`,
+    INDEX: `${TOURISM_FACILITY_BASE_URL}/history-payment-order`
   }
 };

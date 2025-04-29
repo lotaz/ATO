@@ -1,7 +1,9 @@
 import { TOURISM_FACILITY_BASE_URL } from '../../constants/tourism-facility-urls';
 import Layout from '../../layout';
+import Dashboard from '../../pages/tourism-facility/dashboard';
 import { TRoute } from '../types';
 import tourismFacilityActivityRoutes from './activities';
+import certRoutes from './cert';
 import tourismFacilityCertificatesRoutes from './certificates';
 import tourismFacilityContractRoutes from './contract';
 import historyPaymentRoutes from './history_payment';
@@ -20,7 +22,12 @@ const TourFacilityoutes: TRoute = {
     ...tourismFacilityActivityRoutes,
     ...tourismFacilityOrderRoutes,
     ...ocopSellRoutes,
-    ...historyPaymentRoutes
+    ...historyPaymentRoutes,
+    ...certRoutes,
+    {
+      path: '/tourism-facility',
+      element: <Dashboard />
+    }
   ]
 };
 

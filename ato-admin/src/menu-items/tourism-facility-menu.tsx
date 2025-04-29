@@ -1,5 +1,13 @@
 // assets
-import { BankOutlined, BookOutlined, BoxPlotOutlined, ProductOutlined, ShopOutlined } from '@ant-design/icons';
+import {
+  BankOutlined,
+  BookOutlined,
+  BoxPlotOutlined,
+  CheckCircleOutlined,
+  DashboardOutlined,
+  ProductOutlined,
+  ShopOutlined
+} from '@ant-design/icons';
 import { TOURISM_FACILITY_URLs } from '../constants/tourism-facility-urls';
 import { TMenu } from './types';
 import { CONTRACT_BASE_URL } from '../constants/contract-urls';
@@ -10,6 +18,13 @@ const tourismFacilityMenu: TMenu = {
   id: 'pages',
   type: 'group',
   children: [
+    {
+      id: 'dashboard',
+      title: 'Trang chủ',
+      type: 'item',
+      url: '/tourism-facility',
+      icon: DashboardOutlined
+    },
     {
       id: 'product',
       title: 'Quản lý sản phẩm',
@@ -46,6 +61,36 @@ const tourismFacilityMenu: TMenu = {
       type: 'item',
       url: TOURISM_FACILITY_URLs.PACKAGE.INDEX,
       icon: BoxPlotOutlined
+    },
+    {
+      id: 'certificates',
+      title: 'Quản lý chứng chỉ',
+      type: 'item',
+      url: TOURISM_FACILITY_URLs.CERTIFICATES.INDEX,
+      icon: CheckCircleOutlined,
+      subItems: [
+        {
+          id: 'create-certificates',
+          title: 'Thêm mới chứng chỉ',
+          type: 'item',
+          url: TOURISM_FACILITY_URLs.PRODUCT.CREATE,
+          icon: ProductOutlined
+        },
+        {
+          id: 'view-certificates',
+          title: 'Thông tin chứng chỉ',
+          type: 'item',
+          url: TOURISM_FACILITY_URLs.PRODUCT.DETAILS,
+          icon: ProductOutlined
+        },
+        {
+          id: 'update-certificates',
+          title: 'Chỉnh sửa thông tin chứng chỉ',
+          type: 'item',
+          url: TOURISM_FACILITY_URLs.PRODUCT.UPDATE,
+          icon: ProductOutlined
+        }
+      ]
     },
     {
       id: 'orders',

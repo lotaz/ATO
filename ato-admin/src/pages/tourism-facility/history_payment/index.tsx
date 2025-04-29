@@ -123,7 +123,10 @@ const OrderPaymentHistory = () => {
   };
 
   // Add pagination logic
-  const paginatedPayments = filteredPayments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
+  const paginatedPayments = filteredPayments.slice(
+    page * rowsPerPage,
+    page * rowsPerPage + rowsPerPage
+  );
 
   return (
     <Stack spacing={3}>

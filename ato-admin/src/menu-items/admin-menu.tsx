@@ -147,22 +147,22 @@ const adminMenu: TMenu = {
         }
       ]
     },
-    {
-      id: 'request',
-      title: 'Quản lý yêu cầu',
-      type: 'item',
-      url: ADMIN_URLs.REQUEST.INDEX,
-      icon: MessageOutlined,
-      subItems: [
-        {
-          id: 'reply-request',
-          title: 'Phản hồi yêu cầu',
-          type: 'item',
-          url: ADMIN_URLs.REQUEST.REPLY,
-          icon: ProfileOutlined
-        }
-      ]
-    },
+    // {
+    //   id: 'request',
+    //   title: 'Quản lý yêu cầu',
+    //   type: 'item',
+    //   url: ADMIN_URLs.REQUEST.INDEX,
+    //   icon: MessageOutlined,
+    //   subItems: [
+    //     {
+    //       id: 'reply-request',
+    //       title: 'Phản hồi yêu cầu',
+    //       type: 'item',
+    //       url: ADMIN_URLs.REQUEST.REPLY,
+    //       icon: ProfileOutlined
+    //     }
+    //   ]
+    // },
     {
       id: 'config-email',
       title: 'Cấu hình email',
