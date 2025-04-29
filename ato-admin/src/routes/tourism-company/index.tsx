@@ -1,5 +1,6 @@
-import { TOURISM_COMPANY_BASE_URL } from '../../constants/tourism-company-urls';
+import { TOURISM_COMPANY_BASE_URL, TOURISM_COMPANY_URLs } from '../../constants/tourism-company-urls';
 import Layout from '../../layout';
+import TourCompanyDashboard from '../../pages/tourism-company/dashboard';
 import { TRoute } from '../types';
 import accommodationRoutes from './accommodation';
 import BookingRoutes from './booking';
@@ -20,7 +21,11 @@ const TourCompanyRoutes: TRoute = {
     ...accommodationRoutes,
     ...TourGuideTeamRoutes,
     ...BookingRoutes,
-    ...HistoryPaymentRoutes
+    ...HistoryPaymentRoutes,
+    {
+      path: TOURISM_COMPANY_URLs.DASHBOARD.INDEX,
+      element: <TourCompanyDashboard />
+    }
   ]
 };
 
