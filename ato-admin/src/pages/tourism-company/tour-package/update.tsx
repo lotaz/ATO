@@ -38,6 +38,7 @@ import { DurationType } from '../../../types/tourism-company/tour-package.types'
 import { TimeType } from '../../../types/tourism-facility/package.types';
 import { TourGuideResponse } from '../../../types/tourism-company/tour-guide.types';
 import { tourGuideService } from '../../../services/tourism-company/tour-guide.service';
+import { enqueueSnackbar } from 'notistack';
 interface Driver {
   driverId: string;
   driverName: string;
@@ -255,7 +256,13 @@ const UpdateTourPackage = () => {
       };
 
       if (id) {
-        await agriculturalTourService.updatePackage(id, requestData as any);
+        const response = await agriculturalTourService.updatePackage(id, requestData as any);
+        const data = response.data;
+
+        if (data.status === false) {
+          enqueueSnackbar(data.message, { variant: 'error' });
+          return;
+        }
       } else {
         await agriculturalTourService.createPackage(requestData as any);
       }

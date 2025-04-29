@@ -73,7 +73,7 @@ const BookingList = () => {
   };
   // Group bookings by tour ID
   const groupedBookings = bookings.reduce((acc, booking) => {
-    const tourId = booking.agriculturalTourPackage.packageId;
+    const tourId = booking.agriculturalTourPackage.tourId;
     if (!acc[tourId]) {
       acc[tourId] = {
         packageName: booking.agriculturalTourPackage.packageName,

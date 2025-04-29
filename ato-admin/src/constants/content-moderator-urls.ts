@@ -15,6 +15,10 @@ export const CONTENT_MODERATOR_URLs = {
     INDEX: `${CONTENT_MODERATOR_BASE_URL}/cer`,
     DETAILS: `${CONTENT_MODERATOR_BASE_URL}/cer/details`
   },
+  FACILITY_CER: {
+    INDEX: `${CONTENT_MODERATOR_BASE_URL}/facility-cert`,
+    DETAILS: `${CONTENT_MODERATOR_BASE_URL}/facility-cert/details`
+  },
   PRODUCT: {
     INDEX: `${CONTENT_MODERATOR_BASE_URL}/product`,
     DETAILS: `${CONTENT_MODERATOR_BASE_URL}/product/details`
