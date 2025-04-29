@@ -1,3 +1,5 @@
+import { TouristFacility } from '../../types';
+
 export interface Certificate {
   certificationId: number;
   productId: number;
@@ -12,6 +14,21 @@ export interface Certificate {
   updatedDate: string | null;
   imgs: string[] | null;
   uploadedDate: string;
+}
+
+export interface FacilityCertification {
+  certificationId: string;
+  certificationName: string;
+  imgs?: string[];
+  issueDate: Date;
+  expiryDate: Date;
+  certificationDetails?: string;
+  createDate: Date;
+  updateDate?: Date;
+  statusApproval: StatusApproval;
+  replyRequest?: string;
+  touristFacilityId?: string;
+  touristFacility?: TouristFacility;
 }
 
 export enum StatusApproval {

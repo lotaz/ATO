@@ -242,7 +242,7 @@ const OrderDetails = () => {
               color={
                 order.status === StatusOrder.Processing
                   ? "warning"
-                  : order.status === StatusOrder.Shipped
+                  : order.status === StatusOrder.AcceptOrder
                   ? "info"
                   : order.status === StatusOrder.Completed
                   ? "success"
@@ -392,7 +392,7 @@ const OrderDetails = () => {
       </Modal>
 
       {/* Add Complete Order Button */}
-      {order?.status === StatusOrder.Shipped && (
+      {order?.status === StatusOrder.AcceptOrder && (
         <Box sx={{ mt: 3, textAlign: "center" }}>
           <LoadingButton
             variant="contained"

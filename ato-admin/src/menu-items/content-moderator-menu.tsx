@@ -1,7 +1,10 @@
 // assets
 import {
+  CheckCircleFilled,
   CheckCircleOutlined,
+  CheckOutlined,
   CheckSquareOutlined,
+  CheckSquareTwoTone,
   ExclamationCircleOutlined,
   FileMarkdownOutlined,
   NotificationOutlined,
@@ -61,8 +64,24 @@ const contentModeratorMenu: TMenu = {
       ]
     },
     {
+      id: 'cert',
+      title: 'Phê duyệt chứng chỉ tổ chức',
+      type: 'item',
+      url: CONTENT_MODERATOR_URLs.FACILITY_CER.INDEX,
+      icon: CheckOutlined,
+      subItems: [
+        {
+          id: 'view-cert',
+          title: 'Chi tiết chứng chỉ tổ chức',
+          type: 'item',
+          url: CONTENT_MODERATOR_URLs.FACILITY_CER.DETAILS,
+          icon: ProfileOutlined
+        }
+      ]
+    },
+    {
       id: 'certificate',
-      title: 'Phê duyệt chứng chỉ',
+      title: 'Phê duyệt chứng chỉ sản phẩm',
       type: 'item',
       url: CONTENT_MODERATOR_URLs.CER.INDEX,
       icon: CheckSquareOutlined,
