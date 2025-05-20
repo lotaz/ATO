@@ -123,13 +123,6 @@ export default function Profile() {
                           </Stack>
                         </Stack>
                       </Grid>
-                      <Grid item>
-                        <Tooltip title="Logout">
-                          <IconButton onClick={handleLogout} size="large" sx={{ color: 'text.primary' }}>
-                            <LogoutOutlined />
-                          </IconButton>
-                        </Tooltip>
-                      </Grid>
                     </Grid>
                   </CardContent>
 

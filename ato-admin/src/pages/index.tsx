@@ -18,6 +18,8 @@ const Index = () => {
 
   useEffect(() => {
     let url = AUTHEN_URLs.LOGIN;
+
+    console.log('-----', user);
     if (user !== null) {
       switch (user?.role as Role) {
         case 'Admin':

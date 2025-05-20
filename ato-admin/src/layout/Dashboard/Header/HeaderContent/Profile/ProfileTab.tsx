@@ -25,13 +25,6 @@ export default function ProfileTab({ handleLogout }: IProps) {
 
   return (
     <List component="nav" sx={{ p: 0, '& .MuiListItemIcon-root': { minWidth: 32 } }}>
-      <ListItemButton selected={selectedIndex === 1} onClick={() => handleListItemClick(1)}>
-        <ListItemIcon>
-          <UserOutlined />
-        </ListItemIcon>
-        <ListItemText primary="Thông tin cá nhân" />
-      </ListItemButton>
-
       <ListItemButton selected={selectedIndex === 2}>
         <ListItemIcon>
           <LogoutOutlined />

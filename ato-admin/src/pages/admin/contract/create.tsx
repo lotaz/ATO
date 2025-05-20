@@ -130,10 +130,6 @@ const CreateContract = () => {
                 value={formData.discountRate}
                 onChange={handleChange('discountRate')}
                 required
-                inputProps={{
-                  min: 0,
-                  max: 100
-                }}
               />
             </Grid>
 
@@ -173,7 +169,7 @@ const CreateContract = () => {
                 fullWidth
                 label="Nội dung hợp đồng"
                 multiline
-                rows={4}
+                rows={12}
                 value={formData.contractContent}
                 onChange={handleChange('contractContent')}
                 required

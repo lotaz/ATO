@@ -47,22 +47,22 @@ const contentModeratorMenu: TMenu = {
         }
       ]
     },
-    {
-      id: 'review',
-      title: 'Quản lý đánh giá',
-      type: 'item',
-      url: CONTENT_MODERATOR_URLs.REVIEW.INDEX,
-      icon: ExclamationCircleOutlined,
-      subItems: [
-        {
-          id: 'view-review',
-          title: 'Chi tiết đánh giá',
-          type: 'item',
-          url: CONTENT_MODERATOR_URLs.REVIEW.DETAILS,
-          icon: ProfileOutlined
-        }
-      ]
-    },
+    // {
+    //   id: 'review',
+    //   title: 'Quản lý đánh giá',
+    //   type: 'item',
+    //   url: CONTENT_MODERATOR_URLs.REVIEW.INDEX,
+    //   icon: ExclamationCircleOutlined,
+    //   subItems: [
+    //     {
+    //       id: 'view-review',
+    //       title: 'Chi tiết đánh giá',
+    //       type: 'item',
+    //       url: CONTENT_MODERATOR_URLs.REVIEW.DETAILS,
+    //       icon: ProfileOutlined
+    //     }
+    //   ]
+    // },
     {
       id: 'cert',
       title: 'Phê duyệt chứng chỉ tổ chức',
