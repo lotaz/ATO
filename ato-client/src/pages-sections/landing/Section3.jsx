@@ -115,20 +115,18 @@ const Section3 = ({ filterDemo, setFilterDemo }) => {
         </Grid>
 
         <Link href="https://tinyurl.com/get-bazaar" passHref legacyBehavior>
-          <a>
-            <Button
-              color="primary"
-              variant="contained"
-              sx={{
-                mx: "auto",
-                mt: "2.25rem",
-                display: "block",
-                minWidth: "125px",
-              }}
-            >
-              Purchase Now
-            </Button>
-          </a>
+          <Button
+            color="primary"
+            variant="contained"
+            sx={{
+              mx: "auto",
+              mt: "2.25rem",
+              display: "block",
+              minWidth: "125px",
+            }}
+          >
+            Purchase Now
+          </Button>
         </Link>
       </Container>
     </Box>

@@ -31,7 +31,7 @@ const Signup = () => {
       gender: values.gender,
       password: values.password,
       dob: values.dob,
-      role: "3fa85f64-5717-4562-b3fc-2c963f66afa6", // Default role for tourist
+      role: "C78A64EB-5190-44C1-9886-CA707854B807", // Default role for tourist
     };
 
     const response = await post("auth/sign-up", signupData);
@@ -214,11 +214,9 @@ const Signup = () => {
       <FlexRowCenter mt="1.25rem">
         <Box>Đã có tài khoản?</Box>
         <Link href="/login" passHref legacyBehavior>
-          <a>
-            <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
-              Đăng nhập
-            </H6>
-          </a>
+          <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
+            Đăng nhập
+          </H6>
         </Link>
       </FlexRowCenter>
     </Wrapper>

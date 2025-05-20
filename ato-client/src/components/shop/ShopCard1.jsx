@@ -79,21 +79,19 @@ const ShopCard1 = (props) => {
           }}
         />
         <Link href={`/shops/${slug}`}>
-          <a>
-            <IconButton
+          <IconButton
+            sx={{
+              my: 0.5,
+            }}
+          >
+            <East
               sx={{
-                my: 0.5,
+                fontSize: 19,
+                transform: ({ direction }) =>
+                  `rotate(${direction === "rtl" ? "180deg" : "0deg"})`,
               }}
-            >
-              <East
-                sx={{
-                  fontSize: 19,
-                  transform: ({ direction }) =>
-                    `rotate(${direction === "rtl" ? "180deg" : "0deg"})`,
-                }}
-              />
-            </IconButton>
-          </a>
+            />
+          </IconButton>
         </Link>
       </FlexBetween>
     </Card>

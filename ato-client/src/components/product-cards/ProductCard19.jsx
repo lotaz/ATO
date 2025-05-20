@@ -31,11 +31,9 @@ const ProductCard19 = ({ image, title, price, slug }) => {
       }}
     >
       <Link href={`/product/${slug}`}>
-        <a>
-          <Box maxWidth={100} bgcolor="grey.300">
-            <BazaarImage width="100%" alt="product" src={image} />
-          </Box>
-        </a>
+        <Box maxWidth={100} bgcolor="grey.300">
+          <BazaarImage width="100%" alt="product" src={image} />
+        </Box>
       </Link>
 
       <Box>

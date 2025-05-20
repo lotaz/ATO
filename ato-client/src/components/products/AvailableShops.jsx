@@ -13,25 +13,23 @@ const AvailableShops = () => {
         {shopList.map((item) => (
           <Grid item lg={2} md={3} sm={4} xs={12} key={item.name}>
             <Link href="/shops/53324">
-              <a>
-                <FlexRowCenter
-                  p={3.25}
-                  width="100%"
-                  component={Card}
-                  flexDirection="column"
-                >
-                  <Avatar
-                    src={item.imgUrl}
-                    sx={{
-                      width: 48,
-                      height: 48,
-                    }}
-                  />
-                  <H4 mt={1.5} color="grey.800">
-                    {item.name}
-                  </H4>
-                </FlexRowCenter>
-              </a>
+              <FlexRowCenter
+                p={3.25}
+                width="100%"
+                component={Card}
+                flexDirection="column"
+              >
+                <Avatar
+                  src={item.imgUrl}
+                  sx={{
+                    width: 48,
+                    height: 48,
+                  }}
+                />
+                <H4 mt={1.5} color="grey.800">
+                  {item.name}
+                </H4>
+              </FlexRowCenter>
             </Link>
           </Grid>
         ))}
