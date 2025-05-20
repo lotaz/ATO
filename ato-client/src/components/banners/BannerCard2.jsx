@@ -46,11 +46,9 @@ const BannerCard2 = ({ img, url, text1, text2, text3 }) => {
         </Box>
 
         <Link href={url}>
-          <a>
-            <Button variant="outlined" size="large" color="info">
-              Shop Now
-            </Button>
-          </a>
+          <Button variant="outlined" size="large" color="info">
+            Shop Now
+          </Button>
         </Link>
       </CardContent>
     </CardWrapper>

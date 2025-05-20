@@ -76,9 +76,7 @@ const BlogCard2 = ({ id, image, title, date, description }) => {
 
       <Box px={2} pt={1} pb={3}>
         <Link href="#">
-          <a>
-            <StyledTitle fontWeight={700}>{title}</StyledTitle>
-          </a>
+          <StyledTitle fontWeight={700}>{title}</StyledTitle>
         </Link>
 
         <StyledParagraph mt={0.5} mb={3}>

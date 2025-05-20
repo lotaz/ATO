@@ -1,10 +1,9 @@
-import { Fragment, useCallback, useState } from "react";
 import Footer from "components/footer/Footer";
 import Header from "components/header/Header";
+import Navbar from "components/navbar/Navbar";
 import Sticky from "components/sticky/Sticky";
 import Topbar from "components/topbar/Topbar";
-import Navbar from "components/navbar/Navbar";
-import { MobileNavigationBar } from "components/mobile-navigation";
+import { Fragment, useCallback, useState } from "react";
 /**
  *  Used in:
  *  1. market-1, matket-2, gadget-shop,
@@ -45,7 +44,6 @@ const ShopLayout1 = ({
       </div>
 
       {/* SMALL DEVICE BOTTOM NAVIGATION */}
-      <MobileNavigationBar />
 
       {/* FOOTER */}
       <Footer />

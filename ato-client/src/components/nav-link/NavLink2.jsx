@@ -10,16 +10,14 @@ const NavLink2 = ({
 }) => {
   return url ? (
     <Link href={url}>
-      <a>
-        <Small
-          fontWeight="900"
-          borderBottom={2}
-          color={color}
-          borderColor={borderColor}
-        >
-          {title}
-        </Small>
-      </a>
+      <Small
+        fontWeight="900"
+        borderBottom={2}
+        color={color}
+        borderColor={borderColor}
+      >
+        {title}
+      </Small>
     </Link>
   ) : (
     <Small
