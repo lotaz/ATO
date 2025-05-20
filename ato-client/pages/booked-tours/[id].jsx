@@ -1,5 +1,19 @@
-import { CalendarMonthOutlined, CardTravelOutlined } from "@mui/icons-material";
-import { TabContext, TabList, TabPanel } from "@mui/lab";
+import {
+  CalendarMonthOutlined,
+  CardTravelOutlined,
+  HomeOutlined,
+} from "@mui/icons-material";
+import {
+  TabContext,
+  TabList,
+  TabPanel,
+  Timeline,
+  TimelineConnector,
+  TimelineContent,
+  TimelineDot,
+  TimelineItem,
+  TimelineSeparator,
+} from "@mui/lab";
 import {
   Alert,
   Box,
@@ -7,7 +21,6 @@ import {
   Card,
   CardContent,
   Chip,
-  Divider,
   Grid,
   List,
   ListItem,
@@ -20,25 +33,16 @@ import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
 import { PaymentStatus, StatusBooking } from "constants/order-enums";
+import dayjs from "dayjs";
 import { get } from "helpers/axios-helper";
 import { useRouter } from "next/router";
 import { useState } from "react";
 import useSWR from "swr";
-import {
-  Timeline,
-  TimelineConnector,
-  TimelineContent,
-  TimelineDot,
-  TimelineItem,
-  TimelineSeparator,
-} from "@mui/lab";
-import {
-  CalendarOutlined,
-  CarOutlined,
-  HomeOutlined,
-} from "@mui/icons-material";
-import dayjs from "dayjs";
+import { useSnackbar } from "notistack";
+import { ConfirmDialog } from "components/ConfirmDialog";
 const fetcher = (url) => get(url).then((res) => res.data);
+import { post } from "helpers/axios-helper";
+
 export const BookingDestinationStatus = {
   Pending: 0,
   InProgress: 1,
@@ -50,6 +54,8 @@ const BookedTourDetailsPage = () => {
   const router = useRouter();
   const { id } = router.query;
   const [tabValue, setTabValue] = useState("1");
+  const [openConfirm, setOpenConfirm] = useState(false);
+  const { enqueueSnackbar } = useSnackbar();
 
   const {
     data: booking,
@@ -57,17 +63,24 @@ const BookedTourDetailsPage = () => {
     isLoading,
   } = useSWR(id ? `/tourist/book-tour/get-book-tour/${id}` : null, fetcher);
 
+  const {
+    data: tourInfo,
+    error: tourInfoError,
+    isLoading: isTourInfoLoading,
+  } = useSWR(
+    booking?.agriculturalTourPackage?.tourId
+      ? `/general/${booking.agriculturalTourPackage.tourId}`
+      : null,
+    fetcher
+  );
+
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading booking details</div>;
   if (!booking) return <div>Booking not found</div>;
 
+  const isStarted = tourInfo?.isStarted ?? false;
+
   // Status translations and colors
-  const statusBookingTranslations = {
-    [StatusBooking.Pending]: "Đang chờ xử lý",
-    [StatusBooking.Confirmed]: "Đã xác nhận",
-    [StatusBooking.Cancelled]: "Đã hủy",
-    [StatusBooking.Completed]: "Hoàn thành",
-  };
 
   const paymentStatusTranslations = {
     [PaymentStatus.Paid]: "Đã thanh toán",
@@ -77,20 +90,6 @@ const BookedTourDetailsPage = () => {
   };
   const handleTabChange = (event, newValue) => {
     setTabValue(newValue);
-  };
-  const getStatusColor = (status) => {
-    switch (status) {
-      case StatusBooking.Pending:
-        return "warning";
-      case StatusBooking.Confirmed:
-        return "success";
-      case StatusBooking.Cancelled:
-        return "error";
-      case StatusBooking.Completed:
-        return "info";
-      default:
-        return "default";
-    }
   };
 
   const getStatusTrackingColor = (status) => {
@@ -124,14 +123,7 @@ const BookedTourDetailsPage = () => {
         return "default";
     }
   };
-  const calculateTotalAmount = () => {
-    const tourAmount = booking.totalAmmount || 0;
-    const productsAmount =
-      booking.orders?.reduce((sum, order) => {
-        return sum + (order.totalAmount || 0);
-      }, 0) || 0;
-    return (tourAmount + productsAmount).toLocaleString();
-  };
+
   const getStatusMessage = (status) => {
     switch (status) {
       case BookingDestinationStatus.Pending:
@@ -148,6 +140,16 @@ const BookedTourDetailsPage = () => {
         return "Chưa bắt đầu";
     }
   };
+  const handleCancelTour = async () => {
+    try {
+      await post(`/tourist/book-tour/cancel/${id}`);
+      enqueueSnackbar("Hủy tour thành công", { variant: "success" });
+      router.push("/booked-tours");
+    } catch (error) {
+      enqueueSnackbar("Hủy tour thất bại", { variant: "error" });
+    }
+  };
+
   return (
     <CustomerDashboardLayout>
       <UserDashboardHeader
@@ -188,6 +190,7 @@ const BookedTourDetailsPage = () => {
                 <Tab label="Thông tin đặt chuyến" value="1" />
                 <Tab label="Thanh toán" value="2" />
                 <Tab label="Lịch trình" value="3" />
+                <Tab label="Hướng dẫn viên" value="4" />
               </TabList>
             </Box>
 
@@ -217,6 +220,20 @@ const BookedTourDetailsPage = () => {
                         Thông tin đặt chuyến
                       </Typography>
                       <List>
+                        <ListItem>
+                          <ListItemText
+                            primary={
+                              <Typography color="text.secondary">
+                                <strong>Công ty du lịch: </strong>
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography variant="body1">
+                                {tourInfo?.tourCompany?.name}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
                         <ListItem sx={{ py: 1 }}>
                           <ListItemText
                             primary={
@@ -249,6 +266,20 @@ const BookedTourDetailsPage = () => {
                                   hour: "2-digit",
                                   minute: "2-digit",
                                 })}
+                              </Typography>
+                            }
+                          />
+                        </ListItem>
+                        <ListItem>
+                          <ListItemText
+                            primary={
+                              <Typography color="text.secondary">
+                                <strong>Điểm hẹn: </strong>
+                              </Typography>
+                            }
+                            secondary={
+                              <Typography variant="body1">
+                                {tourInfo?.location}
                               </Typography>
                             }
                           />
@@ -456,7 +487,7 @@ const BookedTourDetailsPage = () => {
                                 {destination.typeActivity === 0 ? (
                                   <CalendarMonthOutlined />
                                 ) : destination.typeActivity === 1 ? (
-                                  <CarOutlined />
+                                  <CalendarMonthOutlined />
                                 ) : (
                                   <HomeOutlined />
                                 )}
@@ -586,6 +617,54 @@ const BookedTourDetailsPage = () => {
                 )}
               </Box>
             </TabPanel>
+            <TabPanel value="4" sx={{ p: 0 }}>
+              <Box
+                sx={{
+                  bgcolor: "#f8f9fa",
+                  p: 3,
+                  borderRadius: 2,
+                  border: "1px solid #e0e0e0",
+                }}
+              >
+                <Typography
+                  variant="h6"
+                  gutterBottom
+                  color="primary.main"
+                  fontWeight="bold"
+                >
+                  Danh sách hướng dẫn viên
+                </Typography>
+                {tourInfo?.tourGuides?.length > 0 ? (
+                  <List>
+                    {tourInfo.tourGuides.map((guide, index) => (
+                      <ListItem key={index} sx={{ py: 1 }}>
+                        <ListItemText
+                          primary={
+                            <Typography variant="body1" fontWeight="bold">
+                              {guide.name}
+                            </Typography>
+                          }
+                          secondary={
+                            <Stack spacing={0.5}>
+                              <Typography variant="body2">
+                                Số điện thoại: {guide.phone || "Chưa cập nhật"}
+                              </Typography>
+                              <Typography variant="body2">
+                                Email: {guide.email || "Chưa cập nhật"}
+                              </Typography>
+                            </Stack>
+                          }
+                        />
+                      </ListItem>
+                    ))}
+                  </List>
+                ) : (
+                  <Alert severity="info">
+                    Chưa có thông tin hướng dẫn viên
+                  </Alert>
+                )}
+              </Box>
+            </TabPanel>
           </TabContext>
 
           {/* Actions */}
@@ -597,8 +676,21 @@ const BookedTourDetailsPage = () => {
             >
               Trở lại
             </Button>
+
+            {isStarted === false && (
+              <Button
+                variant="contained"
+                onClick={() => setOpenConfirm(true)}
+                color="error"
+                sx={{ mr: 2 }}
+              >
+                Hủy tour
+              </Button>
+            )}
+
             <Button
               variant="contained"
+              color="primary"
               onClick={() => router.push(`/tour-packages/${booking.tourId}`)}
               sx={{ mr: 2 }}
             >
@@ -612,6 +704,15 @@ const BookedTourDetailsPage = () => {
           </Box>
         </CardContent>
       </Card>
+      <ConfirmDialog
+        open={openConfirm}
+        onClose={() => setOpenConfirm(false)}
+        onConfirm={handleCancelTour}
+        title="Xác nhận hủy tour"
+        message="Bạn có chắc chắn muốn hủy tour này?"
+        confirmText="Đồng ý"
+        cancelText="Hủy bỏ"
+      />
     </CustomerDashboardLayout>
   );
 };

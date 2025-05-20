@@ -4,6 +4,7 @@ import { DatePicker } from "@mui/x-date-pickers";
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import Card1 from "components/Card1";
+import FileUploader from "components/FileUploader";
 import { FlexBox } from "components/flex-box";
 import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
@@ -15,7 +16,6 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState } from "react";
 import * as yup from "yup";
-import { FileUploader } from "./FileUploader";
 // ===========================================================
 // Add this import at the top
 import { useSnackbar } from "notistack";
@@ -45,7 +45,7 @@ const ProfileEditor = () => {
     }
   }, [id]);
 
-  if (!user) return <p>Đang tải...</p>;
+  if (!user) return null;
 
   const INITIAL_VALUES = {
     fullName: user.fullName || "",
@@ -242,5 +242,4 @@ const ProfileEditor = () => {
   );
 };
 
-// Remove getStaticPaths and getStaticProps as we're using client-side data fetching
 export default ProfileEditor;

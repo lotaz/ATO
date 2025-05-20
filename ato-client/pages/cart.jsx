@@ -25,7 +25,6 @@ import { useRouter } from "next/router";
 import CheckoutForm from "pages-sections/checkout/CheckoutForm";
 import { useEffect, useLayoutEffect, useState } from "react";
 import paymentService from "services/payment.service";
-import { enqueueSnackbar } from "notistack";
 
 const Cart = () => {
   const { state } = useAppContext();
@@ -33,11 +32,14 @@ const Cart = () => {
   const [groupShippingFees, setGroupShippingFees] = useState({});
   const [selectedProducts, setSelectedProducts] = useState({});
   const [selectAll, setSelectAll] = useState(false);
+  const router = useRouter();
 
   useLayoutEffect(() => {
-    const token = localStorage.getItem("jwt_token");
-    if (!token) {
-      router.push("/login");
+    if (typeof window !== "undefined") {
+      const token = localStorage.getItem("jwt_token");
+      if (!token) {
+        router.push("/login");
+      }
     }
   }, [router]);
 
@@ -159,7 +161,6 @@ const Cart = () => {
   const [shippingMethod, setShippingMethod] = useState("standard");
   const [paymentMethod, setPaymentMethod] = useState(PaymentType.Transfer);
 
-  const router = useRouter();
   const [addresses, setAddresses] = useState([]);
   const [shippingFee, setShippingFee] = useState(0);
   const [selectedAddressId, setSelectedAddressId] = useState(null);

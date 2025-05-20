@@ -8,6 +8,7 @@ import {
   CardContent,
   Chip,
   CircularProgress,
+  InputAdornment,
 } from "@mui/material";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { H2 } from "components/Typography";
@@ -15,7 +16,7 @@ import Footer from "components/footer/Footer";
 import SEO from "components/SEO";
 import { useState, useEffect } from "react";
 import { get } from "helpers/axios-helper";
-import { LocationOn } from "@mui/icons-material";
+import { LocationOn, Search } from "@mui/icons-material";
 import { TextField, MenuItem, Button } from "@mui/material";
 import Skeleton from "@mui/material/Skeleton";
 import { useRouter } from "next/router";
@@ -203,9 +204,7 @@ const FacilityCard = ({ facility }) => (
           }}
         >
           <LocationOn fontSize="small" />
-          {[facility.ward_name, facility.district_name, facility.province_name]
-            .filter(Boolean)
-            .join(", ")}
+          {facility.address}
         </Typography>
       </Box>
     </CardContent>
@@ -280,24 +279,53 @@ const FacilityList = () => {
   return (
     <ShopLayout2>
       {/* Hero Section */}
+
       <Box
         sx={{
-          background: "linear-gradient(to right, #1976d2, #0d47a1)",
+          backgroundImage: "url('/assets/small-banners/blur-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           py: { xs: 6, md: 10 },
           mb: 6,
         }}
       >
         <Container maxWidth="lg">
-          <H2 color="white" textAlign="center" mb={2}>
-            Cơ sở du lịch
-          </H2>
-          <Typography
-            color="white"
-            textAlign="center"
-            sx={{ maxWidth: 600, mx: "auto" }}
-          >
-            Khám phá các cơ sở du lịch hiện đại phục vụ cho du lịch nông nghiệp
-          </Typography>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={8} sx={{ mx: "auto", textAlign: "center" }}>
+              <H2 color="white" mb={2}>
+                Cơ sở du lịch
+              </H2>
+              <Typography color="white" sx={{ mb: 4, opacity: 0.9 }}>
+                Khám phá các cơ sở du lịch hiện đại phục vụ cho du lịch nông
+                nghiệp
+              </Typography>
+
+              {/* Search Bar in Hero */}
+              <TextField
+                fullWidth
+                variant="outlined"
+                placeholder="Tìm kiếm cơ sở du lịch..."
+                onChange={(e) =>
+                  setFilters({ ...filters, search: e.target.value })
+                }
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <Search />
+                    </InputAdornment>
+                  ),
+                }}
+                sx={{
+                  maxWidth: 600,
+                  mx: "auto",
+                  "& .MuiOutlinedInput-root": {
+                    bgcolor: "white",
+                    borderRadius: 2,
+                  },
+                }}
+              />
+            </Grid>
+          </Grid>
         </Container>
       </Box>
 
@@ -306,56 +334,6 @@ const FacilityList = () => {
         <SEO title="Cơ sở du lịch" />
 
         {/* Filter Section */}
-        <Box sx={{ mb: 4, p: 3, bgcolor: "background.paper", borderRadius: 2 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} md={4}>
-              <TextField
-                fullWidth
-                label="Tìm kiếm cơ sở"
-                value={filters.search}
-                onChange={(e) =>
-                  setFilters({ ...filters, search: e.target.value })
-                }
-              />
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                select
-                fullWidth
-                label="Tỉnh/Thành phố"
-                value={filters.province}
-                onChange={(e) =>
-                  setFilters({ ...filters, province: e.target.value })
-                }
-              >
-                <MenuItem value="">Tất cả</MenuItem>
-                {provinces.map((province) => (
-                  <MenuItem key={province} value={province}>
-                    {province}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-            <Grid item xs={12} md={4}>
-              <TextField
-                select
-                fullWidth
-                label="Quận/Huyện"
-                value={filters.district}
-                onChange={(e) =>
-                  setFilters({ ...filters, district: e.target.value })
-                }
-              >
-                <MenuItem value="">Tất cả</MenuItem>
-                {districts.map((district) => (
-                  <MenuItem key={district} value={district}>
-                    {district}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </Grid>
-          </Grid>
-        </Box>
 
         <Grid container spacing={3}>
           <Grid item xs={12}>

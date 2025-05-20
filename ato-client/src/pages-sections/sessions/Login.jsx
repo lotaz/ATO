@@ -175,11 +175,9 @@ const Login = () => {
       <FlexRowCenter mt="1.25rem">
         <Box>Chưa có tài khoản?</Box>
         <Link href="/signup" passHref legacyBehavior>
-          <a>
-            <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
-              Đăng ký
-            </H6>
-          </a>
+          <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
+            Đăng ký
+          </H6>
         </Link>
       </FlexRowCenter>
 
@@ -192,11 +190,9 @@ const Login = () => {
       >
         Quên mật khẩu?
         <Link href="/reset-password" passHref legacyBehavior>
-          <a>
-            <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
-              Cài đặt lại mật khẩu
-            </H6>
-          </a>
+          <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
+            Cài đặt lại mật khẩu
+          </H6>
         </Link>
       </FlexBox>
     </Wrapper>

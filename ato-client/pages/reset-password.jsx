@@ -70,11 +70,9 @@ const ResetPassword = () => {
           <FlexRowCenter mt="1.25rem" justifyContent="center" width="100%">
             <Box>Chưa có tài khoản?</Box>
             <Link href="/signup" passHref legacyBehavior>
-              <a>
-                <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
-                  Đăng ký
-                </H6>
-              </a>
+              <H6 ml={1} borderBottom="1px solid" borderColor="grey.900">
+                Đăng ký
+              </H6>
             </Link>
           </FlexRowCenter>
         </FlexBox>

@@ -135,7 +135,7 @@ const OrderDetails = () => {
     }
   };
 
-  if (!order) return <p>Đang tải...</p>;
+  if (!order) return null;
 
   return (
     <CustomerDashboardLayout>

@@ -3,8 +3,6 @@ import SEO from "components/SEO";
 import Setting from "components/Setting";
 import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
-import { MobileNavigationBar2 } from "components/mobile-navigation";
-import HealthBeautySidenav from "components/page-sidenav/HealthBeautySideNav";
 import BannerSection from "pages-sections/home/BannerSection";
 import BlogSection from "pages-sections/home/BlogSection";
 import CategorySection from "pages-sections/home/CategorySection";
@@ -61,9 +59,6 @@ const Index = (props) => {
       <Setting />
 
       {/* SMALL DEVICE BOTTOM NAVIGATION */}
-      <MobileNavigationBar2>
-        <HealthBeautySidenav navList={props.navigationList} />
-      </MobileNavigationBar2>
     </ShopLayout2>
   );
 };

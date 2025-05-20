@@ -16,32 +16,53 @@ import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { get } from "helpers/axios-helper";
 import { useRouter } from "next/router";
-import { useState } from "react";
 import useSWR from "swr";
 import { TimeType } from "types/tour.ts";
+import { useEffect, useState, useCallback } from "react";
 
 const fetcher = (url) => get(url).then((res) => res.data);
 
+// Add Skeleton component
+const SkeletonCard = () => (
+  <Card sx={{ height: "100%", borderRadius: 2, overflow: "hidden" }}>
+    <Box sx={{ height: 220, bgcolor: "grey.300" }} />
+    <Box sx={{ p: 2.5 }}>
+      <Box sx={{ height: 52, bgcolor: "grey.300", mb: 1.5 }} />
+      <Box sx={{ height: 60, bgcolor: "grey.300", mb: 2 }} />
+      <Box sx={{ height: 20, bgcolor: "grey.300", mb: 1.5 }} />
+      <Box sx={{ height: 20, bgcolor: "grey.300", mb: 2 }} />
+      <Box sx={{ height: 40, bgcolor: "grey.300" }} />
+    </Box>
+  </Card>
+);
+
 const TourPackages = () => {
   const [searchQuery, setSearchQuery] = useState("");
-  const [priceRange, setPriceRange] = useState([0, 10000000]);
+  const [priceRange, setPriceRange] = useState([0, 100000000]);
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
-  const [page, setPage] = useState(1);
-  const itemsPerPage = 6;
+  const [visibleItems, setVisibleItems] = useState(3);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [allPackages, setAllPackages] = useState([]);
 
   const router = useRouter();
 
-  const {
-    data: tourPackages = [],
-    error,
-    isLoading,
-  } = useSWR(
-    "/agricultural-tour-package/get-list-agricultural-tour-packages",
-    fetcher
-  );
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const response = await get(
+          "/agricultural-tour-package/get-list-agricultural-tour-packages"
+        );
+        setAllPackages(response.data);
+      } catch (error) {
+        console.error("Failed to fetch packages:", error);
+      }
+    };
 
-  const filteredPackages = tourPackages.filter((pack) => {
+    fetchPackages();
+  }, []);
+
+  const filteredPackages = allPackages.filter((pack) => {
     const matchesSearch = pack.packageName
       .toLowerCase()
       .includes(searchQuery.toLowerCase());
@@ -55,23 +76,38 @@ const TourPackages = () => {
     return matchesSearch && matchesPrice && matchesDate;
   });
 
-  const totalPages = Math.ceil(filteredPackages.length / itemsPerPage);
-  const paginatedPackages = filteredPackages.slice(
-    (page - 1) * itemsPerPage,
-    page * itemsPerPage
-  );
-
-  const handlePageChange = (_, value) => {
-    setPage(value);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+  const loadMoreItems = async () => {
+    if (isLoadingMore) return;
+    setIsLoadingMore(true);
+    await new Promise((resolve) => setTimeout(resolve, 1000)); // Simulate async loading
+    setVisibleItems((prev) => prev + 3);
+    setIsLoadingMore(false);
   };
+
+  useEffect(() => {
+    if (visibleItems >= filteredPackages.length) return;
+
+    const handleScroll = () => {
+      if (
+        window.innerHeight + document.documentElement.scrollTop >=
+        document.documentElement.offsetHeight - 100
+      ) {
+        loadMoreItems();
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, [isLoadingMore, visibleItems, filteredPackages]);
 
   return (
     <ShopLayout2>
       <Box sx={{ mb: 4 }}>
         <Box
           sx={{
-            background: "linear-gradient(to right, #1976d2, #0d47a1)",
+            backgroundImage: "url('/assets/small-banners/blur-bg.png')",
+            backgroundSize: "cover",
+            backgroundPosition: "center",
             py: { xs: 6, md: 10 },
             mb: 6,
           }}
@@ -94,7 +130,6 @@ const TourPackages = () => {
               value={searchQuery}
               onChange={(e) => {
                 setSearchQuery(e.target.value);
-                setPage(1);
               }}
               InputProps={{
                 startAdornment: (
@@ -118,11 +153,11 @@ const TourPackages = () => {
                   value={priceRange}
                   onChange={(_, newValue) => {
                     setPriceRange(newValue);
-                    setPage(1);
+                    setVisibleItems(3);
                   }}
                   valueLabelDisplay="auto"
                   min={0}
-                  max={10000000}
+                  max={100000000}
                   step={500000}
                   sx={{ mb: 3 }}
                 />
@@ -133,7 +168,6 @@ const TourPackages = () => {
                   value={startDate}
                   onChange={(e) => {
                     setStartDate(e.target.value);
-                    setPage(1);
                   }}
                   fullWidth
                   InputProps={{
@@ -150,7 +184,6 @@ const TourPackages = () => {
                   value={endDate}
                   onChange={(e) => {
                     setEndDate(e.target.value);
-                    setPage(1);
                   }}
                   fullWidth
                   InputProps={{
@@ -164,33 +197,18 @@ const TourPackages = () => {
             </Grid>
 
             <Grid item xs={12} md={9}>
-              {isLoading ? (
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    minHeight: 400,
-                  }}
-                >
-                  <CircularProgress />
-                </Box>
-              ) : error ? (
-                <Box
-                  sx={{
-                    textAlign: "center",
-                    py: 8,
-                    px: 2,
-                  }}
-                >
-                  <Typography color="error">
-                    Đã xảy ra lỗi khi tải dữ liệu
-                  </Typography>
-                </Box>
+              {allPackages.length === 0 ? (
+                <Grid container spacing={3}>
+                  {Array.from({ length: 3 }).map((_, index) => (
+                    <Grid item xs={12} sm={6} md={4} key={index}>
+                      <SkeletonCard />
+                    </Grid>
+                  ))}
+                </Grid>
               ) : filteredPackages.length > 0 ? (
                 <>
                   <Grid container spacing={3}>
-                    {paginatedPackages.map((pack) => (
+                    {filteredPackages.slice(0, visibleItems).map((pack) => (
                       <Grid item xs={12} sm={6} md={4} key={pack.tourId}>
                         <Card
                           sx={{
@@ -383,50 +401,14 @@ const TourPackages = () => {
                     ))}
                   </Grid>
 
-                  {totalPages > 1 && (
-                    <Box
-                      sx={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        mt: 6,
-                        mb: 4,
-                        gap: 2,
-                      }}
-                    >
-                      <Pagination
-                        count={totalPages}
-                        page={page}
-                        onChange={handlePageChange}
-                        color="primary"
-                        size="large"
-                        showFirstButton
-                        showLastButton
-                        sx={{
-                          "& .MuiPaginationItem-root": {
-                            fontSize: 16,
-                            fontWeight: 500,
-                            mx: 0.5,
-                          },
-                          "& .MuiPaginationItem-page.Mui-selected": {
-                            bgcolor: "primary.main",
-                            color: "white",
-                            "&:hover": {
-                              bgcolor: "primary.dark",
-                            },
-                          },
-                          "& .MuiPaginationItem-page:hover": {
-                            bgcolor: "primary.light",
-                          },
-                          "& .MuiPaginationItem-firstLast": {
-                            bgcolor: "grey.100",
-                          },
-                        }}
-                      />
-                      <Typography variant="body2" color="text.secondary">
-                        Trang {page} / {totalPages}
-                      </Typography>
-                    </Box>
+                  {isLoadingMore && (
+                    <Grid container spacing={3} sx={{ mt: 2 }}>
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <Grid item xs={12} sm={6} md={4} key={index}>
+                          <SkeletonCard />
+                        </Grid>
+                      ))}
+                    </Grid>
                   )}
                 </>
               ) : (

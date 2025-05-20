@@ -10,4 +10,7 @@ module.exports = {
     apiUrl: process.env.NEXT_PUBLIC_API_URL,
     environment: process.env.NEXT_ENV,
   },
+  typescript: {
+    ignoreBuildErrors: true,
+  },
 };

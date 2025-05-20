@@ -39,7 +39,9 @@ const ContactPage = () => {
       {/* Hero Section */}
       <Box
         sx={{
-          background: "linear-gradient(to right, #1976d2, #0d47a1)",
+          backgroundImage: "url('/assets/small-banners/blur-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
           py: { xs: 6, md: 10 },
           mb: 6,
         }}
