@@ -196,7 +196,7 @@ const TourPackageList = () => {
                       <Typography variant="body2">Người lớn: {formatCurrency(pkg.priceOfAdults)}</Typography>
                       <Typography variant="body2">Trẻ em: {formatCurrency(pkg.priceOfChildren)}</Typography>
                       <Typography variant="caption" color="text.secondary">
-                        (Áp dụng cho trẻ {pkg.childTicketAge} tuổi)
+                        (Áp dụng cho trẻ {pkg.childTicketAge})
                       </Typography>
                     </Box>
                   </Stack>

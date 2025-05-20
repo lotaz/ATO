@@ -17,7 +17,7 @@ import { TOUR_GUIDE_URLs } from '../../constants/tour-guide-urls';
 import { tourTrackingService } from '../../services/tour-tracking';
 import { AgriculturalTourPackageResponse } from '../../types/tourism-company/agricultural-tour.types';
 import { TimeType } from '../../types/tourism-facility/package.types';
-import { post, put } from '../../helpers/axios-helper';
+import { get, post, put } from '../../helpers/axios-helper';
 import { BookingDestinationStatus, BookingTourDestination } from './types';
 import { Dialog, DialogTitle, DialogContent, DialogActions, TextField } from '@mui/material';
 
@@ -26,7 +26,11 @@ interface TabPanelProps {
   index: number;
   value: number;
 }
-
+interface TouristInfo {
+  name?: string;
+  phone?: string;
+  email?: string;
+}
 const TabPanel = (props: TabPanelProps) => {
   const { children, value, index, ...other } = props;
   return (
@@ -55,10 +59,26 @@ const TourPackageDetails = () => {
   const [tabValue, setTabValue] = useState(0);
   const [openTrackingModal, setOpenTrackingModal] = useState(false);
   const [currentTracking, setCurrentTracking] = useState<BookingTourDestination | null>(null);
+  const [tourists, setTourists] = useState<TouristInfo[]>([]);
+
   useEffect(() => {
     if (id) {
       fetchTourPackage();
     }
+  }, [id]);
+
+  useEffect(() => {
+    const fetchTourists = async () => {
+      if (!id) return;
+      try {
+        const response = await get(`/general/tourist/${id}`);
+        setTourists(response.data);
+      } catch (error) {
+        console.error('Failed to fetch tourists:', error);
+      }
+    };
+
+    fetchTourists();
   }, [id]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
@@ -155,6 +175,7 @@ const TourPackageDetails = () => {
             <Tab label="Thông tin cơ bản" />
             <Tab label="Điểm đến" />
             <Tab label="Hướng dẫn viên" />
+            <Tab label="Du khách" />
           </Tabs>
         </Box>
 
@@ -393,6 +414,35 @@ const TourPackageDetails = () => {
               </Grid>
             ) : (
               <Typography>Không có hướng dẫn viên nào</Typography>
+            )}
+          </CardContent>
+        </TabPanel>
+        <TabPanel value={tabValue} index={3}>
+          <CardContent>
+            {tourists.length > 0 ? (
+              <Grid container spacing={3}>
+                {tourists.map((tourist, index) => (
+                  <Grid item xs={12} md={6} key={index}>
+                    <Card variant="outlined">
+                      <CardContent>
+                        <Stack spacing={2}>
+                          <Typography variant="h6">{tourist.name || 'Không có tên'}</Typography>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <PhoneOutlined style={{ color: 'text.secondary' }} />
+                            <Typography>{tourist.phone || 'Không có số điện thoại'}</Typography>
+                          </Box>
+                          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                            <MailOutlined style={{ color: 'text.secondary' }} />
+                            <Typography>{tourist.email || 'Không có email'}</Typography>
+                          </Box>
+                        </Stack>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+                ))}
+              </Grid>
+            ) : (
+              <Typography>Không có du khách nào</Typography>
             )}
           </CardContent>
         </TabPanel>

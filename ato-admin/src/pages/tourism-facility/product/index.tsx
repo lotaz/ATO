@@ -17,7 +17,7 @@ const ProductList = () => {
   const { products } = useSelector((state: RootState) => state.productSlice);
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1); // Starting from 1 for better UX
-  const [rowsPerPage] = useState(12); // Adjusted for grid layout
+  const [rowsPerPage] = useState(8); // Adjusted for grid layout
 
   const filteredProducts =
     products?.filter(

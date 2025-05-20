@@ -275,12 +275,11 @@ const ContractDetails = () => {
                   border: '1px solid',
                   borderColor: 'divider',
                   borderRadius: 1,
-                  p: 2,
-                  maxHeight: 400,
+                  p: 1,
                   overflowY: 'auto'
                 }}
               >
-                <Typography whiteSpace="pre-wrap">{contract?.contractContent || 'Không có nội dung hợp đồng'}</Typography>
+                <p>{contract?.contractContent || 'Không có nội dung hợp đồng'}</p>
               </Box>
             </Grid>
 

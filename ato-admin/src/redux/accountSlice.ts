@@ -15,6 +15,15 @@ export const createAccount = createAsyncThunk('account/create', async (data: ICr
   }
 });
 
+export const createTourGuideAccount = createAsyncThunk('account/create-guide', async (data: ICreateAccountRequest, { rejectWithValue }) => {
+  try {
+    const response = await accountService.createGuideAccount(data);
+    return response;
+  } catch (error: any) {
+    return rejectWithValue(error.response?.data || error.message);
+  }
+});
+
 // Add new thunk
 export const updateAccount = createAsyncThunk('account/update', async (data: IUpdateAccountRequest, { rejectWithValue }) => {
   try {
@@ -74,6 +83,19 @@ const accountSlice = createSlice({
         enqueueSnackbar('Tạo tài khoản thành công', { variant: 'success' });
       })
       .addCase(createAccount.rejected, (state, action) => {
+        state.createLoading = false;
+        state.createError = action.payload as string;
+        enqueueSnackbar('Tạo tài khoản thất bại', { variant: 'error' });
+      })
+      .addCase(createTourGuideAccount.pending, (state) => {
+        state.createLoading = true;
+        state.createError = null;
+      })
+      .addCase(createTourGuideAccount.fulfilled, (state) => {
+        state.createLoading = false;
+        enqueueSnackbar('Tạo tài khoản thành công', { variant: 'success' });
+      })
+      .addCase(createTourGuideAccount.rejected, (state, action) => {
         state.createLoading = false;
         state.createError = action.payload as string;
         enqueueSnackbar('Tạo tài khoản thất bại', { variant: 'error' });

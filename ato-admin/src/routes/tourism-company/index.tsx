@@ -14,7 +14,6 @@ const TourCompanyRoutes: TRoute = {
   path: TOURISM_COMPANY_BASE_URL,
   element: <Layout />,
   children: [
-    ...TourGuideTeamRoutes,
     ...tourismCompanyTourPackageRoutes,
     ...tourDestinationRoutes,
     ...DriverRoutes,

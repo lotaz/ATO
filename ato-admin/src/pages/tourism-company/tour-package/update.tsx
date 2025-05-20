@@ -90,13 +90,13 @@ const validationSchema = Yup.object().shape({
   slot: Yup.number().min(1, 'Số chỗ phải lớn hơn 0').required('Vui lòng nhập số chỗ'),
   priceOfAdults: Yup.number().min(0, 'Giá không được âm').required('Vui lòng nhập giá'),
   priceOfChildren: Yup.number().min(0, 'Giá không được âm').required('Vui lòng nhập giá'),
-  childTicketAge: Yup.string().required('Vui lòng nhập tuổi'),
   startTime: Yup.date().required('Vui lòng chọn thời gian bắt đầu'),
   endTime: Yup.date()
     .min(Yup.ref('startTime'), 'Thời gian kết thúc phải sau thời gian bắt đầu')
     .required('Vui lòng chọn thời gian kết thúc'),
   durations: Yup.number().min(0.5, 'Thời lượng phải lớn hơn 0.5').required('Vui lòng nhập thời lượng'),
   durationsType: Yup.string().required('Vui lòng chọn đơn vị thời gian'),
+  gatheringLocation: Yup.string().optional(),
   tourGuides: Yup.array().of(Yup.string()).optional(),
   tourDestinations: Yup.array().of(
     Yup.object().shape({
@@ -231,6 +231,7 @@ const UpdateTourPackage = () => {
     durationsType: tourPackage?.durationsType || TimeType.DAY,
     tourGuides: tourPackage?.tourGuides?.map((g: any) => g.guideId) || [],
     statusActive: tourPackage?.statusActive || 0,
+    gatheringLocation: tourPackage?.gatheringLocation || '',
     tourDestinations:
       tourPackage?.tourDestinations?.map((dest: any) => ({
         title: dest.title || '',
@@ -344,7 +345,7 @@ const UpdateTourPackage = () => {
                     />
                   </Grid>
 
-                  <Grid item xs={12} md={6}>
+                  <Grid item xs={12}>
                     <TextField
                       fullWidth
                       type="number"
@@ -355,20 +356,6 @@ const UpdateTourPackage = () => {
                       onBlur={handleBlur}
                       error={Boolean(touched.priceOfChildren && errors.priceOfChildren)}
                       helperText={touched.priceOfChildren && errors.priceOfChildren}
-                    />
-                  </Grid>
-
-                  <Grid item xs={12} md={6}>
-                    <TextField
-                      fullWidth
-                      type="text"
-                      label="Tuổi áp dụng giá trẻ em"
-                      name="childTicketAge"
-                      value={values.childTicketAge}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      error={Boolean(touched.childTicketAge && errors.childTicketAge)}
-                      helperText={touched.childTicketAge && errors.childTicketAge}
                     />
                   </Grid>
 
@@ -1038,6 +1025,21 @@ const UpdateTourPackage = () => {
                         )}
                       </FieldArray>
                     </Card>
+                  </Grid>
+
+                  <Grid item xs={12}>
+                    <TextField
+                      fullWidth
+                      multiline
+                      rows={4}
+                      label="Điểm hẹn"
+                      name="gatheringLocation"
+                      value={values.gatheringLocation}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                      error={Boolean(touched.gatheringLocation && errors.gatheringLocation)}
+                      helperText={touched.gatheringLocation && errors.gatheringLocation}
+                    />
                   </Grid>
 
                   <Grid item xs={12}>

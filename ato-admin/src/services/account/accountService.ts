@@ -26,10 +26,13 @@ export const accountService = {
     return response.data;
   },
   createAccount: async (data: ICreateAccountRequest) => {
-    console.log('data', data);
     const response = await post(`${API_URLs.ACCOUNT.CREATE}`, data);
-    console.log('response', response);
     return response.data;
+  },
+
+  createGuideAccount: async (data: ICreateAccountRequest) => {
+    const response = await post(`${API_URLs.ACCOUNT.CREATE_GUIDE}`, data);
+    console.log('response', response);
   },
   updateAccount: async (data: IUpdateAccountRequest) => {
     const response = await put(`admin/user/update-account`, data);
