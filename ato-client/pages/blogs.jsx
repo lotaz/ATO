@@ -60,11 +60,11 @@ const BlogsPage = ({ blogs }) => {
       <Box sx={{ mb: 4 }}>
         <Box
           sx={{
-            background: "linear-gradient(to right, #1976d2, #0d47a1)",
+            backgroundImage: "url('/assets/small-banners/blur-bg.png')",
             backgroundSize: "cover",
             backgroundPosition: "center",
             py: { xs: 6, md: 10 },
-            mb: 4,
+            mb: 6,
           }}
         >
           <Container maxWidth="lg">

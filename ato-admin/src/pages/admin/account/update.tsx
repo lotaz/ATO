@@ -85,7 +85,8 @@ const UpdateAccount = () => {
               await dispatch(
                 updateAccount({
                   ...values,
-                  dob: dayjs(values.dob).format('YYYY-MM-DD')
+                  dob: dayjs(values.dob).format('YYYY-MM-DD'),
+                  phoneNumber: values.phoneNumber.replace(/\s/g, '')
                 })
               ).unwrap();
               navigate(ADMIN_URLs.ACCOUNT.INDEX);

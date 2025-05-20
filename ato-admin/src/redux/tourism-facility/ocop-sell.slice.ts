@@ -1,11 +1,13 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
 import { OCOPSell } from '../../types/tourism-facility/ocop-sell.types';
 import { ocopSellService } from '../../services/tourism-facility/ocop-sell.service';
+import { enqueueSnackbar } from 'notistack';
 
 interface OCOPSellState {
   list: OCOPSell[];
   selectedOCOPSell: OCOPSell | null;
   loading: boolean;
+  isNaviagate: boolean;
   error: string | null;
 }
 
@@ -13,7 +15,8 @@ const initialState: OCOPSellState = {
   list: [],
   selectedOCOPSell: null,
   loading: false,
-  error: null
+  error: null,
+  isNaviagate: false
 };
 
 export const fetchOCOPSells = createAsyncThunk('ocopSell/fetchAll', async (id: string) => {
@@ -44,13 +47,16 @@ const ocopSellSlice = createSlice({
     builder
       .addCase(fetchOCOPSells.pending, (state) => {
         state.loading = true;
+        state.isNaviagate = false;
       })
       .addCase(fetchOCOPSells.fulfilled, (state, action) => {
         state.loading = false;
+
         state.list = action.payload;
       })
       .addCase(fetchOCOPSells.rejected, (state, action) => {
         state.loading = false;
+
         state.error = action.error.message || null;
       })
       .addCase(fetchOCOPSell.fulfilled, (state, action) => {
@@ -58,6 +64,9 @@ const ocopSellSlice = createSlice({
       })
       .addCase(createOCOPSell.fulfilled, (state, action) => {
         state.list.push(action.payload);
+
+        state.isNaviagate = action.payload.status;
+        enqueueSnackbar(action.payload.message, { variant: action.payload.status ? 'success' : 'error' });
       })
       .addCase(updateOCOPSell.fulfilled, (state, action) => {
         const index = state.list.findIndex((item) => item.ocopSellId === action.payload.ocopSellId);

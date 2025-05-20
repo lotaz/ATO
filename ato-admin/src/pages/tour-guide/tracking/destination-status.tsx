@@ -1,16 +1,6 @@
 import { SaveOutlined } from '@ant-design/icons';
 import { LoadingButton } from '@mui/lab';
-import {
-  Box,
-  Card,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Typography
-} from '@mui/material';
+import { Box, Card, FormControl, InputLabel, MenuItem, Select, Stack, TextField, Typography } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
@@ -49,8 +39,8 @@ const DestinationStatusPage = () => {
         },
         body: JSON.stringify({
           ...formData,
-          actualStartTime: formData.actualStartTime ? dayjs(formData.actualStartTime).toISOString() : undefined,
-          actualEndTime: formData.actualEndTime ? dayjs(formData.actualEndTime).toISOString() : undefined
+          actualStartTime: formData.actualStartTime ? dayjs(formData.actualStartTime)?.toISOString() : undefined,
+          actualEndTime: formData.actualEndTime ? dayjs(formData.actualEndTime)?.toISOString() : undefined
         })
       });
 
@@ -117,12 +107,7 @@ const DestinationStatusPage = () => {
             onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
           />
 
-          <LoadingButton
-            loading={loading}
-            variant="contained"
-            startIcon={<SaveOutlined />}
-            onClick={handleSubmit}
-          >
+          <LoadingButton loading={loading} variant="contained" startIcon={<SaveOutlined />} onClick={handleSubmit}>
             Cập nhật
           </LoadingButton>
         </Stack>

@@ -19,7 +19,8 @@ export const API_URLs = {
   ACCOUNT: {
     LIST: '/admin/user/get-list-users',
     GET: '/admin/user/get-user/:id',
-    CREATE: '/admin/user/create-account'
+    CREATE: '/admin/user/create-account',
+    CREATE_GUIDE: '/admin/user/create-tour-guide'
   },
   COMPANY: {
     LIST: '/admin/tour-company/list-tour-companies',

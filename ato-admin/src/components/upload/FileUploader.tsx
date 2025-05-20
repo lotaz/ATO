@@ -10,7 +10,7 @@ interface FileUploaderProps {
   accept?: string;
 }
 
-const UploadWrapper = styled(Box)(({ theme }) => ({
+const UploadWrapper = styled(Box)(() => ({
   position: 'relative',
   width: '150px',
   height: '150px',
@@ -21,7 +21,7 @@ const UploadWrapper = styled(Box)(({ theme }) => ({
   }
 }));
 
-const UploadOverlay = styled(Box)(({ theme }) => ({
+const UploadOverlay = styled(Box)(() => ({
   position: 'absolute',
   bottom: 0,
   left: 0,

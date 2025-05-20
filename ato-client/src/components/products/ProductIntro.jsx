@@ -156,9 +156,7 @@ const ProductIntro = ({ product }) => {
           <FlexBox alignItems="center" mb={2}>
             <Box>Sold By:</Box>
             <Link href="/shops/fdfdsa">
-              <a>
-                <H6 ml={1}>Mobile Store</H6>
-              </a>
+              <H6 ml={1}>Mobile Store</H6>
             </Link>
           </FlexBox>
         </Grid>

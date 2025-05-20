@@ -2,17 +2,26 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Box, Button, Card, CardContent, Grid, Stack, TextField, Typography } from '@mui/material';
 import { DatePicker } from '@mui/x-date-pickers';
 import { useFormik } from 'formik';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import * as Yup from 'yup';
 import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-urls';
 import { createOCOPSell } from '../../../../redux/tourism-facility/ocop-sell.slice';
+import { useEffect } from 'react';
+import { RootState } from '../../../../redux/store';
 
 const CreateOCOPSell = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch<any>();
   const params = new URLSearchParams(location.search);
   const productId = params.get('productId');
+  const isNaviagate = useSelector((state: RootState) => state.ocopSellSlice.isNaviagate);
+
+  useEffect(() => {
+    if (isNaviagate) {
+      navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${productId}`);
+    }
+  }, [isNaviagate]);
 
   const formik = useFormik({
     initialValues: {
@@ -31,7 +40,6 @@ const CreateOCOPSell = () => {
     onSubmit: async (values) => {
       try {
         await dispatch(createOCOPSell(values));
-        navigate(`${TOURISM_FACILITY_URLs.PRODUCT.DETAILS}?productId=${productId}`);
       } catch (error) {
         console.error('Failed to create OCOP sell:', error);
       }

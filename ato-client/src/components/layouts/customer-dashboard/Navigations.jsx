@@ -1,21 +1,15 @@
-import { Fragment } from "react";
-import { useRouter } from "next/router";
-import { Card, styled, Typography } from "@mui/material";
 import {
   CardTravelOutlined,
-  CreditCard,
-  FavoriteBorder,
   KeyOutlined,
   LocationCity,
-  PasswordOutlined,
-  Person,
-  Place,
-  PlaceOutlined,
+  Person
 } from "@mui/icons-material";
 import ShoppingBagOutlined from "@mui/icons-material/ShoppingBagOutlined";
+import { Card, styled, Typography } from "@mui/material";
 import { FlexBox } from "components/flex-box";
-import CustomerService from "components/icons/CustomerService";
 import NavLink from "components/nav-link/NavLink"; // custom styled components
+import { useRouter } from "next/router";
+import { Fragment } from "react";
 
 const MainContainer = styled(Card)(({ theme }) => ({
   paddingBottom: "1.5rem",

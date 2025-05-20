@@ -281,7 +281,7 @@ const UpdateContract = () => {
                 fullWidth
                 label="Nội dung hợp đồng"
                 multiline
-                rows={4}
+                rows={12}
                 value={formData.contractContent}
                 onChange={handleChange('contractContent')}
                 required

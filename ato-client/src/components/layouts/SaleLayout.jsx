@@ -1,10 +1,9 @@
-import { Fragment } from "react";
 import { Divider } from "@mui/material";
 import Footer from "components/footer/Footer";
 import Header from "components/header/Header";
 import Navbar from "components/navbar/Navbar";
 import Topbar from "components/topbar/Topbar";
-import { MobileNavigationBar } from "components/mobile-navigation";
+import { Fragment } from "react";
 /**
  *  Used:
  *  1. sale-page-1 page
@@ -35,7 +34,6 @@ const SaleLayout = ({ children, type = "one", categoryNav }) => {
       )}
 
       <Footer />
-      <MobileNavigationBar />
     </Fragment>
   );
 };

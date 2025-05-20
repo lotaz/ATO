@@ -1,12 +1,21 @@
-import { Box, Container, Grid, Typography, Card } from "@mui/material";
+import {
+  Box,
+  Container,
+  Grid,
+  Typography,
+  Card,
+  TextField,
+  InputAdornment,
+} from "@mui/material";
 import ShopLayout2 from "components/layouts/ShopLayout2";
-import { H1, H3 } from "components/Typography";
+import { H1, H2, H3 } from "components/Typography";
 import { FlexBox } from "components/flex-box";
 import {
   Agriculture,
   EmojiPeople,
   Landscape,
   LocalActivity,
+  Search,
 } from "@mui/icons-material";
 import Footer from "components/footer/Footer";
 
@@ -38,7 +47,26 @@ const IntroPage = () => {
   return (
     <ShopLayout2>
       {/* Hero Section */}
-
+      <Box
+        sx={{
+          backgroundImage: "url('/assets/small-banners/blur-bg.png')",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          py: { xs: 6, md: 10 },
+          mb: 6,
+          position: "relative",
+        }}
+      >
+        <Container maxWidth="lg">
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={8} sx={{ mx: "auto", textAlign: "center" }}>
+              <H2 color="white" mb={2}>
+                Về chúng tôi
+              </H2>
+            </Grid>
+          </Grid>
+        </Container>
+      </Box>
       {/* About Section */}
       <Container sx={{ mb: 8, mt: 4 }}>
         <Grid container spacing={4} alignItems="center">

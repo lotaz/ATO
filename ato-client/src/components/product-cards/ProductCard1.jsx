@@ -140,15 +140,13 @@ const ProductCard1 = ({
           </HoverIconWrapper>
 
           <Link href={`/product/${slug}`}>
-            <a>
-              <LazyImage
-                src={imgUrl}
-                width={0}
-                height={0}
-                layout="responsive"
-                alt={title}
-              />
-            </a>
+            <LazyImage
+              src={imgUrl}
+              width={0}
+              height={0}
+              layout="responsive"
+              alt={title}
+            />
           </Link>
         </ImageWrapper>
 
@@ -168,18 +166,16 @@ const ProductCard1 = ({
           <FlexBox>
             <Box flex="1 1 0" minWidth="0px" mr={1}>
               <Link href={`/product/${slug}`}>
-                <a>
-                  <H3
-                    mb={1}
-                    title={title}
-                    fontSize="14px"
-                    fontWeight="600"
-                    className="title"
-                    color="text.secondary"
-                  >
-                    {title}
-                  </H3>
-                </a>
+                <H3
+                  mb={1}
+                  title={title}
+                  fontSize="14px"
+                  fontWeight="600"
+                  className="title"
+                  color="text.secondary"
+                >
+                  {title}
+                </H3>
               </Link>
 
               {!hideRating && (

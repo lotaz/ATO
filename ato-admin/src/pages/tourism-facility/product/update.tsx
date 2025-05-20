@@ -10,7 +10,6 @@ import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls'
 import { RootState } from '../../../redux/store';
 import { fetchProduct, updateProduct } from '../../../redux/tourism-facility/product.slice';
 import { ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
-import { number } from 'prop-types';
 
 const validationSchema = Yup.object().shape({
   productName: Yup.string().required('Tên sản phẩm là bắt buộc'),
@@ -19,12 +18,12 @@ const validationSchema = Yup.object().shape({
   manufacturer: Yup.string().required('Nhà sản xuất là bắt buộc'),
   addressManufacturer: Yup.string().required('Địa chỉ nhà sản xuất là bắt buộc'),
   origin: Yup.string().required('Nguồn gốc là bắt buộc'),
-  nutritionType: Yup.string(),
-  age: Yup.string(),
-  ingredient: Yup.string(),
-  volume: Yup.string(),
+  nutritionType: Yup.string().required('Loại dinh dưỡng là bắt buộc'),
+  age: Yup.string().required('Tuổi là bắt buộc'),
+  ingredient: Yup.string().required('Thành phần là bắt buộc'),
+  volume: Yup.string().required('Dung tích là bắt buộc'),
   unitProduct: Yup.number().required('Số lượng là bắt buộc').min(0, 'Số lượng phải lớn hơn 0'),
-  additional: Yup.string(),
+  additional: Yup.string().optional(),
   imgs: Yup.array().min(1, 'Cần ít nhất 1 ảnh')
 });
 

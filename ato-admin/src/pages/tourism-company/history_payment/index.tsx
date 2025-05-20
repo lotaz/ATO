@@ -23,7 +23,6 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { bookTourService, TourBooking } from '../../../services/tourism-company/book-tour.service';
 import { paymentService, VNPayPaymentResponse } from '../../../services/tourism-company/history_payment';
@@ -37,6 +36,7 @@ export enum StatusActive {
   Active = 1,
   Inactive = 0
 }
+//hehe
 
 const TourPaymentHistory = () => {
   const [payments, setPayments] = useState<VNPayPaymentResponse[]>([]);
@@ -123,7 +123,7 @@ const TourPaymentHistory = () => {
   };
 
   const formatDateTime = (date: string | undefined | null) => {
-    return date ? moment(date).format('DD/MM/YYYY HH:mm') : 'N/A';
+    return date;
   };
 
   const formatCurrency = (amount: number | undefined | null) => {
@@ -235,10 +235,7 @@ const TourPaymentHistory = () => {
                             : 'N/A'}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
-                          <strong>Ngày sinh:</strong>{' '}
-                          {selectedPayment.bookingAgriculturalTour?.customer?.dob
-                            ? moment(selectedPayment.bookingAgriculturalTour.customer.dob).format('DD/MM/YYYY')
-                            : 'N/A'}
+                          <strong>Ngày sinh:</strong> {selectedPayment.bookingAgriculturalTour?.customer?.dob}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
                           <strong>Trạng thái tài khoản:</strong>{' '}
@@ -405,8 +402,7 @@ const TourPaymentHistory = () => {
                           <strong>Số tiền:</strong> {formatCurrency(selectedPayment.amount)}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
-                          <strong>Thời gian:</strong>{' '}
-                          {selectedPayment.payDate ? moment(selectedPayment.payDate).format('DD/MM/YYYY HH:mm:ss') : 'N/A'}
+                          <strong>Thời gian:</strong> {selectedPayment.payDate}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
                           <strong>Trạng thái:</strong>{' '}

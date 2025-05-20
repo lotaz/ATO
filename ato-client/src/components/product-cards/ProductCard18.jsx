@@ -86,17 +86,15 @@ const ProductCard18 = ({ product }) => {
     <Card>
       <CardMedia>
         <Link href={`/product/${product.slug}`}>
-          <a>
-            <Image
-              width={300}
-              height={300}
-              alt="category"
-              objectFit="cover"
-              layout="responsive"
-              className="product-img"
-              src={product.thumbnail}
-            />
-          </a>
+          <Image
+            width={300}
+            height={300}
+            alt="category"
+            objectFit="cover"
+            layout="responsive"
+            className="product-img"
+            src={product.thumbnail}
+          />
         </Link>
 
         <AddToCartButton

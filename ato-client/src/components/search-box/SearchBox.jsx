@@ -118,10 +118,5 @@ const categories = [
   "Camera",
   "Toys",
 ];
-const dummySearchResult = [
-  "Máy nội nha Endo Motor có đèn",
-  "Giá để máy lấy cao",
-  "Van điện 30v máy lấy cao",
-  "Ghế nha khoa",
-];
+const dummySearchResult = [];
 export default SearchBox;

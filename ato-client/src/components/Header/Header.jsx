@@ -107,13 +107,11 @@ const Header = ({ isFixed, className, searchBoxType = "type1" }) => {
           }}
         >
           <Link href="/">
-            <a>
-              <Image
-                height={70}
-                src="/assets/congbinh/logos/logo.png"
-                alt="logo"
-              />
-            </a>
+            <Image
+              height={70}
+              src="/assets/congbinh/logos/logo.png"
+              alt="logo"
+            />
           </Link>
 
           {isFixed && (

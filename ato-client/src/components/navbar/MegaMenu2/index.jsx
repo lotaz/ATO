@@ -74,27 +74,25 @@ const MegaMenu2 = ({ title, menuList }) => {
                       {item.child.map((sub, key) => {
                         return (
                           <Link href="#" key={key} passHref>
-                            <a>
-                              <SubCategoryListItem>
-                                {sub.img && (
-                                  <Avatar
-                                    src={sub.img}
-                                    sx={{
-                                      backgroundColor: "grey.100",
-                                      borderRadius: 1,
-                                    }}
-                                  />
-                                )}
-                                {sub.Icon && (
-                                  <sub.Icon
-                                    sx={{
-                                      fontSize: 16,
-                                    }}
-                                  />
-                                )}
-                                {sub.title}
-                              </SubCategoryListItem>
-                            </a>
+                            <SubCategoryListItem>
+                              {sub.img && (
+                                <Avatar
+                                  src={sub.img}
+                                  sx={{
+                                    backgroundColor: "grey.100",
+                                    borderRadius: 1,
+                                  }}
+                                />
+                              )}
+                              {sub.Icon && (
+                                <sub.Icon
+                                  sx={{
+                                    fontSize: 16,
+                                  }}
+                                />
+                              )}
+                              {sub.title}
+                            </SubCategoryListItem>
                           </Link>
                         );
                       })}

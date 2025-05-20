@@ -8,7 +8,6 @@ import {
   DialogTitle,
   Grid,
   IconButton,
-  Paper,
   Stack,
   Table,
   TableBody,
@@ -19,11 +18,10 @@ import {
   TableRow,
   Typography
 } from '@mui/material';
-import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { paymentService, VNPayPaymentResponse } from '../../../services/tourism-facility/history-payment';
-import AppSearchBar from '../../../components/table/SearchBar';
 import { NoDataDisplay } from '../../../components/no-data/NoDataDisplay';
+import AppSearchBar from '../../../components/table/SearchBar';
+import { paymentService, VNPayPaymentResponse } from '../../../services/tourism-facility/history-payment';
 
 const OrderPaymentHistory = () => {
   const [payments, setPayments] = useState<VNPayPaymentResponse[]>([]);
@@ -95,7 +93,7 @@ const OrderPaymentHistory = () => {
   };
 
   const formatDateTime = (date: string | undefined | null) => {
-    return date ? moment(date).format('DD/MM/YYYY HH:mm') : 'N/A';
+    return date;
   };
 
   const formatCurrency = (amount: number | undefined | null) => {
@@ -123,10 +121,7 @@ const OrderPaymentHistory = () => {
   };
 
   // Add pagination logic
-  const paginatedPayments = filteredPayments.slice(
-    page * rowsPerPage,
-    page * rowsPerPage + rowsPerPage
-  );
+  const paginatedPayments = filteredPayments.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage);
 
   return (
     <Stack spacing={3}>
@@ -262,8 +257,7 @@ const OrderPaymentHistory = () => {
                             : 'N/A'}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
-                          <strong>Ngày sinh:</strong>{' '}
-                          {selectedPayment.order?.account?.dob ? moment(selectedPayment.order.account.dob).format('DD/MM/YYYY') : 'N/A'}
+                          <strong>Ngày sinh:</strong> {selectedPayment.order?.account?.dob}
                         </Typography>
                         <Typography variant="body2" sx={{ mb: 1 }}>
                           <strong>Trạng thái tài khoản:</strong>{' '}

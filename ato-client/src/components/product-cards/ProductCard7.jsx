@@ -81,11 +81,9 @@ const ProductCard7 = ({ id, name, qty, price, imgUrl, slug }) => {
         flexDirection="column"
       >
         <Link href={`/product/${slug}`}>
-          <a>
-            <Typography sx={{ width: "80%" }} fontWeight="600" fontSize={18}>
-              {name}
-            </Typography>
-          </a>
+          <Typography sx={{ width: "80%" }} fontWeight="600" fontSize={18}>
+            {name}
+          </Typography>
         </Link>
 
         <FlexBox gap={1} flexWrap="wrap" alignItems="center">

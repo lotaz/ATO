@@ -53,6 +53,9 @@ const TourPackageDetails = () => {
       : null,
     fetcher
   );
+
+  console.log("tour", tour);
+
   const [selectedImage, setSelectedImage] = useState(0);
   const [selectedDestination, setSelectedDestination] = useState(null);
 
@@ -643,6 +646,10 @@ const TourPackageDetails = () => {
                     <Box sx={{ mt: 2 }}>
                       <Typography variant="body2">
                         <strong>Giới thiệu:</strong> {guide.bio}
+                      </Typography>
+                      <Typography variant="body2">
+                        <strong>Số điện thoại:</strong>{" "}
+                        {guide.account.phoneNumber}
                       </Typography>
                       <Typography variant="body2">
                         <strong>Ngôn ngữ:</strong> {guide.languages}

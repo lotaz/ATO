@@ -17,34 +17,32 @@ const ProductCard8 = (props) => {
       }}
     >
       <Link href={`/product/${slug}`}>
-        <a>
-          <HoverBox mb={1.5} borderRadius="8px">
-            <LazyImage
-              alt={title}
-              width={500}
-              height={500}
-              borderRadius="8px"
-              layout="responsive"
-              objectFit="contain"
-              objectPosition="center"
-              src={imgUrl || "/assets/images/products/Rectangle 116.png"}
-            />
-          </HoverBox>
+        <HoverBox mb={1.5} borderRadius="8px">
+          <LazyImage
+            alt={title}
+            width={500}
+            height={500}
+            borderRadius="8px"
+            layout="responsive"
+            objectFit="contain"
+            objectPosition="center"
+            src={imgUrl || "/assets/images/products/Rectangle 116.png"}
+          />
+        </HoverBox>
 
-          <Span title={title} mb={0.5} color="inherit" ellipsis display="block">
-            {title}
+        <Span title={title} mb={0.5} color="inherit" ellipsis display="block">
+          {title}
+        </Span>
+
+        <FlexBox alignItems="center">
+          <H6 color="primary.main" mr={0.5}>
+            {currency(price)}
+          </H6>
+
+          <Span color="grey.600">
+            <del>{calculateDiscount(price, 35)}</del>
           </Span>
-
-          <FlexBox alignItems="center">
-            <H6 color="primary.main" mr={0.5}>
-              {currency(price)}
-            </H6>
-
-            <Span color="grey.600">
-              <del>{calculateDiscount(price, 35)}</del>
-            </Span>
-          </FlexBox>
-        </a>
+        </FlexBox>
       </Link>
     </BazaarCard>
   );

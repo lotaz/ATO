@@ -8,6 +8,7 @@ import { TOURISM_FACILITY_URLs } from '../../../../constants/tourism-facility-ur
 import { RootState } from '../../../../redux/store';
 import { fetchActivity } from '../../../../redux/tourism-facility/activity.slice';
 import { ImageCarousel } from '../../../../components/carousel/ImageCarousel';
+import { StatusApproval } from '../../../../types/tourism-facility/package.types';
 
 // Add this import at the top
 
@@ -108,8 +109,9 @@ const ActivityDetails = () => {
               </Typography>
               <Stack direction="row" spacing={2} alignItems="center">
                 <Chip
-                  label={activityData.statusApproval ? 'Đã duyệt' : 'Chưa duyệt'}
-                  color={activityData.statusApproval ? 'success' : 'warning'}
+                  label={getStatusApprovalLabel(activityData.statusApproval)}
+                  color={getStatusColor(activityData.statusApproval)}
+                  size="small"
                 />
               </Stack>
             </Grid>
@@ -146,3 +148,21 @@ const ActivityDetails = () => {
 };
 
 export default ActivityDetails;
+const getStatusApprovalLabel = (status: StatusApproval) => {
+  const labels = {
+    [StatusApproval.APPROVED]: 'Đã duyệt',
+    [StatusApproval.PROCESSING]: 'Đang xử lý',
+    [StatusApproval.REJECT]: 'Từ chối',
+    [StatusApproval.UPDATE]: 'Cập nhật'
+  };
+  return labels[status] || 'Không xác định';
+};
+const getStatusColor = (status: StatusApproval) => {
+  const colors = {
+    [StatusApproval.APPROVED]: 'success',
+    [StatusApproval.PROCESSING]: 'warning',
+    [StatusApproval.REJECT]: 'error',
+    [StatusApproval.UPDATE]: 'info'
+  };
+  return colors[status] || 'default';
+};

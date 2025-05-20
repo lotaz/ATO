@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { format } from "date-fns";
 import { Person } from "@mui/icons-material";
 import {
   Avatar,
@@ -10,20 +8,19 @@ import {
   Typography,
   useMediaQuery,
 } from "@mui/material";
-import TableRow from "components/TableRow";
-import { H3, H5, Small } from "components/Typography";
-import { FlexBetween, FlexBox } from "components/flex-box";
+import { H5, Small } from "components/Typography";
+import { FlexBox } from "components/flex-box";
 import UserDashboardHeader from "components/header/UserDashboardHeader";
 import CustomerDashboardLayout from "components/layouts/customer-dashboard";
 import CustomerDashboardNavigation from "components/layouts/customer-dashboard/Navigations";
-import { currency } from "lib";
-import api from "utils/__api__/users";
-import { useEffect, useState } from "react";
+import { format } from "date-fns";
 import { get } from "helpers/axios-helper";
+import Link from "next/link";
+import { useEffect, useState } from "react";
 
 // ============================================================
 // Add these imports
-import { CalendarMonth, Email, Phone, Place } from "@mui/icons-material";
+import { CalendarMonth, Email, Phone } from "@mui/icons-material";
 
 const Profile = () => {
   const [user, setUser] = useState(null);
@@ -42,7 +39,7 @@ const Profile = () => {
     fetchProfile();
   }, []);
 
-  if (!user) return <p>Đang tải...</p>;
+  if (!user) return null;
 
   const HEADER_LINK = (
     <Link href={`/profile/${user.id}`} passHref>
@@ -161,24 +158,4 @@ const Profile = () => {
   );
 };
 
-const TableRowItem = ({ title, value }) => {
-  return (
-    <FlexBox flexDirection="column" p={1}>
-      <Small color="grey.600" mb={0.5} textAlign="left">
-        {title}
-      </Small>
-      <span>{value}</span>
-    </FlexBox>
-  );
-};
-
-export const getStaticProps = async () => {
-  const user = await api.getUser();
-  return {
-    props: {
-      user,
-    },
-  };
-};
-// Remove getStaticProps as we're now using client-side fetching
 export default Profile;

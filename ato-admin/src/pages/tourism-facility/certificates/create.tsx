@@ -81,7 +81,7 @@ const CreateCertificate = () => {
                     type="date"
                     label="Ngày cấp"
                     name="issueDate"
-                    value={values.issueDate.toISOString().split('T')[0]}
+                    value={values.issueDate}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.issueDate && Boolean(errors.issueDate)}
@@ -96,7 +96,7 @@ const CreateCertificate = () => {
                     type="date"
                     label="Ngày hết hạn"
                     name="expiryDate"
-                    value={values.expiryDate.toISOString().split('T')[0]}
+                    value={values.expiryDate}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     error={touched.expiryDate && Boolean(errors.expiryDate)}

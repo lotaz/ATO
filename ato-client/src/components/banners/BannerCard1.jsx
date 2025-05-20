@@ -81,9 +81,7 @@ const BannerCard1 = ({
         />
 
         <Link href={url}>
-          <a>
-            <CardLink>Shop Now</CardLink>
-          </a>
+          <CardLink>Shop Now</CardLink>
         </Link>
       </CardContent>
     </CardWrapper>
