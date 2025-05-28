@@ -23,6 +23,8 @@ const validationSchema = Yup.object().shape({
   breakTimeInMinutes: Yup.number().required('Thời gian nghỉ là bắt buộc').min(0, 'Thời gian nghỉ phải lớn hơn 0'),
   breakTimeInMinutesType: Yup.number().required('Đơn vị thời gian nghỉ là bắt buộc'),
   startTime: Yup.date().required('Thời gian bắt đầu là bắt buộc'),
+  maxCapacity: Yup.number().min(1, 'Số tour tối đa phải lớn hơn 0').typeError('Số tour tối đa phải là số'),
+
   endTime: Yup.date().required('Thời gian kết thúc là bắt buộc')
 });
 
@@ -44,7 +46,8 @@ const CreateActivity = () => {
     startTime: new Date(),
     endTime: new Date(),
     packageId: packageId || '',
-    products: []
+    products: [],
+    maxCapacity: 1
   };
 
   const handleSubmit = async (values: ActivityRequest, { setSubmitting }: any) => {
@@ -90,6 +93,20 @@ const CreateActivity = () => {
                     error={touched.activityName && Boolean(errors.activityName)}
                     helperText={touched.activityName && errors.activityName}
                   />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Giới hạn số tour"
+                    name="maxCapacity"
+                    value={values.maxCapacity}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.maxCapacity && Boolean(errors.maxCapacity)}
+                    helperText={touched.maxCapacity && errors.maxCapacity}
+                  ></TextField>
                 </Grid>
 
                 <Grid item xs={12} md={6}>

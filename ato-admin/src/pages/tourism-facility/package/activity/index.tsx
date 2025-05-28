@@ -66,6 +66,7 @@ const ActivityList = ({ activities, packageId }: { activities: ActivityResponse[
               <TableHead>
                 <TableRow>
                   <TableCell>Tên hoạt động</TableCell>
+                  <TableCell>Giới hạn số tour</TableCell>
                   <TableCell>Thời gian (giờ)</TableCell>
                   <TableCell>Địa điểm</TableCell>
                   <TableCell>Trạng thái</TableCell>
@@ -77,6 +78,7 @@ const ActivityList = ({ activities, packageId }: { activities: ActivityResponse[
                 {currentActivities?.map((activity) => (
                   <TableRow key={activity.activityId}>
                     <TableCell>{activity.activityName}</TableCell>
+                    <TableCell>{activity.maxCapacity || 0}</TableCell>
                     <TableCell>{activity.durationInHours || '-'}</TableCell>
                     <TableCell>{activity.location || '-'}</TableCell>
                     <TableCell>
