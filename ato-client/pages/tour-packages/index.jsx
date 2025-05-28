@@ -11,6 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import HtmlParagraph from "components/HtmlParagraph";
 import { H2 } from "components/Typography";
 import Footer from "components/footer/Footer";
 import ShopLayout2 from "components/layouts/ShopLayout2";
@@ -288,7 +289,7 @@ const TourPackages = () => {
                                 WebkitBoxOrient: "vertical",
                               }}
                             >
-                              {pack.description}
+                              <HtmlParagraph html={pack.description} />
                             </Typography>
 
                             <Box
