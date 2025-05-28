@@ -42,7 +42,7 @@ import { useSnackbar } from "notistack";
 import { ConfirmDialog } from "components/ConfirmDialog";
 const fetcher = (url) => get(url).then((res) => res.data);
 import { post } from "helpers/axios-helper";
-
+import HtmlParagraph from "components/HtmlParagraph";
 export const BookingDestinationStatus = {
   Pending: 0,
   InProgress: 1,
@@ -78,9 +78,29 @@ const BookedTourDetailsPage = () => {
   if (error) return <div>Error loading booking details</div>;
   if (!booking) return <div>Booking not found</div>;
 
-  const isStarted = tourInfo?.isStarted ?? false;
+  const getStatusColor = (status) => {
+    switch (status) {
+      case 0: // Added Processing case
+        return "warning";
+      case 1:
+        return "primary";
+      case 2:
+        return "error";
+      case 4:
+        return "info";
 
-  // Status translations and colors
+      default:
+        return "default";
+    }
+  };
+
+  const statusBookingTranslations = {
+    [StatusBooking.Processing]: "Đang xử lý", // Updated label for Processing
+    [StatusBooking.Completed]: "Hoàn thành",
+    [StatusBooking.Canceled]: "Đã hủy", // Assuming Canceled maps to Canceled
+    [StatusBooking.ConfirmBooking]: "Đã xác nhận", // Updated label for ConfirmBooking
+    [StatusBooking.InProgress]: "Đang thực hiện", // Added label for InProgress
+  };
 
   const paymentStatusTranslations = {
     [PaymentStatus.Paid]: "Đã thanh toán",
@@ -163,20 +183,28 @@ const BookedTourDetailsPage = () => {
           <strong>{booking.agriculturalTourPackage?.packageName}</strong>
         </Typography>
         <Box>
-          <>
-            {/* {statusBookingTranslations[booking.statusBooking] && (
-              <Chip
-                label={statusBookingTranslations[booking.statusBooking]}
-                color={getStatusColor(booking.statusBooking)}
-                sx={{ mr: 1 }}
-              />
-            )} */}
-          </>
+          {statusBookingTranslations[booking.statusBooking] && (
+            <Chip
+              label={statusBookingTranslations[booking.statusBooking]}
+              color={getStatusColor(booking.statusBooking)}
+              sx={{ mr: 1, color: "white" }}
+            />
+          )}
 
-          <Chip
-            label={paymentStatusTranslations[booking.paymentStatus]}
-            color={getPaymentStatusColor(booking.paymentStatus)}
-          />
+          {booking.statusBooking === 1 && (
+            <Chip
+              sx={{ color: "white" }}
+              label={paymentStatusTranslations[booking.paymentStatus]}
+              color={"success"}
+            />
+          )}
+          {booking.statusBooking === 2 && (
+            <Chip
+              sx={{ color: "white" }}
+              label={"Đã hoàn tiền"}
+              color={"success"}
+            />
+          )}
         </Box>
       </Box>
       <Card>
@@ -278,9 +306,9 @@ const BookedTourDetailsPage = () => {
                               </Typography>
                             }
                             secondary={
-                              <Typography variant="body1">
+                              <HtmlParagraph>
                                 {tourInfo?.location}
-                              </Typography>
+                              </HtmlParagraph>
                             }
                           />
                         </ListItem>
@@ -677,7 +705,7 @@ const BookedTourDetailsPage = () => {
               Trở lại
             </Button>
 
-            {isStarted === false && (
+            {booking.statusBooking !== 2 && booking.statusBooking !== 1 && (
               <Button
                 variant="contained"
                 onClick={() => setOpenConfirm(true)}

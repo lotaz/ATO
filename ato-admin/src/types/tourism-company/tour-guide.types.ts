@@ -24,6 +24,8 @@ export interface TourGuideResponse {
   rating: number;
   createDate: string;
   updateDate?: string;
+  isAvailable?: boolean;
+  message?: string;
   account?: {
     id: string;
     email?: string;

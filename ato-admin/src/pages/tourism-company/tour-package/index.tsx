@@ -19,6 +19,7 @@ import { agriculturalTourService } from '../../../services/tourism-company/agric
 import { AgriculturalTourPackageResponse } from '../../../types/tourism-company/agricultural-tour.types';
 import { TimeType } from '../../../types/tourism-facility/package.types';
 import { FormControl, InputLabel, MenuItem, Select } from '@mui/material';
+import { DurationType } from '../../../types/tourism-company/tour-package.types';
 
 const TourPackageList = () => {
   const navigate = useNavigate();
@@ -56,14 +57,12 @@ const TourPackageList = () => {
         (statusFilter === 'inactive' && pkg.statusActive === 1))
   );
 
-  const getDurationType = (type: TimeType) => {
+  const getDurationType = (type: DurationType) => {
     const types = {
-      [TimeType.SECOND]: 'Giây',
-      [TimeType.MINUTE]: 'Phút',
-      [TimeType.HOUR]: 'Giờ',
-      [TimeType.DAY]: 'Ngày',
-      [TimeType.MONTH]: 'Tháng',
-      [TimeType.YEAR]: 'Nằm'
+      [DurationType.HOURS]: 'Giờ',
+      [DurationType.DAYS]: 'Ngày',
+      [DurationType.MONTHS]: 'Tháng',
+      [DurationType.WEEKS]: 'Tuần'
     };
     return types[type] || 'Undefined';
   };

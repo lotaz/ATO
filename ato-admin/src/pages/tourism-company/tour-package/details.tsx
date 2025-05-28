@@ -17,6 +17,8 @@ import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
 import { agriculturalTourService } from '../../../services/tourism-company/agricultural-tour.service';
 import { AgriculturalTourPackageResponse } from '../../../types/tourism-company/agricultural-tour.types';
 import { TimeType } from '../../../types/tourism-facility/package.types';
+import { DurationType } from '../../../types/tourism-company/tour-package.types';
+import HtmlParagraph from '../../../components/HtmlParagraph';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -38,7 +40,7 @@ const DetailItem = ({ label, value }: { label: string; value: any }) => (
     <Typography variant="subtitle2" color="text.secondary">
       {label}
     </Typography>
-    <Typography variant="body1">{value || '-'}</Typography>
+    <HtmlParagraph html={value} />
   </Box>
 );
 
@@ -73,14 +75,12 @@ const TourPackageDetails = () => {
     }
   };
 
-  const getDurationType = (type: TimeType) => {
+  const getDurationType = (type: DurationType) => {
     const types = {
-      [TimeType.SECOND]: 'Giây',
-      [TimeType.MINUTE]: 'Phút',
-      [TimeType.HOUR]: 'Giờ',
-      [TimeType.DAY]: 'Ngày',
-      [TimeType.MONTH]: 'Tháng',
-      [TimeType.YEAR]: 'Năm'
+      [DurationType.HOURS]: 'Giờ',
+      [DurationType.DAYS]: 'Ngày',
+      [DurationType.MONTHS]: 'Tháng',
+      [DurationType.WEEKS]: 'Tuần'
     };
     return types[type] || 'Undefined';
   };
@@ -159,9 +159,9 @@ const TourPackageDetails = () => {
                             {destination.title}
                           </Typography>
                           <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                            <Typography variant="caption" color="text.secondary">
+                            {/* <Typography variant="caption" color="text.secondary">
                               Thứ tự: {destination.visitOrder}
-                            </Typography>
+                            </Typography> */}
                             <Typography variant="caption" color="text.secondary">
                               •
                             </Typography>

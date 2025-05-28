@@ -28,41 +28,28 @@ const BookedToursPage = () => {
   if (isLoading) return <div>Loading...</div>;
   if (error) return <div>Error loading booked tours</div>;
   if (!bookedTours) return <div>No booked tours found</div>;
-
   const getStatusColor = (status) => {
     switch (status) {
-      case StatusBooking.Pending:
+      case 0: // Added Processing case
         return "warning";
-      case StatusBooking.Confirmed:
-        return "success";
-      case StatusBooking.Cancelled:
+      case 1:
+        return "primary";
+      case 2:
         return "error";
-      case StatusBooking.Completed:
+      case 4:
         return "info";
+
       default:
         return "default";
     }
   };
 
-  const getPaymentStatusColor = (status) => {
-    switch (status) {
-      case PaymentStatus.Paid:
-        return "success";
-      case PaymentStatus.UnPaid:
-        return "warning";
-      case PaymentStatus.Failed:
-        return "error";
-      case PaymentStatus.Refunded:
-        return "info";
-      default:
-        return "default";
-    }
-  };
   const statusBookingTranslations = {
-    [StatusBooking.Pending]: "Đang chờ xử lý",
-    [StatusBooking.Confirmed]: "Đã xác nhận",
-    [StatusBooking.Cancelled]: "Đã hủy",
+    [StatusBooking.Processing]: "Đang xử lý", // Updated label for Processing
     [StatusBooking.Completed]: "Hoàn thành",
+    [StatusBooking.Canceled]: "Đã hủy", // Assuming Canceled maps to Canceled
+    [StatusBooking.ConfirmBooking]: "Đã xác nhận", // Updated label for ConfirmBooking
+    [StatusBooking.InProgress]: "Đang thực hiện", // Added label for InProgress
   };
 
   const paymentStatusTranslations = {
@@ -95,14 +82,24 @@ const BookedToursPage = () => {
                       <Chip
                         label={statusBookingTranslations[booking.statusBooking]}
                         color={getStatusColor(booking.statusBooking)}
-                        sx={{ mr: 1 }}
+                        sx={{ mr: 1, color: "white" }}
                       />
                     )}
 
-                    <Chip
-                      label={paymentStatusTranslations[booking.paymentStatus]}
-                      color={getPaymentStatusColor(booking.paymentStatus)}
-                    />
+                    {booking.statusBooking === 1 && (
+                      <Chip
+                        sx={{ color: "white" }}
+                        label={paymentStatusTranslations[booking.paymentStatus]}
+                        color={"success"}
+                      />
+                    )}
+                    {booking.statusBooking === 2 && (
+                      <Chip
+                        sx={{ color: "white" }}
+                        label={"Đã hoàn tiền"}
+                        color={"success"}
+                      />
+                    )}
                   </Box>
                 </Box>
 

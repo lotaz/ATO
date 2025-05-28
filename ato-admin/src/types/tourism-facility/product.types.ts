@@ -24,7 +24,6 @@ export interface TCreateProduct {
   description: string;
   additional: string;
   nutritionType: string;
-  age: string;
   ingredient: string;
   volume: string;
   origin: string;

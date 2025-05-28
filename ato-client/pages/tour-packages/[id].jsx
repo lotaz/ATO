@@ -5,6 +5,7 @@ import {
   Group,
   LocationOn,
 } from "@mui/icons-material";
+import HtmlParagraph from "components/HtmlParagraph";
 import Timeline from "@mui/lab/Timeline";
 import TimelineConnector from "@mui/lab/TimelineConnector";
 import TimelineContent from "@mui/lab/TimelineContent";
@@ -194,15 +195,7 @@ const TourPackageDetails = () => {
                   mb: 3,
                 }}
               >
-                <Typography
-                  sx={{
-                    lineHeight: 1.8,
-                    color: "text.primary",
-                    fontSize: "1.1rem",
-                  }}
-                >
-                  {tour.description}
-                </Typography>
+                <HtmlParagraph html={tour.description} />
               </Box>
 
               <Grid container spacing={2}>

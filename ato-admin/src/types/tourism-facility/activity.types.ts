@@ -46,6 +46,7 @@ export interface ActivityRequest {
   endTime: Date;
   packageId?: string;
   products?: ProductActivityRequest[];
+  maxCapacity?: number;
 }
 
 // Make sure TimeType is imported or defined in your types

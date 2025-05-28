@@ -27,8 +27,8 @@
     "@fontsource/roboto": "^5.0.12",
     "@mui/base": "^5.0.0-beta.38",
     "@mui/lab": "^5.0.0-alpha.167",
-    "@mui/material": "^5.15.12",
-    "@mui/system": "^5.15.12",
+    "@mui/material": "^6.4.9",
+     "@mui/system": "^5.15.12",
     "@mui/x-data-grid": "^8.1.0",
     "@mui/x-date-pickers": "^7.26.0",
     "@reduxjs/toolkit": "^1.9.5",
@@ -66,7 +66,18 @@
     "vite": "^6.3.3",
     "vite-jsconfig-paths": "^2.0.1",
     "web-vitals": "^3.5.2",
-    "yup": "^1.4.0"
+    "yup": "^1.4.0",
+    "@tiptap/starter-kit": "^2.12.0",
+    "@tiptap/extension-color": "^2.12.0",
+    "@tiptap/extension-history": "^2.12.0",
+    "@tiptap/extension-image": "^2.12.0",
+    "@tiptap/extension-link": "^2.12.0",
+    "@tiptap/extension-strike": "^2.12.0",
+    "@tiptap/extension-text-align": "^2.12.0",
+    "@tiptap/extension-text-style": "^2.12.0",
+    "@tiptap/extension-underline": "^2.12.0",
+    "mui-tiptap": "^1.18.1",
+    "@hello-pangea/dnd": "^18.0.1"
   },
   "eslintConfig": {
     "extends": [

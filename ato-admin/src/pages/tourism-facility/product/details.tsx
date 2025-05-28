@@ -190,7 +190,6 @@ const ProductDetails = () => {
                     </Typography>
                     <DetailItem label="Mô tả" value={product.description} />
                     <DetailItem label="Loại dinh dưỡng" value={product.nutritionType} />
-                    <DetailItem label="Tuổi" value={product.age} />
                     <DetailItem label="Thành phần" value={product.ingredient} />
                     <DetailItem label="Khối lượng" value={product.volume} />
                     <DetailItem label="Thông tin thêm" value={product.additional} />

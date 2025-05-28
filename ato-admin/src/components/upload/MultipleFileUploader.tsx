@@ -63,11 +63,15 @@ export const MultipleFileUploader = ({ values = [], onChange, accept = 'image/*'
     formData.append('file', file);
 
     try {
-      const response = await axios.post('/api/file/upload-image', formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data'
+      const response = await axios.post(
+        'https://ato-api-dxedbxa2c3g2bvg4.canadacentral-01.azurewebsites.net/api/file/upload-image',
+        formData,
+        {
+          headers: {
+            'Content-Type': 'multipart/form-data'
+          }
         }
-      });
+      );
       return response?.data?.fileUrl;
     } catch (error) {
       console.error('Error uploading file:', error);

@@ -9,5 +9,6 @@ export interface Driver {
 }
 
 export const driverService = {
-  getDrivers: () => get<Driver[]>('tour-company/driver/get-list-drivers')
+  getDrivers: () => get<Driver[]>('tour-company/driver/get-list-drivers'),
+  getAvailableDrivers: (packageId: string) => get<Driver[]>('tour-company/driver/available/' + packageId)
 };
