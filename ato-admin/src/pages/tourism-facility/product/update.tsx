@@ -19,7 +19,6 @@ const validationSchema = Yup.object().shape({
   addressManufacturer: Yup.string().required('Địa chỉ nhà sản xuất là bắt buộc'),
   origin: Yup.string().required('Nguồn gốc là bắt buộc'),
   nutritionType: Yup.string().required('Loại dinh dưỡng là bắt buộc'),
-  age: Yup.string().required('Tuổi là bắt buộc'),
   ingredient: Yup.string().required('Thành phần là bắt buộc'),
   volume: Yup.string().required('Dung tích là bắt buộc'),
   unitProduct: Yup.number().required('Số lượng là bắt buộc').min(0, 'Số lượng phải lớn hơn 0'),
@@ -185,19 +184,6 @@ const UpdateProduct = () => {
                     onBlur={handleBlur}
                     error={touched.nutritionType && Boolean(errors.nutritionType)}
                     helperText={touched.nutritionType && errors.nutritionType}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    label="Độ tuổi"
-                    name="age"
-                    value={values.age}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    error={touched.age && Boolean(errors.age)}
-                    helperText={touched.age && errors.age}
                   />
                 </Grid>
 

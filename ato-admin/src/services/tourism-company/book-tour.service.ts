@@ -1,4 +1,5 @@
-import { get } from '../../helpers/axios-helper';
+import { get, post } from '../../helpers/axios-helper';
+import { TourStatus } from '../../pages/tourism-company/book_tour/booking-list';
 
 export interface VNPayPaymentResponse {
   responseId: string;
@@ -47,9 +48,11 @@ export interface TourBooking {
   agriculturalTourPackage: AgriculturalTourPackage;
   orders: any[];
   vnPayPaymentResponses: VNPayPaymentResponse[];
+  groupId?: string;
 }
 
 export const bookTourService = {
   getBookings: () => get<TourBooking[]>('tour-company/book-tour/get-list-book-tours'),
+  updateBookingStatus: (values: TourStatus) => post(`tour-company/book-tour/update-booking-status`, values),
   getBookingsByBookingId: (bookId: string) => get<TourBooking[]>(`tour-company/book-tour/get-book-tour/${bookId}`)
 };

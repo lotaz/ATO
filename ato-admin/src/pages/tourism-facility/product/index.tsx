@@ -10,7 +10,11 @@ import { TOURISM_FACILITY_URLs } from '../../../constants/tourism-facility-urls'
 import type { RootState } from '../../../redux/store';
 import { fetchProducts } from '../../../redux/tourism-facility/product.slice';
 import { ProductCategory, ProductCategoryLabels } from '../../../types/tourism-facility/product-category.enum';
-
+import { get } from '../../../helpers/axios-helper';
+import { enqueueSnackbar } from 'notistack';
+interface Notification {
+  message: string;
+}
 const ProductList = () => {
   const dispatch = useDispatch<any>();
   const navigate = useNavigate();
@@ -18,7 +22,7 @@ const ProductList = () => {
   const [searchText, setSearchText] = useState('');
   const [page, setPage] = useState(1); // Starting from 1 for better UX
   const [rowsPerPage] = useState(8); // Adjusted for grid layout
-
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const filteredProducts =
     products?.filter(
       (product) =>
@@ -33,6 +37,34 @@ const ProductList = () => {
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchProducts());
+
+    // Fetch notifications
+    const fetchNotifications = async () => {
+      try {
+        const response = await get('/general/ocop-notification');
+        if (response.data && response.data.length > 0) {
+          setNotifications(response.data);
+        }
+      } catch (error) {
+        console.error('Failed to fetch notifications:', error);
+      }
+    };
+
+    fetchNotifications();
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (notifications.length > 0) {
+      notifications.forEach((noti) => {
+        enqueueSnackbar(noti.message, {
+          variant: 'warning'
+        });
+      });
+    }
+  }, [notifications]);
 
   return (
     <Stack spacing={3}>
