@@ -124,7 +124,6 @@ const ProductDetails = () => {
 
             <Grid item xs={12} md={6}>
               <DetailItem label="Loại dinh dưỡng" value={product.nutritionType || 'Không có thông tin'} />
-              <DetailItem label="Độ tuổi" value={product.age || 'Không có thông tin'} />
               <DetailItem label="Thành phần" value={product.ingredient || 'Không có thông tin'} />
               <DetailItem label="Khối lượng" value={product.volume || 'Không có thông tin'} />
               <DetailItem label="Đơn vị" value={product.unitProduct ? UnitProductLabels[product.unitProduct] : '-'} />

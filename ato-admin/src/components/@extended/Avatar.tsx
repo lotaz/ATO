@@ -98,7 +98,7 @@ export default function Avatar({ children, color = 'primary', type, size = 'md',
   const theme = useTheme();
 
   return (
-    <AvatarStyle theme={theme} color={color} type={type} size={size} {...others}>
+    <AvatarStyle color={color} type={type} size={size} {...others}>
       {children}
     </AvatarStyle>
   );

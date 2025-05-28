@@ -16,36 +16,6 @@ const DriverList = () => {
   const { drivers } = useSelector((state: RootState) => state.driverSlice);
   const [searchText, setSearchText] = useState('');
 
-  const columns: TColumn[] = [
-    {
-      id: 'driverName',
-      label: 'Tên tài xế',
-      minWidth: 170
-    },
-    {
-      id: 'phoneNumber',
-      label: 'Số điện thoại',
-      minWidth: 130
-    },
-    {
-      id: 'vehicleType',
-      label: 'Loại xe',
-      minWidth: 130,
-      format: (value: VehicleType) => {
-        const displayNames: Record<VehicleType, string> = {
-          [VehicleType.CAR_4]: 'Xe 4 chỗ',
-          [VehicleType.CAR_7]: 'Xe 7 chỗ',
-          [VehicleType.CAR_16]: 'Xe 16 chỗ',
-          [VehicleType.CAR_29]: 'Xe 29 chỗ',
-          [VehicleType.CAR_45]: 'Xe 45 chỗ',
-          [VehicleType.SLEEPER_BUS_SINGLE]: 'Xe giường nằm đơn',
-          [VehicleType.SLEEPER_BUS_COUPLE]: 'Xe giường nằm đôi',
-          [VehicleType.FLY]: 'Máy bay'
-        };
-        return displayNames[value] || value;
-      }
-    }
-  ];
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(8);
 

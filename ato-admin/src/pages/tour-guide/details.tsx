@@ -240,9 +240,9 @@ const TourPackageDetails = () => {
                               {!tracking && <Chip label={'Chưa bắt đầu'} color="warning" />}
                             </Stack>
                             <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 2 }}>
-                              <Typography variant="caption" color="text.secondary">
+                              {/* <Typography variant="caption" color="text.secondary">
                                 Thứ tự: {destination.visitOrder}
-                              </Typography>
+                              </Typography> */}
                               <Typography variant="caption" color="text.secondary">
                                 •
                               </Typography>

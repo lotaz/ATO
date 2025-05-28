@@ -1,9 +1,12 @@
-import { ArrowDownOutlined, ArrowUpOutlined, CloseOutlined, ExpandOutlined, SearchOutlined } from '@ant-design/icons';
+import { ArrowDownOutlined, ArrowUpOutlined, CiCircleFilled, ClockCircleOutlined, CloseOutlined, SearchOutlined } from '@ant-design/icons';
 import {
   Avatar,
+  Box,
+  Button,
   Card,
   CardContent,
   Chip,
+  CircularProgress,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -11,7 +14,6 @@ import {
   Grid,
   IconButton,
   InputAdornment,
-  Paper,
   Stack,
   Table,
   TableBody,
@@ -19,11 +21,28 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography
 } from '@mui/material';
+import { enqueueSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 import { bookTourService, TourBooking } from '../../../services/tourism-company/book-tour.service';
-import { TextField } from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { TOURISM_COMPANY_URLs } from '../../../constants/tourism-company-urls';
+
+// Define the StatusBooking enum to match the backend
+export enum StatusBooking {
+  Processing = 0,
+  Completed = 1,
+  Canceled = 2,
+  ConfirmBooking = 3,
+  InProgress = 4
+}
+
+export type TourStatus = {
+  tourId: string;
+  statusBooking: number;
+};
 
 const BookingList = () => {
   const getPaymentStatusText = (status: number) => {
@@ -39,33 +58,62 @@ const BookingList = () => {
 
   const getBookingStatusText = (status: number) => {
     switch (status) {
-      case 0:
+      case StatusBooking.Processing:
         return 'Chờ xác nhận';
-      case 1:
-        return 'Đã xác nhận';
+      case StatusBooking.Completed:
+        return 'Đã hoàn thành';
+      case StatusBooking.InProgress:
+        return 'Đang diễn ra';
+      case StatusBooking.Canceled:
+        return 'Đã hủy';
+      case StatusBooking.ConfirmBooking:
+        return 'Đã xác nhận đủ khách';
       default:
         return 'Không xác định';
     }
   };
 
+  const getBookingStatusColor = (status: number) => {
+    switch (status) {
+      case StatusBooking.Processing:
+        return 'warning';
+      case StatusBooking.Completed:
+        return 'success';
+      case StatusBooking.Canceled:
+        return 'error';
+      case StatusBooking.ConfirmBooking:
+        return 'info';
+      default:
+        return 'default';
+    }
+  };
+  const navigate = useNavigate();
+
   const [bookings, setBookings] = useState<TourBooking[]>([]);
   const [selectedBooking, setSelectedBooking] = useState<TourBooking | null>(null);
   const [loading, setLoading] = useState(true);
-
+  const [selectedBookings, setSelectedBookings] = useState<string[]>([]);
+  const [batchUpdateOpen, setBatchUpdateOpen] = useState(false);
+  const [batchStatus, setBatchStatus] = useState<StatusBooking | null>(null);
+  const [updatingBatch, setUpdatingBatch] = useState(false);
+  const [selectedGroupId, setSelectedGroupId] = useState(null);
   useEffect(() => {
-    const fetchBookings = async () => {
-      try {
-        const response = await bookTourService.getBookings();
-        setBookings(response.data);
-      } catch (error) {
-        console.error('Failed to fetch bookings:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchBookings();
   }, []);
+
+  const fetchBookings = async () => {
+    try {
+      setLoading(true);
+      const response = await bookTourService.getBookings();
+      setBookings(response.data);
+    } catch (error) {
+      console.error('Failed to fetch bookings:', error);
+      enqueueSnackbar('Không thể tải danh sách đặt tour', { variant: 'error' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const calculatePriceBreakdown = (booking: TourBooking) => {
     const adultTotal = booking.numberOfAdults * booking.agriculturalTourPackage.priceOfAdults;
     const childTotal = booking.numberOfChildren * booking.agriculturalTourPackage.priceOfChildren;
@@ -73,14 +121,17 @@ const BookingList = () => {
   };
   // Group bookings by tour ID
   const groupedBookings = bookings.reduce((acc, booking) => {
-    const tourId = booking.agriculturalTourPackage.tourId;
-    if (!acc[tourId]) {
-      acc[tourId] = {
+    const groupId = booking.groupId;
+    if (!acc[groupId]) {
+      acc[groupId] = {
         packageName: booking.agriculturalTourPackage.packageName,
+        groupId: booking.groupId,
+        totalBookedPeople: booking.totalBookedPeople,
+        slot: booking.agriculturalTourPackage.slot,
         bookings: []
       };
     }
-    acc[tourId].bookings.push(booking);
+    acc[groupId].bookings.push(booking);
     return acc;
   }, {});
 
@@ -100,6 +151,37 @@ const BookingList = () => {
     tourGroup.packageName.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '50vh' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+  const handleBatchUpdateStatus = async () => {
+    try {
+      setUpdatingBatch(true);
+      // Assuming your API has an updateBookingStatus method
+
+      const values: TourStatus = {
+        tourId: selectedGroupId,
+        statusBooking: batchStatus
+      };
+
+      await bookTourService.updateBookingStatus(values);
+
+      enqueueSnackbar('Cập nhật trạng thái  tour thành công', { variant: 'success' });
+      setSelectedBookings([]);
+      setBatchUpdateOpen(false);
+      fetchBookings();
+    } catch (error) {
+      console.error('Failed to update bookings in batch:', error);
+      enqueueSnackbar('Không thể cập nhật trạng thái đặt tour', { variant: 'error' });
+    } finally {
+      setUpdatingBatch(false);
+    }
+  };
+
   return (
     <>
       <Stack spacing={3} sx={{ mb: 3 }}>
@@ -118,9 +200,8 @@ const BookingList = () => {
           }}
         />
       </Stack>
-
       {filteredGroupedBookings.map(([tourId, tourGroup]) => (
-        <Card key={tourId} sx={{ mb: 2, boxShadow: 3 }} onClick={() => toggleTour(tourId)}>
+        <Card key={tourId} sx={{ mb: 2, boxShadow: 3 }}>
           <CardContent>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Stack direction="row" alignItems="center" spacing={2}>
@@ -129,23 +210,25 @@ const BookingList = () => {
                   <Typography variant="h6" sx={{ fontWeight: 'medium' }}>
                     {tourGroup.packageName}
                   </Typography>
-                  <Stack direction="row" spacing={1} alignItems="center">
-                    <Typography variant="body2" color="text.secondary">
-                      {tourGroup.bookings.length} hóa đơn đặt
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      •
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      {new Intl.NumberFormat('vi-VN').format(
-                        tourGroup.bookings.reduce((sum, booking) => sum + calculatePriceBreakdown(booking).total, 0)
-                      )}{' '}
-                      VNĐ
-                    </Typography>
-                  </Stack>
+
+                  <Typography variant="body2">
+                    Số chỗ: {tourGroup.totalBookedPeople}/{tourGroup.slot}
+                  </Typography>
+
+                  <Typography variant="body2" color="text.secondary">
+                    Mã nhóm: {tourGroup.bookings[0]?.groupId}
+                  </Typography>
+
+                  <Box>
+                    <Chip
+                      label={getBookingStatusText(tourGroup.bookings[0]?.statusBooking)}
+                      color={getBookingStatusColor(tourGroup.bookings[0]?.statusBooking)}
+                      size="small"
+                    />
+                  </Box>
                 </Stack>
               </Stack>
-              <IconButton sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }}>
+              <IconButton sx={{ backgroundColor: 'rgba(0, 0, 0, 0.04)' }} onClick={() => toggleTour(tourId)}>
                 {expandedTours[tourId] ? <ArrowUpOutlined /> : <ArrowDownOutlined />}
               </IconButton>
             </Stack>
@@ -164,7 +247,13 @@ const BookingList = () => {
                   </TableHead>
                   <TableBody>
                     {tourGroup.bookings.map((booking) => (
-                      <TableRow key={booking.bookingId} hover onClick={() => setSelectedBooking(booking)} sx={{ cursor: 'pointer' }}>
+                      <TableRow
+                        key={booking.bookingId}
+                        hover
+                        onClick={() => setSelectedBooking(booking)}
+                        sx={{ cursor: 'pointer' }}
+                        selected={selectedBookings.includes(booking.bookingId)}
+                      >
                         <TableCell>{booking.bookingId}</TableCell>
                         <TableCell>{new Date(booking.bookingDate).toLocaleDateString('vi-VN')}</TableCell>
                         <TableCell>
@@ -189,12 +278,114 @@ const BookingList = () => {
                 </Table>
               </TableContainer>
             )}
+
+            <Stack direction="row" spacing={2} sx={{ marginTop: 3 }}>
+              {/* Show "Chờ xác nhận" button only if not already in Processing status */}
+              {tourGroup.bookings[0]?.statusBooking === StatusBooking.ConfirmBooking && (
+                <Button
+                  variant="contained"
+                  color="warning"
+                  size="small"
+                  onClick={() => {
+                    setSelectedGroupId(tourGroup.groupId);
+                    setBatchStatus(StatusBooking.Processing);
+                    setBatchUpdateOpen(true);
+                  }}
+                  startIcon={<span style={{ fontSize: '1.2rem' }}>⏳</span>}
+                >
+                  Chờ xác nhận
+                </Button>
+              )}
+
+              {/* Show "Xác nhận đủ khách" button only if in Processing status */}
+              {tourGroup.bookings[0]?.statusBooking === StatusBooking.Processing && (
+                <Button
+                  variant="contained"
+                  color="info"
+                  size="small"
+                  onClick={() => {
+                    setSelectedGroupId(tourGroup.groupId);
+                    setBatchStatus(StatusBooking.ConfirmBooking);
+                    setBatchUpdateOpen(true);
+                  }}
+                  startIcon={<span style={{ fontSize: '1.2rem' }}>✓</span>}
+                >
+                  Xác nhận đủ khách
+                </Button>
+              )}
+
+              {/* Show "Đang diễn ra" button only if in ConfirmBooking status */}
+              {tourGroup?.bookings[0]?.statusBooking === StatusBooking.ConfirmBooking && (
+                <Stack direction="row" spacing={1}>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="primary"
+                    startIcon={<span style={{ fontSize: '1.2rem' }}>✏️</span>}
+                    onClick={() => {
+                      // Chuyển đến trang chi tiết tour hoặc trang quản lý tour
+                      navigate(`${TOURISM_COMPANY_URLs.TOUR_PACKAGE.UPDATE}?id=${tourGroup?.bookings[0]?.agriculturalTourPackage?.tourId}`);
+                    }}
+                  >
+                    Cập nhật hướng dẫn viên, tài xế
+                  </Button>
+                  <Button
+                    variant="contained"
+                    size="small"
+                    color="inherit"
+                    onClick={() => {
+                      setSelectedGroupId(tourGroup?.groupId);
+                      setBatchStatus(StatusBooking.InProgress);
+                      setBatchUpdateOpen(true);
+                    }}
+                    startIcon={<ClockCircleOutlined />}
+                  >
+                    Bắt đầu tour
+                  </Button>
+                </Stack>
+              )}
+
+              {/* Show "Hoàn thành" button only if in InProgress status */}
+              {tourGroup?.bookings[0]?.statusBooking === StatusBooking.InProgress && (
+                <Button
+                  variant="contained"
+                  color="success"
+                  size="small"
+                  onClick={() => {
+                    setSelectedGroupId(tourGroup?.groupId);
+                    setBatchStatus(StatusBooking.Completed);
+                    setBatchUpdateOpen(true);
+                  }}
+                  startIcon={<span style={{ fontSize: '1.2rem' }}>✅</span>}
+                >
+                  Hoàn thành
+                </Button>
+              )}
+
+              {/* Show "Hủy" button for all statuses except Completed and Canceled */}
+              {tourGroup?.bookings[0]?.statusBooking !== StatusBooking.Completed &&
+                tourGroup?.bookings[0]?.statusBooking !== StatusBooking.InProgress &&
+                tourGroup?.bookings[0]?.statusBooking !== StatusBooking.ConfirmBooking &&
+                tourGroup?.bookings[0]?.statusBooking !== StatusBooking.Canceled && (
+                  <Button
+                    variant="contained"
+                    color="error"
+                    size="small"
+                    onClick={() => {
+                      setSelectedGroupId(tourGroup.groupId);
+                      setBatchStatus(StatusBooking.Canceled);
+                      setBatchUpdateOpen(true);
+                    }}
+                    startIcon={<span style={{ fontSize: '1.2rem' }}>❌</span>}
+                  >
+                    Hủy tour
+                  </Button>
+                )}
+            </Stack>
           </CardContent>
         </Card>
       ))}
-
       {filteredGroupedBookings.length === 0 && <Typography>Không tìm thấy dữ liệu</Typography>}
-
       <Dialog open={Boolean(selectedBooking)} onClose={() => setSelectedBooking(null)} maxWidth="md" fullWidth>
         {selectedBooking && (
           <>
@@ -363,13 +554,14 @@ const BookingList = () => {
                         </Grid>
                       </Grid>
                       <Divider />
-                      <Stack direction="row" spacing={2} alignItems="center">
+
+                      <Stack direction="row" spacing={2} alignItems="center" sx={{ mt: 2 }}>
                         <Typography variant="body2">
-                          <strong>Trạng thái đặt tour:</strong>
+                          <strong>Trạng thái hiện tại:</strong>
                         </Typography>
                         <Chip
                           label={getBookingStatusText(selectedBooking.statusBooking)}
-                          color={selectedBooking.statusBooking === 1 ? 'success' : 'warning'}
+                          color={getBookingStatusColor(selectedBooking.statusBooking)}
                           size="small"
                         />
                       </Stack>
@@ -380,6 +572,30 @@ const BookingList = () => {
             </DialogContent>
           </>
         )}
+      </Dialog>
+      <Dialog open={batchUpdateOpen} onClose={() => setBatchUpdateOpen(false)}>
+        <DialogTitle>
+          <Typography variant="h6">Cập nhật trạng thái tour</Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={3} sx={{ minWidth: 300, pt: 1 }}>
+            <Typography>Bạn có chắc muốn cập nhật trạng thái tour.</Typography>
+
+            <Stack direction="row" spacing={2} justifyContent="flex-end">
+              <Button color="error" onClick={() => setBatchUpdateOpen(false)}>
+                Hủy
+              </Button>
+              <Button
+                variant="contained"
+                color="primary"
+                onClick={handleBatchUpdateStatus}
+                disabled={updatingBatch || batchStatus === null}
+              >
+                {updatingBatch ? <CircularProgress size={24} /> : 'Xác nhận'}
+              </Button>
+            </Stack>
+          </Stack>
+        </DialogContent>
       </Dialog>
     </>
   );
