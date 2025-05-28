@@ -26,6 +26,7 @@ const validationSchema = Yup.object().shape({
   breakTimeInMinutesType: Yup.number().required('Loại thời gian nghỉ là bắt buộc'),
   startTime: Yup.date().required('Thời gian bắt đầu là bắt buộc'),
   endTime: Yup.date().required('Thời gian kết thúc là bắt buộc'),
+  maxCapacity: Yup.number().min(1, 'Số tour tối đa phải lớn hơn 0').typeError('Số tour tối đa phải là số'),
   imgs: Yup.array().of(Yup.string()),
   products: Yup.array().of(
     Yup.object().shape({
@@ -91,7 +92,8 @@ const UpdateActivity = () => {
             startTime: activityData.startTime,
             endTime: activityData.endTime,
             imgs: activityData.imgs || [],
-            products: activityData.products || []
+            products: activityData.products || [],
+            maxCapacity: activityData.maxCapacity || 1
           }}
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
@@ -110,6 +112,20 @@ const UpdateActivity = () => {
                     error={touched.activityName && Boolean(errors.activityName)}
                     helperText={touched.activityName && errors.activityName}
                   />
+                </Grid>
+
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    type="number"
+                    label="Giới hạn số tour"
+                    name="maxCapacity"
+                    value={values.maxCapacity}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    error={touched.maxCapacity && Boolean(errors.maxCapacity)}
+                    helperText={touched.maxCapacity && errors.maxCapacity}
+                  ></TextField>
                 </Grid>
 
                 {/* Add new fields for time type selection */}

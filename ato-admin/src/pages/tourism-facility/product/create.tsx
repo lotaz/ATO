@@ -29,7 +29,6 @@ const initialValues: TCreateProduct = {
   description: '',
   additional: '',
   nutritionType: '',
-  age: '',
   ingredient: '',
   volume: '',
   origin: '',
@@ -218,18 +217,6 @@ const CreateProduct = () => {
                     name="nutritionType"
                     label="Loại dinh dưỡng"
                     value={values.nutritionType}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Grid>
-
-                <Grid item xs={12} md={6}>
-                  <TextField
-                    fullWidth
-                    name="age"
-                    label="Tuổi"
-                    value={values.age}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     InputLabelProps={{ shrink: true }}
