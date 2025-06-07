@@ -21,22 +21,24 @@ const FeedbackSection = ({ entityId, entityType }) => {
   const [feedbacks, setFeedbacks] = useState([]);
 
   useEffect(() => {
-    const fetchFeedbacks = async () => {
-      if (!entityId) return;
+    try {
+      const fetchFeedbacks = async () => {
+        if (!entityId) return;
 
-      try {
-        const response = await get(
-          entityType === "product"
-            ? `/tourist/feedback/get-list-product-feedbacks/${entityId}`
-            : `/tourist/feedback/get-list-tour-feedbacks/${entityId}`
-        );
-        setFeedbacks(response.data);
-      } catch (error) {
-        console.error("Error fetching feedbacks:", error);
-      }
-    };
+        try {
+          const response = await get(
+            entityType === "product"
+              ? `/tourist/feedback/get-list-product-feedbacks/${entityId}`
+              : `/tourist/feedback/get-list-tour-feedbacks/${entityId}`
+          );
+          setFeedbacks(response.data);
+        } catch (error) {
+          console.error("Error fetching feedbacks:", error);
+        }
+      };
 
-    fetchFeedbacks();
+      fetchFeedbacks();
+    } catch {}
   }, [entityId, reload]);
 
   console.log("feedbacks", feedbacks);

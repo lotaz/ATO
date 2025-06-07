@@ -83,6 +83,8 @@ const UpdateTourPackage = () => {
     return <Typography>Loading...</Typography>;
   }
 
+  console.log(tourPackage); // Log the tourPackage object t
+
   const initialValues = {
     packageName: tourPackage?.packageName || '',
     description: tourPackage?.description || '',
@@ -96,7 +98,7 @@ const UpdateTourPackage = () => {
     durations: tourPackage?.durations || 0,
     durationsType: tourPackage?.durationsType || TimeType.DAY,
     tourGuides: tourPackage?.tourGuides?.map((g: any) => g.guideId) || [],
-    statusActive: tourPackage?.statusActive || 0,
+    statusActive: tourPackage?.statusActive ?? 1,
     gatheringLocation: tourPackage?.gatheringLocation || '',
     tourDestinations:
       tourPackage?.tourDestinations?.map((dest: any) => ({

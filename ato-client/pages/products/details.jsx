@@ -5,7 +5,6 @@ import {
   Button,
   Card,
   CardContent,
-  Chip,
   Container,
   Grid,
   ImageList,
@@ -16,18 +15,17 @@ import {
   styled,
   Typography,
 } from "@mui/material";
-import BazaarCard from "components/BazaarCard";
-import { FlexBetween, FlexBox } from "components/flex-box";
+import FeedbackSection from "components/feedback/FeedbackSection";
+import { FlexBox } from "components/flex-box";
 import ShopLayout2 from "components/layouts/ShopLayout2";
 import { H2, H3, H4 } from "components/Typography";
 import { API_URLs } from "constants/api-url";
+import { useAppContext } from "contexts/AppContext";
 import { get } from "helpers/axios-helper";
 import { useRouter } from "next/router";
+import { useSnackbar } from "notistack";
 import { useState } from "react";
 import useSWR from "swr";
-import { useAppContext } from "contexts/AppContext";
-import { useSnackbar } from "notistack";
-import FeedbackSection from "components/feedback/FeedbackSection";
 
 const fetcher = (url) => get(url).then((res) => res.data);
 const PRODUCT_CATEGORIES = {
@@ -53,16 +51,23 @@ const ButtonBox = styled(FlexBox)(({ theme }) => ({
 })); // =============================================================
 const ProductDetails = () => {
   const { enqueueSnackbar } = useSnackbar();
-
   const router = useRouter();
-  const { id } = router.query;
+
+  if (!router.isReady) return <div>Loading...</div>;
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("productId");
+  const ocopId = params.get("ocopId");
+  console.log("id", id);
   const [selectedImage, setSelectedImage] = useState(0);
   const [showFullDescription, setShowFullDescription] = useState(false);
   const {
     data: product,
     error,
     isLoading,
-  } = useSWR(id ? `${API_URLs.PRODUCT.DETAILS}/${id}` : null, fetcher);
+  } = useSWR(
+    id ? `${API_URLs.PRODUCT.DETAILS}/${id}/${ocopId}` : null,
+    fetcher
+  );
   const { state, dispatch } = useAppContext();
 
   if (isLoading) return <div>Loading...</div>;
@@ -196,6 +201,13 @@ const ProductDetails = () => {
             />
           </ListItem>
         )}
+
+        <ListItem>
+          <ListItemText
+            primary="Ngày hết hạn"
+            secondary={new Date(product.expirationDate).toLocaleString()}
+          />
+        </ListItem>
       </List>
     </Card>
   );
