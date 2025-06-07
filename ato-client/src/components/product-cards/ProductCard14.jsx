@@ -136,7 +136,7 @@ const ProductCard14 = (props) => {
   const router = useRouter();
 
   const handleClick = () => {
-    router.push(`/products/${id}`);
+    router.push(`/products/details?productId=${id}&ocopId=${product.ocopId}`);
   };
 
   const { palette } = useTheme();
@@ -260,6 +260,13 @@ const ProductCard14 = (props) => {
             <FlexBox gap={1} alignItems="center" mt={0.5}>
               <Box fontWeight="600" color="error.main">
                 đ{price?.toLocaleString()}
+              </Box>
+            </FlexBox>
+
+            <FlexBox gap={1} alignItems="center" mt={0.5}>
+              <Box fontWeight="600" color="error.main">
+                Ngày hết hạn:{" "}
+                {new Date(product.expirationDate).toLocaleString()}
               </Box>
             </FlexBox>
           </Box>

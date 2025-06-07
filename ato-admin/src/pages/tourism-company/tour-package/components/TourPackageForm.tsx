@@ -26,7 +26,9 @@ import {
   Chip,
   IconButton,
   Alert,
-  Tooltip
+  Tooltip,
+  Switch,
+  FormControlLabel
 } from '@mui/material';
 import { DateTimePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs';
@@ -159,6 +161,8 @@ const TourPackageForm = ({
     setFieldValue('tourDestinations', updatedDestinations);
   };
 
+  console.log(formik.values.statusActive);
+
   return (
     <form onSubmit={handleSubmit}>
       <Card>
@@ -230,6 +234,18 @@ const TourPackageForm = ({
                   error={Boolean(touched.gatheringLocation && errors.gatheringLocation)}
                   helperText={errors.gatheringLocation}
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormControlLabel
+                  control={
+                    <Switch
+                      checked={formik.values.statusActive === 0}
+                      onChange={(e) => formik.setFieldValue('statusActive', e.target.checked ? 0 : 1)}
+                      name="statusActive"
+                    />
+                  }
+                  label="Đang hoạt động"
+                />{' '}
               </Grid>
             </Grid>
           </TabPanel>

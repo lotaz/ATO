@@ -22,10 +22,10 @@ export const useTourPackageData = (packageId: string) => {
     const fetchData = async () => {
       try {
         const [driversResponse, accommodationsResponse, tourPackagesResponse, tourGuideResponse] = await Promise.all([
-          driverService.getAvailableDrivers(packageId),
+          packageId ? driverService.getAvailableDrivers(packageId) : driverService.getAllAvailableDrivers(),
           accommodationService.getAccommodations(),
           tourismPackageService.getListTourismPackages(),
-          tourGuideService.getTourGuidesAvailable(packageId)
+          packageId ? tourGuideService.getTourGuidesAvailable(packageId) : tourGuideService.getAllTourGuidesAvailable()
         ]);
 
         console.log('tourPackagesResponse', tourPackagesResponse.data);

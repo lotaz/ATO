@@ -6,6 +6,7 @@ const TOUR_GUIDE_API = '/tour-company/guideteams';
 export const tourGuideService = {
   getTourGuides: async () => await get<TourGuideResponse[]>(`${TOUR_GUIDE_API}/get-list-guide-teams`),
   getTourGuidesAvailable: async (packageId: string) => await get<TourGuideResponse[]>(`${TOUR_GUIDE_API}/available/${packageId}`),
+  getAllTourGuidesAvailable: async () => await get<TourGuideResponse[]>(`${TOUR_GUIDE_API}/available`),
 
   getTourGuide: async (id: string) => await get<TourGuideResponse>(`${TOUR_GUIDE_API}/get-guide-team/${id}`),
 

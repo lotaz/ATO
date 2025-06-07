@@ -34,6 +34,7 @@ export interface FormValues {
   durationsType: TimeType;
   tourGuides: string[];
   gatheringLocation?: string;
+  statusActive: number;
   tourDestinations: {
     title: string;
     description: string;
@@ -64,7 +65,8 @@ export const createTourInitialValues: FormValues = {
   durationsType: TimeType.DAY,
   tourGuides: [],
   tourDestinations: [],
-  gatheringLocation: ''
+  gatheringLocation: '',
+  statusActive: 1
 };
 
 export const createTourPackageSchema = Yup.object().shape({
